@@ -13,12 +13,13 @@ const __dirname = dirname(__filename);
 const app = express();
 app.get("/products",(req, res) => { });
 
+
 app.get('/', (req, res) => {
 res.sendFile(path.join(__dirname, "../frontend", "index.html"));
 })
 
-app.get('/signup', (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
+app.get('/forgotpass', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "forgotpass.html"));
     })
 
 dotenv.config();
