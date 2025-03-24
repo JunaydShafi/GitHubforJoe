@@ -17,6 +17,10 @@ app.get('/', (req, res) => {
 res.sendFile(path.join(__dirname, "../frontend", "index.html"));
 })
 
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
+    })
+
 dotenv.config();
 //console.log(process.env.MONGO_URI)
 
