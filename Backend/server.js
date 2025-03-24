@@ -3,9 +3,19 @@ import express from "express";
 import dotenv from "dotenv"; 
 import { connectDB } from "./config/db.js"; // make sure it is db.js and not just db
 
+import path from "path";
+import {fileURLToPath} from 'url';
+import {dirname} from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 app.get("/products",(req, res) => { });
+
+app.get('/', (req, res) => {
+res.sendFile(path.join(__dirname, "../frontend", "index.html"));
+})
 
 dotenv.config();
 //console.log(process.env.MONGO_URI)
