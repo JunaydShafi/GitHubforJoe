@@ -18,8 +18,22 @@ res.sendFile(path.join(__dirname, "../frontend", "index.html"));
 })
 
 app.get('/signup', (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
+res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
+})
+
+app.get('/createAccount', (req, res) => {
+res.sendFile(path.join(__dirname, "../frontend", "createAccount.html"));
+})
+
+app.get('/style', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "style.css"));
     })
+
+    //app.get('images/JoesWallpaper.png', (req, res) => {
+     //   res.sendFile(path.join(__dirname, "../frontend/images", "images/JoesWallpaper.png"));
+      //  })
+
+    //app.use(express.static(path.join(__dirname, 'frontend')));
 
 dotenv.config();
 //console.log(process.env.MONGO_URI)
