@@ -17,6 +17,50 @@ app.get('/', (req, res) => {
 res.sendFile(path.join(__dirname, "../frontend", "index.html"));
 })
 
+app.get('/customerMainPage', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "customerMainPage.html"));
+    })
+
+app.get('/customerJobsProfile', (req, res) => {
+res.sendFile(path.join(__dirname, "../frontend", "customerJobsProfile.html"));
+})
+
+app.get('/customerRequestAppointment', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "customerRequestAppointment.html"));
+    })
+
+app.get('/myCars', (req, res) => {
+res.sendFile(path.join(__dirname, "../frontend", "myCars.html"));
+})
+
+app.get('/upcomingAppointment', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "upcomingAppointment.html"));
+    })
+
+app.get('/jobProgress', (req, res) => {
+res.sendFile(path.join(__dirname, "../frontend", "jobProgress.html"));
+})
+
+app.get('/jobHistory', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "jobHistory.html"));
+    })
+
+app.get('/jobReview', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "jobReview.html"));
+    })
+
+app.get('/requestSent', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "requestSent.html"));
+    })
+
+app.get('/carInfo', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "carInfo.html"));
+    })
+
+app.get('/addCar', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "addCar.html"));
+    })
+    
 app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
     })
