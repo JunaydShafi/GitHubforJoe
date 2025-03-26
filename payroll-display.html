@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payroll</title>
+
+  <!-- Link to external CSS for styling -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Header section with logo/title and action buttons -->
+  <header style="background-color: #13574a; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <!-- Business name -->
+    <div style="font-size: 24px; font-weight: bold;">JOE'S AUTO SHOP</div>
+
+    <!-- Right-side buttons: Log Out & Main Page -->
+    <div>
+      <button id="logoutBtn" style="margin-right: 10px;">Log Out</button>
+      <button id="mainPageBtn">Main Page</button>
+    </div>
+  </header>
+
+  <!-- Main content area -->
+  <main style="padding: 40px;">
+    <!-- Section title -->
+    <h2><u>Expected Upcoming Payroll</u></h2>
+    
+    <!-- Grid container for payroll details -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 40px;">
+      
+      <!-- Hours section -->
+      <div class="payroll-box">
+        <h3><u>Hours</u></h3>
+        <div class="payroll-value">Hours recorded within 2 weeks</div>
+      </div>
+
+      <!-- Rate section -->
+      <div class="payroll-box">
+        <h3><u>Rate</u></h3>
+        <div class="payroll-value">Employee rate from database</div>
+      </div>
+
+      <!-- Expected Pay section -->
+      <div class="payroll-box">
+        <h3><u>Expected</u></h3>
+        <div class="payroll-value">Shows Calculation</div>
+      </div>
+
+      <!-- Overtime section (now aligned in the same row as others) -->
+      <div class="payroll-box">
+        <h3><u>Overtime</u></h3>
+        <div class="payroll-value">hrs - 40 (db)</div>
+      </div>
+    </div>
+
+    <!-- Back button at bottom of page -->
+    <button id="backBtn" style="margin-top: 50px;">Back</button>
+  </main>
+
+  <!-- Link to JavaScript for dynamic behavior -->
+  <script src="script.js"></script>
+</body>
+</html>
