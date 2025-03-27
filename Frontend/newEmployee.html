@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Employee</title>
+</head>
+<body>
+    <div>
+        <h1>Administator</h1>
+    </div>
+
+    <form>
+        <p>Input Employee Info</p>
+        <label for="fname">First Name</label><br>
+        <input id="fname" required><br>
+        <label for="lname">Last Name</label><br>
+        <input id="lname" required><br>
+        <label for="eemail">Email</label><br>
+        <input type="email" id="eemail" required><br>
+        <label for="eid">Employee ID Number</label><br>
+        <input id="eid" minlength="7" maxlength="7" size="7" required><br>
+        <label for="prate">Hourly Rate</label><br>
+        <input id="prate" maxlength="5" size="5" required><br>
+        <label for="isadmin">Employee is Admin</label><br>
+        <input type="checkbox" id="isadmin"><br>
+        <input type="submit" onclick="location.href='payroll'">
+    </form>
+</body>
+</html>
