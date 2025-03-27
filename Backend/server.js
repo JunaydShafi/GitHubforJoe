@@ -11,7 +11,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-app.get("/products",(req, res) => { });
+
+app.use(express.static(path.join(__dirname,'..?frontend')));
 
 app.get('/', (req, res) => {
 res.sendFile(path.join(__dirname, "../frontend", "index.html"));
@@ -38,6 +39,14 @@ app.get('/newEmployee', (req,res)=>{
 
 app.get('/payroll', (req,res)=>{
     res.sendFile(path.join(__dirname, "../frontend", "payroll.html"));
+})
+
+app.get('/approval', (req,res)=>{
+    res.sendFile(path.join(__dirname, "../frontend", "approval.html"));
+})
+
+app.get('/createJob',(req,res)=>{
+    res.sendFile(path.join(__dirname,"../frontend","createJob.html"));
 })
 
 dotenv.config();
