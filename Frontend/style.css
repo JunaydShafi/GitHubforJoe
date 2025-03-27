@@ -3,8 +3,9 @@
 :root{
     --accent-color: #1a6346;
     --base-color: white;
-    --text-color: black;
+    --text-color: grey;
     --input-color: white;
+    --grey-color: #2e302b;
 }
 
 *{
@@ -15,7 +16,7 @@
 html{
     font-family: Poppins, Segoe UI, sans-serif;
     font-size: 12pt;
-    color: var(--text-color);
+    color: var(--base-color);
     text-align: center;
 }
 
@@ -24,19 +25,21 @@ body{
     background-image: url(images/JoesWallpaper.png);
     background-size: cover;
     background-position: right;
-    overflow: hidden;
+    overflow: hidden; /*Overflow makes it so you cannot scroll*/
 }
 
 .wrapper{
-    box-sizing: border-box;
-    background-color: var(--accent-color);
-    height: 100vh;
-    width: max(40%, 600px);
-    padding: 10px;
-    border-radius: 0 20px 20px 0;
+    width: 800px;
+    height: 350px;
+    margin: 10% auto;
+    padding: 140px;
+    background-color: rgba(26, 99, 70,0.9);
+    box-shadow: 0px 4px 10px black;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 h1{
@@ -48,8 +51,8 @@ h1{
 
 form{
     width: min(400px, 100%);
-    margin-top: 20px;
-    margin-bottom: 50px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -112,8 +115,8 @@ form button{
     border: none;
     border-radius: 1000px;
     padding: 0.85em 4em;
-    background-color: var(black);
-    color: var(white);
+    background-color: var(--grey-color);
+    color: var(--base-color);
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;

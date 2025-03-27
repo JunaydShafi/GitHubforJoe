@@ -32,11 +32,6 @@ app.get('/backend/website.js', (req, res) => {
 
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-    //app.get('images/JoesWallpaper.png', (req, res) => {
-     //   res.sendFile(path.join(__dirname, "../frontend/images", "images/JoesWallpaper.png"));
-      //  })
-
-    //app.use(express.static(path.join(__dirname, 'frontend')));
 
 dotenv.config();
 //console.log(process.env.MONGO_URI)
