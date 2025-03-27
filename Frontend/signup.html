@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup Page</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
     <body>
         <div class="wrapper">
             <h1>Log In</h1>
+            <p id = "error-message"></p>
             <form>
 
                 <div>
 
                     <label for="email-input">
-                        <span>@</span>
+                        <span style="color:black">@</span>
                     </label>
 
                     <input type="email" name = "email" id = "email-input" placeholder="Email">
@@ -29,7 +30,11 @@
 
                 <button type="submit">Login</button>
             </form>
-            <p>Don't have an Account? <button onclick="location.href='createAccount'">Create An Account</button>  </p>
+            <div class="account-box">
+                <p>Don't have an Account? 
+                    <button onclick="location.href='createAccount'">Create An Account</button>  
+                </p>
+            </div>
         </div>
     </body>
 </html>

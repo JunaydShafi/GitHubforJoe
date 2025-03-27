@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 :root{
-    --accent-color:purple;
+    --accent-color: #1a6346;
     --base-color: white;
     --text-color: black;
     --input-color: white;
@@ -29,7 +29,7 @@ body{
 
 .wrapper{
     box-sizing: border-box;
-    background-color: var(--base-color);
+    background-color: var(--accent-color);
     height: 100vh;
     width: max(40%, 600px);
     padding: 10px;
@@ -112,8 +112,8 @@ form button{
     border: none;
     border-radius: 1000px;
     padding: 0.85em 4em;
-    background-color: var(--accent-color);
-    color: var(--base-color);
+    background-color: var(black);
+    color: var(white);
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
@@ -142,4 +142,32 @@ form div.incorrect label{
 
 form div.incorrect input{
     border-color: red;
+}
+
+#error_message{
+    color: red;
+}
+
+.account-box {
+    border: 2px solid #2e302b;   /* Creates a border */
+    padding: 10px;            /* Adds space inside the box */
+    display: inline-block;     /* Shrinks box to fit content */
+    border-radius: 5px;        /* Rounded corners */
+    background-color: #2e302b; /* Light background */
+    text-align: center;        /* Centers text */
+    margin: 10px 0;            /* Adds space above and below */
+    color:white;
+}
+
+.account-box button {
+    background-color: #2e302b; /* Blue button */
+    color: white;              /* White text */
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.account-box button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
 }

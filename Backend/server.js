@@ -1,6 +1,7 @@
 //const express = require('express');
 import express from "express";
 import dotenv from "dotenv"; 
+//import application from application;
 import { connectDB } from "./config/db.js"; // make sure it is db.js and not just db
 
 import path from "path";
@@ -25,9 +26,11 @@ app.get('/createAccount', (req, res) => {
 res.sendFile(path.join(__dirname, "../frontend", "createAccount.html"));
 })
 
-app.get('/style', (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "style.css"));
-    })
+app.get('/backend/website.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'website.js'));
+});
+
+app.use(express.static(path.join(__dirname, '../frontend')));
 
     //app.get('images/JoesWallpaper.png', (req, res) => {
      //   res.sendFile(path.join(__dirname, "../frontend/images", "images/JoesWallpaper.png"));
