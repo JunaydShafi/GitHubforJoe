@@ -33,7 +33,7 @@ body{
     height: 350px;
     margin: 10% auto;
     padding: 140px;
-    background-color: rgba(26, 99, 70,0.9);
+    background-color: rgba(26, 99, 70,0.9);/*have to use a rgb of the color to add 0.9 to give transparancy*/
     box-shadow: 0px 4px 10px black;
     border-radius: 20px;
     display: flex;
@@ -156,14 +156,14 @@ form div.incorrect input{
     padding: 10px;            /* Adds space inside the box */
     display: inline-block;     /* Shrinks box to fit content */
     border-radius: 5px;        /* Rounded corners */
-    background-color: #2e302b; /* Light background */
+    background-color: #2e302b; /* grey background */
     text-align: center;        /* Centers text */
     margin: 10px 0;            /* Adds space above and below */
     color:white;
 }
 
 .account-box button {
-    background-color: #2e302b; /* Blue button */
+    background-color: #2e302b; /* grey backround button */
     color: white;              /* White text */
     border: none;
     padding: 5px 10px;

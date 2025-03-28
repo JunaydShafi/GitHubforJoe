@@ -8,17 +8,17 @@ const error_message = document.getElementById('error-message')
 
 form.addEventListener('submit', (e) => {
 
-    let errors = []
+    let errors = [] // array to store errors
 
     if(firstname_input)
     {// if valid firstname then go to signup
-        errors = getSignupFromErrors(firstname_input.ariaValueMax, email_input.ariaValueMax, phonenumber_input.ariaValueMax, password_input.ariaValueMax, confirm_input.value)
+        errors = getSignupFromErrors(firstname_input.value, email_input.value, phonenumber_input.value, password_input.value, confirm_input.value)
     }
     else{// if their is no firstname then we are in login
         errors = getLoginFormErrors(email_input.value, password_input.value)
     }
 
-    if(errors.length > 0){
+    if(errors.length > 0){// if there are anny errors
         e.preventDefault()
         error_message.innerText = errors.join('. ')
     }
@@ -35,10 +35,10 @@ function getSignupFromErrors(firstname, email, phonenumber, password, confirmpas
     }
 
     if(email === '' || email == null)
-        {
-            errors.push('email is required')
-            email_input.parentElement.classList.add('incorrect')
-        }
+    {
+        errors.push('email is required')
+        email_input.parentElement.classList.add('incorrect')
+    }
 
     if(phonenumber === '' || phonenumber == null)
         {
@@ -51,5 +51,55 @@ function getSignupFromErrors(firstname, email, phonenumber, password, confirmpas
             errors.push('password is required')
             password_input.parentElement.classList.add('incorrect')
         }
+
+    if(password.length < 8)
+    {   
+        errors.push('Password must have at least 8 characters')
+        password_input.parentElement.classList.add('incorrect')
+    }
+
+    
+    if(password !== confirmpassword)
+    {
+        errors.push('Password does not match confirm password')
+        password_input.parentElement.classList.add('incorrect')
+        confirm_input.parentElement.classList.add('incorrect')
+    }
     return errors;
 }
+
+function getLoginFormErrors(email, password)
+{
+    let errors = []
+
+    if(email === '' || email == null)
+    {
+        errors.push('email is required')
+        email_input.parentElement.classList.add('incorrect')
+    }
+
+    if(password === '' || password == null)
+    {
+        errors.push('password is required')
+        password_input.parentElement.classList.add('incorrect')
+    }
+    if(password.length < 8)
+    {   
+        errors.push('Password must have at least 8 characters')
+        password_input.parentElement.classList.add('incorrect')
+    }
+
+    return errors;
+}
+
+const allInputs = [firstname_input, email_input, phonenumber_input, password_input, confirm_input].filter(input => input != null)// array to contain all emelemts
+ 
+allInputs.forEach(input =>{// remove error message
+    input.addEventListener('input', () => {
+        if(input.parentElement.classList.contains('incorrect'))
+        {
+            input.parentElement.classList.remove('incorrect')
+            error_message.innerText =''
+        }
+    })
+})
