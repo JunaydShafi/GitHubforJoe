@@ -29,12 +29,6 @@ app.get('/images/:imageName', (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend", "images", imageName));
 });
 
-
-// Environment variables (optional for DB connection)
-//dotenv.config();
-//connectDB();
-
-// Start the server
 app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
 });
