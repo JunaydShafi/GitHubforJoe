@@ -1,0 +1,270 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f7f5;
+    color: #1a1a1a;
+  }
+  
+  header {
+    background-color: #1e1e1e;
+    color: #fff;
+    padding: 20px 30px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .container {
+    display: flex;
+    padding: 50px;
+    justify-content: center;
+    gap: 50px;
+  }
+  
+  .job-panel {
+    background-color: #eaeaea;
+    padding: 30px;
+    width: 380px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .job-panel label {
+    display: block;
+    margin: 20px 0 5px;
+    font-weight: 600;
+  }
+  
+  .job-panel input[type="text"],
+  .job-panel textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  
+  .dates {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .est-date {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .side-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .gold-button {
+    background-color: #d4af37;
+    color: #000;
+    border: none;
+    padding: 14px 24px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .gold-button:hover {
+    background-color: #b9982f;
+  }
+  
+  .back-button {
+    margin-top: 30px;
+    background-color: #2e7d32;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background-color: #1b5e20;
+  }
+  
+  /* === Payroll Page Specific === */
+
+.payroll-banner {
+    background-color: #135c48;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+    border-bottom: 4px solid #1e1e1e;
+  }
+  
+  .logo {
+    height: 50px;
+  }
+  
+  .corner-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .gold-button.small {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 5px;
+  }
+  
+  .payroll-content {
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .section-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-decoration: underline;
+  }
+  
+  .payroll-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 40px;
+    justify-items: center;
+    margin-bottom: 40px;
+  }
+  
+  .payroll-box h3 {
+    font-size: 18px;
+    text-decoration: underline;
+    margin-bottom: 10px;
+  }
+  
+  .info-box {
+    background-color: #d9d9d9;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* === Employee Dashboard Styles === */
+
+.dashboard-content {
+    padding: 50px;
+    max-width: 1000px;
+    margin: auto;
+  }
+  
+  .job-section {
+    margin-bottom: 60px;
+  }
+  
+  .section-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-bottom: 10px;
+  }
+  
+  .job-date {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .job-card {
+    background-color: #d9d9d9;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .job-card h3 {
+    font-size: 20px;
+    margin: 0;
+  }
+  
+  .dark-button {
+    background-color: #1e1e1e;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dark-button:hover {
+    background-color: #333;
+  }
+  
+  /* === Main Page (Employee) === */
+
+.header-banner {
+    background-color: #135c48;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 4px solid #1e1e1e;
+  }
+  
+  .banner-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .logo {
+    height: 50px;
+  }
+  
+  .main-employee {
+    background-color: #eaeaea;
+    padding: 60px 20px;
+    min-height: 80vh;
+    text-align: center;
+  }
+  
+  .main-button-group {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+  }
+  
+  .gold-button.large {
+    padding: 14px 40px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+  
+  .gold-button.small {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 5px;
+  }
+  
