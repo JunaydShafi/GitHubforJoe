@@ -11,6 +11,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+app.use(express.static(path.join(__dirname, "../frontend")));
+
 app.get("/products",(req, res) => { });
 
 
@@ -18,9 +20,26 @@ app.get('/', (req, res) => {
 res.sendFile(path.join(__dirname, "../frontend", "index.html"));
 })
 
+app.get('/backend/website.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'website.js'));
+});
+
+
 app.get('/forgotpass', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "forgotpass.html"));
     })
+
+   app.get('/forgotpassconf', (req, res) => {
+        res.sendFile(path.join(__dirname, "../frontend", "forgotpassconf.html"));
+        })
+
+        app.get('/resetpass', (req, res) => {
+            res.sendFile(path.join(__dirname, "../frontend", "resetpass.html"));
+            })
+    
+            app.get('/success', (req, res) => {
+                res.sendFile(path.join(__dirname, "../frontend", "success.html"));
+                })
 
 dotenv.config();
 //console.log(process.env.MONGO_URI)

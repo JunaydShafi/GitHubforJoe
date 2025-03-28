@@ -6,22 +6,27 @@
     <title>Forgot password</title>
 </head>
     <body>
-        <div style="text-align:center">
+        <div class="wrapper">
+        <link rel="stylesheet" href="style.css" />
+
         <h1>Forgot Password?</h1>
         <form onsubmit="redirecttoConfirmation(event)">
         <h2>Email</h2>
-        <form>
             <label for="email"></label>
             <input type="email" id="email" name="email" required>
           <br><br>
-          <button onclick="history.back()">Go Back</button>
-          <input type="submit" value="Submit">
-            </form>
+          <button type= "button" onclick="history.back()">Go Back</button>
+            <input type="submit" value="Send">
+        </form>
+        </div>
+
             <script>
-            function redirecttoConfirmation(event){
-                event.preventDefault();
-                window.location.href="forgotpassconf.html";
-            }
-     </script>
+                function redirecttoConfirmation(event) {
+                    event.preventDefault();
+                    window.location.href = "forgotpassconf";
+                }
+
+            </script>
         </body>
 </html>
+
