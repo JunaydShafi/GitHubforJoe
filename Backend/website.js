@@ -24,7 +24,7 @@ form.addEventListener('submit', (e) => {
     }
 })
 
-function getSignupFromErrors(firstname, email, phonenumber, password, confirmpassword)
+function getSignupFromErrors(firstname, email, phonenumber, password, confirmpassword)// catch errors for sighnup
 {
     let errors = []
 
@@ -68,7 +68,7 @@ function getSignupFromErrors(firstname, email, phonenumber, password, confirmpas
     return errors;
 }
 
-function getLoginFormErrors(email, password)
+function getLoginFormErrors(email, password)// catch errors for login page
 {
     let errors = []
 
@@ -80,7 +80,7 @@ function getLoginFormErrors(email, password)
 
     if(password === '' || password == null)
     {
-        errors.push('password is required')
+        errors.push('Password is required')
         password_input.parentElement.classList.add('incorrect')
     }
     if(password.length < 8)

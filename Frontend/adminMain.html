@@ -5,18 +5,40 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Administrator Dashbord</title>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
-    <div>
-      <h1>Administator</h1>
-  </div>
-  
-  <div>
-    <button onclick="location.href='appointments'">Appointments</button>
-    <button onclick="location.href='payroll'">Payroll</button>
-    <button onclick="location.href='reviews'">Reviews</button>
-    <button onclick="location.href='newEmployee'">New Employee</button>
-  </div>
+
+
+    <div class="header-main">
+      <div class="logo">
+        <img src="images/WhiteLogo.png" alt="Logo">
+      </div>
+      <div class = "Title">
+        <div class="title-container">
+            <div class="shop-name">Joe's AutoShop</div>
+            <div class="tagline">If it ain't Joe don't fix it!</div>
+        </div>
+        </div class="wrapperHeadder">
+          <div class="account-box-left">
+           <button onclick="location.href='index.html'">Log Out</button>
+          </div>
+        </div>
+    </div>
+
+    <div class="wrapperAdmin">
+      <form id="form">
+
+      <div>
+        <h1>Administator</h1>
+      </div>
+
+        <button onclick="location.href='appointments'">Appointments</button>
+        <button onclick="location.href='payroll'">Payroll</button>
+        <button onclick="location.href='reviews'">Reviews</button>
+        <button onclick="location.href='newEmployee'">New Employee</button>
+      </form>
+    </div>
   
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

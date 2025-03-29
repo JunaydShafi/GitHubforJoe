@@ -42,6 +42,31 @@ body{
     justify-content: center;
 }
 
+.wrapperAdmin{
+    width: 700px;
+    height: 350px;
+    margin: 10% auto;
+
+    padding: 140px;
+    background-color: rgba(26, 99, 70,0.9);/*have to use a rgb of the color to add 0.9 to give transparancy*/
+    box-shadow: 0px 4px 10px black;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.wrapperHeadder{
+    width: 1000px;
+    height: 60px;
+    margin-left: auto;
+    padding: 10px;
+    background-color: rgba(26, 99, 70,0.9);/*have to use a rgb of the color to add 0.9 to give transparancy*/
+    box-shadow: 0px 4px 10px black;
+    border-radius: 20px;
+}
+
 h1{
     font-size: 3rem;
     font-weight: 900;
@@ -174,3 +199,73 @@ form div.incorrect input{
 .account-box button:hover {
     background-color: #0056b3; /* Darker blue on hover */
 }
+
+/*These account box left is for the headder to align signout button to top right*/
+.account-box-left {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 2px solid #2e302b;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    background-color: #2e302b;
+    text-align: center;
+    color: white;
+}
+.account-box-left button {
+    background-color: #2e302b; /* grey backround button */
+    color: white;              /* White text */
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+.account-box-left button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+/*sams stuff start*/
+.header-main {
+    background-color: rgba(26, 99, 70,0.9);
+    height: 100px;
+    color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 380px; 
+    padding-right: 380px;
+    position: fixed;
+    top: 0px;
+    left: 0;
+    right: 0;
+    z-index: 999; 
+}
+
+.title {
+    display: flex;
+}
+
+.title-container {
+    margin-left: 20px;
+}
+
+.shop-name {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 0;
+}
+
+
+.tagline {
+    font-size: 1em;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.logo img {
+    width: 80px;
+    height: auto;
+}
+/*sams stuff ends here*/
