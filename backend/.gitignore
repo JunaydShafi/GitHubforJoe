@@ -1,0 +1,15 @@
+# Ignore node_modules and system files
+node_modules/
+.env
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# VS Code settings
+.vscode/
+
+# OS-specific junk
+*.swp
