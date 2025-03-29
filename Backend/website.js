@@ -92,7 +92,7 @@ function getLoginFormErrors(email, password)// catch errors for login page
     return errors;
 }
 
-const allInputs = [firstname_input, email_input, phonenumber_input, password_input, confirm_input].filter(input => input != null)// array to contain all emelemts
+const allInputs = [firstname_input, email_input, phonenumber_input, password_input, confirm_input].filter(input => input != null)// array to contain all emelemts. The filter filteres so the error messages go away
  
 allInputs.forEach(input =>{// remove error message
     input.addEventListener('input', () => {
