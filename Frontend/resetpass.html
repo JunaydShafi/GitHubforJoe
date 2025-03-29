@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reset password</title>
+</head>
+<body>
+    <div style="text-align:center">
+
+        <div class="wrapper">
+            <link rel="stylesheet" href="style.css" />
+
+        <h1>Reset Password</h1>
+
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" name="password" class="input-field" required>
+        <br><br>
+    
+        <label for="confirmPassword">Confirm New Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" class="input-field" required>
+        
+        <br><br>
+        <div class="button-container">
+        <button type= "button" onclick="confirmPassword()">Confirm</button>
+    
+        <script>
+            function confirmPassword() {
+                const newPassword = document.getElementById("newPassword").value;
+                const confirmPassword = document.getElementById("confirmPassword").value;
+            
+                if (!newPassword || !confirmPassword) {
+                alert("Please fill in both password fields.");
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+            window.location.href = "success";
+        }
+            </script>
+    
+    </body>
+</html>

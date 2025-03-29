@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -166,3 +167,138 @@ p {
     background: linear-gradient(to top, #8b1e1e, #e44242);;
     border-color: #bd2d2d;
 }
+
+
+/* ACTUAL BACKGROUND (image of cars) */
+body {
+    background-image: url("JoesWallpaper.jpg"); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh; 
+}
+/* TRANSPARENT GREEN BOX */
+.wrapper{
+  width: 350px;
+  margin:10% auto;
+  max-width: 350px;
+  padding: 120px;
+  background-color: rgba(14, 64, 25, 0.9);
+  box-shadow: 0px 4px 10px black; 
+  border-radius: 20px;
+}
+/* STYLE FOR EMAIL INPUT FIELD AND GO BACK/SEND BUTTON */
+form input, button{
+    width:150px;
+    height:30px;
+    margin-bottom: 30px;
+    border: none;
+    padding-left: 5px;
+    box-sizing: border-box;
+    font-size: 15px;
+    outline: none;
+    border-radius: 8px;
+    background-color: rgb(40, 39, 39);
+    color: rgb(236, 235, 235);
+    cursor: pointer;
+}
+/* COLOR STYLE FOR TEXT ON HEADING AND EMAIL */
+.wrapper h1, h2 {
+    color: white;
+    text-align: center;
+}
+/* ADJUSTS THE HEIGHT AND POSITION OF FORGOT PASSWORD HEADING */
+.wrapper h1 {
+    margin-top: 0;
+    position: absolute;
+    top: 150px; 
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    font-size: 22px; 
+}
+/* ADJUSTS THE HEIGHT AND POSITION OF EMAIL HEADING */
+.wrapper h2 {
+    margin-bottom: 5px; 
+    margin-top: 0;
+    position: absolute;
+    top: 180px; 
+    left: 39%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    font-size: 22px; 
+}
+/* ADJUSTS THE BOX STYLE FOR EMAIL INPUT */
+input[type="email"] {
+    width: 100%;
+    max-width: 500px;
+    margin-top: -30px;  
+    margin-bottom: 20px;
+    background-color: white;
+    color: black;
+    display: block;   
+}
+/* ADDING SPACE ABOVE THE SUBMIT ("SEND") BUTTON */
+button, 
+input[type="submit"] {
+    margin-top: 50px; 
+}
+button {
+    margin-right: 45px; /* PUSHES "Go Back" AWAY FROM "Send" */
+}
+/* ADJUSTS THE "Check your email to reset password" TEXT */
+.left-align {
+    text-align: left;
+    margin-left: 135px; 
+}
+/* STYLE FOR "New Password" and "Confirm New Password" TEXT */
+label {
+    display: block;  
+    color: white;
+    font-size: 20px;
+    text-align: left; 
+    margin-bottom: 5px; 
+    width: 100%;
+}
+/* STYLE FOR "New Password" and "Confirm New Password" BOXES */
+.input-field {
+    width: 100%; 
+    padding: 15px; 
+    margin: 0px 0; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+    font-size: 18px; 
+    height: 5px; 
+    box-sizing: border-box; 
+}
+/* SUCCESS PAGE (text below the top heading) */
+h2.go-to-home {
+    color: white;
+    font-size: 20px;
+    margin-top: 50px; 
+    margin-left: 130px; 
+
+}
+/* SUCCESS PAGE (RETURN TO HOME PAGE BUTTON) */
+.center-button {
+    width: 50%; 
+    padding: 5px; 
+    display: block; 
+    margin-left: auto; 
+    margin-right: auto; 
+    margin-top: 30px; 
+    text-align: center;
+}
+/*CONFIRMING TEST RESET PW BUTTON POSITION */
+.button-container {
+    display: flex;
+    justify-content: center; 
+    margin-right: -50px;
+}
+/*RETURN TO LOGIN AND TEST RESET PW BUTTON POSITION */
+.button-containers {
+    display: flex;
+    justify-content: flex-end;  
+    margin-right: -35px;
+}
+
