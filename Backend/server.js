@@ -52,6 +52,10 @@ app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
 })
 
+app.get('/createAccount', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "createAccount.html"));
+    })
+    
 app.get('/forgotpassconf', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "forgotpassconf.html"));
 })
@@ -167,11 +171,11 @@ dotenv.config();
 //console.log(process.env.MONGO_URI)
 
 
-app.get('/images/:imageName', (req, res) => {
+ /* app.get('/images/:imageName', (req, res) => {
     const { imageName } = req.params;
     res.sendFile(path.join(__dirname, "../Frontend", "images", imageName));
-});
-
+ });
+*/
 app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
 });

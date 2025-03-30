@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root{
+    --accent-color: #1a6346;
+    --base-color: white;
+    --text-color: grey;
+    --input-color: white;
+    --grey-color: #2e302b;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html{
+    font-family: Poppins, Segoe UI, sans-serif;
+    font-size: 12pt;
+    color: var(--base-color);
+    text-align: center;
+}
+
+body{
+    min-height: 100vh;
+    background-image: url(images/JoesWallpaper.png);
+    background-size: cover;
+    background-position: right;
+    overflow: hidden; /*Overflow makes it so you cannot scroll*/
+}
+
+.wrapper{
+    width: 800px;
+    height: 350px;
+    margin: 10% auto;
+    padding: 140px;
+    background-color: rgba(26, 99, 70,0.9);/*have to use a rgb of the color to add 0.9 to give transparancy*/
+    box-shadow: 0px 4px 10px black;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.wrapperAdmin{
+    width: 700px;
+    height: 350px;
+    margin: 10% auto;
+
+    padding: 140px;
+    background-color: rgba(26, 99, 70,0.9);/*have to use a rgb of the color to add 0.9 to give transparancy*/
+    box-shadow: 0px 4px 10px black;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.wrapperHeadder{
+    width: 1000px;
+    height: 60px;
+    margin-left: auto;
+    padding: 10px;
+    background-color: rgba(26, 99, 70,0.9);/*have to use a rgb of the color to add 0.9 to give transparancy*/
+    box-shadow: 0px 4px 10px black;
+    border-radius: 20px;
+}
+
+h1{
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+
+}
+
+form{
+    width: min(400px, 100%);
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+form > div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+form label{
+    flex-shrink: 0;
+    height: 50px;
+    width: 50px;
+    background-color: var(--base-color);
+    fill: var(--base-color);
+    color: var(--base-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+form input{
+    box-sizing: border-box;
+    flex-grow: 1;
+    min-width: 0;
+    height: 50px;
+    padding: 1em;
+    font: inherit;
+    border-radius: 0 10px 10px 0;
+    border: 2px solid var(--input-color);
+    border-left: none;
+    background-color: var(--input-color);
+    transition: 150ms ease;
+}
+
+form input:hover{
+    border-color: var(--accent-color);
+}
+
+form input:focus{
+    outline: none;
+    border-color: var(--text-color);
+}
+
+div:has(input:focus) > label{
+    background-color: var(--text-color);
+}
+
+form input::placeholder{
+    color: var(--text-color);
+}
+
+form button{
+    margin-top: 10px;
+    border: none;
+    border-radius: 1000px;
+    padding: 0.85em 4em;
+    background-color: var(--grey-color);
+    color: var(--base-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 150ms ease;
+}
+
+form button:hover{
+    background-color: var(--text-color);
+}
+
+form button:focus{
+    outline: none;
+    background-color: var(--text-color);
+}
+
+@media(max-width: 1100px){
+    .wrapper{
+        width: min(600px, 100%);
+        border-radius: 0;
+    }
+}
+
+form div.incorrect label{
+    background-color: red;
+}
+
+form div.incorrect input{
+    border-color: red;
+}
+
+#error_message{
+    color: red;
+}
+
+.account-box {
+    border: 2px solid #2e302b;   /* Creates a border */
+    padding: 10px;            /* Adds space inside the box */
+    display: inline-block;     /* Shrinks box to fit content */
+    border-radius: 5px;        /* Rounded corners */
+    background-color: #2e302b; /* grey background */
+    text-align: center;        /* Centers text */
+    margin: 10px 0;            /* Adds space above and below */
+    color:white;
+}
+
+.account-box button {
+    background-color: #2e302b; /* grey backround button */
+    color: white;              /* White text */
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.account-box button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/*These account box left is for the headder to align signout button to top right*/
+.account-box-left {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 2px solid #2e302b;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    background-color: #2e302b;
+    text-align: center;
+    color: white;
+}
+.account-box-left button {
+    background-color: #2e302b; /* grey backround button */
+    color: white;              /* White text */
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+.account-box-left button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+/*sams stuff start*/
+.header-main {
+    background-color: rgba(26, 99, 70,0.9);
+    height: 100px;
+    color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 380px; 
+    padding-right: 380px;
+    position: fixed;
+    top: 0px;
+    left: 0;
+    right: 0;
+    z-index: 999; 
+}
+
+.title {
+    display: flex;
+}
+
+.title-container {
+    margin-left: 20px;
+}
+
+.shop-name {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 0;
+}
+
+
+.tagline {
+    font-size: 1em;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.logo img {
+    width: 80px;
+    height: auto;
+}
+/*sams stuff ends here*/
