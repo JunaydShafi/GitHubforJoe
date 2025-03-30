@@ -16,16 +16,57 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 app.use(express.static(path.join(__dirname,'..?frontend')));
 
 
+
+// Main landing page
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend", "index.html"));
 });
 
+app.get('/', (req, res) => {
+res.sendFile(path.join(__dirname, "../frontend", "index.html"));
+})
+
+app.get('/backend/website.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'website.js'));
+});
+
+
+// a test page for main->make appt
 app.get('/appointment', (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend", "appointment.html"));
 });
 
 
-<!-- app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, "../Frontend", "style.css"));}); -->
+
+// Login and Sign up pages
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "login.html"))
+})
+app.get('/forgotpass', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "forgotpass.html"));
+})
+
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
+})
+
+app.get('/forgotpassconf', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "forgotpassconf.html"));
+})
+
+app.get('/resetpass', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "resetpass.html"));
+})
+
+app.get('/success', (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "success.html"));
+})
+
+
+
+// Admin pages
 
 app.get('/adminMain', (req,res)=>{
     res.sendFile(path.join(__dirname, "../frontend", "adminMain.html"));
@@ -54,79 +95,74 @@ app.get('/createJob',(req,res)=>{
     res.sendFile(path.join(__dirname,"../frontend","createJob.html"));
 })
 
-app.get('/', (req, res) => {
-res.sendFile(path.join(__dirname, "../frontend", "index.html"));
-})
-
-app.get('/backend/website.js', (req, res) => {
-    res.sendFile(path.join(__dirname, 'website.js'));
-});
 
 
-app.get('/forgotpass', (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "forgotpass.html"));
+// Customer pages
 
 app.get('/customerMainPage', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "customerMainPage.html"));
-    })
+})
 
 app.get('/customerJobsProfile', (req, res) => {
-res.sendFile(path.join(__dirname, "../frontend", "customerJobsProfile.html"));
+    res.sendFile(path.join(__dirname, "../frontend", "customerJobsProfile.html"));
 })
 
 app.get('/customerRequestAppointment', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "customerRequestAppointment.html"));
-    })
+})
 
 app.get('/myCars', (req, res) => {
-res.sendFile(path.join(__dirname, "../frontend", "myCars.html"));
+    res.sendFile(path.join(__dirname, "../frontend", "myCars.html"));
 })
 
 app.get('/upcomingAppointment', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "upcomingAppointment.html"));
-    })
+})
 
 app.get('/jobProgress', (req, res) => {
-res.sendFile(path.join(__dirname, "../frontend", "jobProgress.html"));
+    res.sendFile(path.join(__dirname, "../frontend", "jobProgress.html"));
 })
 
 app.get('/jobHistory', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "jobHistory.html"));
-    })
+})
 
 app.get('/jobReview', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "jobReview.html"));
-    })
+})
 
 app.get('/requestSent', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "requestSent.html"));
-    })
+})
 
 app.get('/carInfo', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "carInfo.html"));
-    })
+})
 
 app.get('/addCar', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "addCar.html"));
-    })
+})
     
-app.get('/signup', (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
 
-    })
 
-   app.get('/forgotpassconf', (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend", "forgotpassconf.html"));
-        })
+// Employe Pages
 
-        app.get('/resetpass', (req, res) => {
-            res.sendFile(path.join(__dirname, "../frontend", "resetpass.html"));
-            })
-    
-            app.get('/success', (req, res) => {
-                res.sendFile(path.join(__dirname, "../frontend", "success.html"));
-                })
-
+app.get("/employee-dashboard", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Frontend/employee-dashboard.html"));
+  });
+  
+  app.get("/main-employee", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Frontend/main-employee.html"));
+  });
+  
+  app.get("/employee-job-view", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Frontend/employee-job-view.html"));
+  });
+  
+  app.get("/payroll-display", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Frontend/payroll-display.html"));
+  });
+  
 dotenv.config();
 //console.log(process.env.MONGO_URI)
 

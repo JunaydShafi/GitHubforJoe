@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Job View</title>
+  <link rel="stylesheet" href="/css/empstyle.css" />
+</head>
+<body>
+  <header>Employee Job View</header>
+
+  <div class="container">
+    <!-- Job Info Panel -->
+    <div class="job-panel">
+      <label for="vehicle-info">Vehicle Info</label>
+      <textarea id="vehicle-info" rows="2" placeholder="Details..."></textarea>
+
+      <label for="reason">Reason for</label>
+      <textarea id="reason" rows="2" placeholder="Details..."></textarea>
+
+      <label for="mechanic">Mechanic</label>
+      <textarea id="mechanic" rows="2" placeholder="Mechanic name..."></textarea>
+
+      <label for="note">Mechanic note</label>
+      <input type="text" id="note" placeholder="Optional note..." />
+
+      <div class="dates">
+        <div>
+          <strong>Start Date</strong><br />
+          xx/xx/xxxx
+        </div>
+        <div>
+          <strong>Complete</strong><br />
+          xx/xx/xxxx
+        </div>
+      </div>
+
+      <div class="est-date">
+        <strong>Estimated Completion Date</strong><br />
+        xx/xx/xxxx
+      </div>
+
+      <a href="/employee-dashboard.html" class="back-button">Back</a>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="side-buttons">
+      <button class="gold-button" id="startBtn">Start</button>
+      <button class="gold-button" id="completeBtn">Mark Complete</button>
+    </div>
+  </div>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
