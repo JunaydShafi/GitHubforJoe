@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="/Junstyle.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administrator Dashbord</title>
+  </head>
+  <body>
+
+
+    <div class="header-main"><!--this is for the top footer of the page-->
+      <div class="logo">
+        <img src="images/WhiteLogo.png" alt="Logo">
+      </div>
+      <div class = "Title">
+        <div class="title-container">
+            <div class="shop-name">Joe's AutoShop</div>
+            <div class="tagline">If it ain't Joe don't fix it!</div>
+        </div>
+          <div class="account-box-left">
+           <button onclick="location.href='index.html'">Log Out</button>
+          </div>
+      </div>
+    </div>
+
+    <div class="wrapperAdmin">
+
+      <div>
+        <h1>Administator</h1>
+      </div>
+
+        <button onclick="location.href='appointments'">Appointments</button>
+        <button onclick="location.href='payroll'">Payroll</button>
+        <button onclick="location.href='reviews'">Reviews</button>
+        <button onclick="location.href='newEmployee'">New Employee</button>
+    </div>
+  
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
