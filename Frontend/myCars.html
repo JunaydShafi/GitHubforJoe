@@ -3,16 +3,42 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/Junstyle.css">
         <title>My Cars</title>
     </head>
     <body>
-        <h1>Joe's Auto Shop</h1>
+
+        <div class="header-main"><!--this is for the top footer of the page-->
+            <div class="logo">
+              <img src="images/WhiteLogo.png" alt="Logo">
+            </div>
+            <div class = "Title">
+              <div class="title-container">
+                  <div class="shop-name">Joe's AutoShop</div>
+                  <div class="tagline">If it ain't Joe don't fix it!</div>
+              </div>
+                <div class="account-box-left">
+                    <button onclick="location.href='index.html'">Log Out</button>
+                    <button onclick="location.href='customerMainPage.html'">Main Page</button>
+                </div>
+            </div>
+          </div>
+
+        <div class = "wrapper">
+
+            <h1>Joe's Auto Shop</h1>
 
         <h3>My Cars</h3>
         <h4>2003 STI Subaru Impreza</h4>
-        <button onclick="location.href='carInfo'">View</button>
-        <div id="root"></div>
 
-        <button onclick="location.href='addCar'">Add a Car +</button>
+        <div class ="account-box">
+            <button onclick="location.href='carInfo'">View</button>
+        </div>
+        
+        <div class ="account-box">
+            <button onclick="location.href='addCar'">Add a Car +</button>
+        </div>
+
+        </div>
     </body>
 </html>

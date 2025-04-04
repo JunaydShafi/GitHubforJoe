@@ -6,6 +6,7 @@
     --text-color: grey;
     --input-color: white;
     --grey-color: #2e302b;
+    --buttonHover-color: #0056b3;
 }
 
 *{
@@ -149,7 +150,7 @@ form button{
 }
 
 form button:hover{
-    background-color: var(--text-color);
+    background-color: var(--buttonHover-color);
 }
 
 form button:focus{
@@ -225,8 +226,153 @@ form div.incorrect input{
     background-color: #0056b3; /* Darker blue on hover */
 }
 
+/* STart----------------------------------------------------------------------------------
+to make buttons for admin homepage
+1 2
+3 4
+*/
+.buttonn-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 150px; /* Space between buttons */
+    width: 10px; /* Adjust as needed */
+}
 
-/*sams stuff start*/
+buttonn {
+    width: 100%;
+    padding: 10px;
+}
+/*End                                            ---------------------------*/
+
+/*bottom back on bottom left of screen*/
+
+bottom-Left{
+    position:absolute;
+    bottom: 5%;
+    right: 20%;
+}
+
+.bottomLeftCenter {
+    position: absolute;
+    left: 18%;  /* Adjust as needed */
+    bottom: 8%; /* Adjust as needed */
+    transform: translateY(0%); /* Ensures it aligns properly */
+    padding: 10px 20px; /* Keeps button size manageable */
+    width: auto; /* Prevents stretching */
+
+    background-color: #2e302b; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* Removes default border */
+    border-radius: 5px; /* Rounds edges slightly */
+    cursor: pointer; /* Changes cursor to indicate it's clickable */
+    font-size: 16px; /* Adjust text size */
+}
+
+.bottomLeftCenter:hover {
+    background-color: #0056b3; /* Slightly lighter color on hover */
+}
+
+
+.bottomRightCenter {
+    position: absolute;
+    left: 18%;  /* Adjust as needed */
+    top: 24%; /* Adjust as needed */
+    transform: translateY(0%); /* Ensures it aligns properly */
+    padding: 10px 20px; /* Keeps button size manageable */
+    width: auto; /* Prevents stretching */
+
+    background-color: #2e302b; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* Removes default border */
+    border-radius: 5px; /* Rounds edges slightly */
+    cursor: pointer; /* Changes cursor to indicate it's clickable */
+    font-size: 16px; /* Adjust text size */
+}
+
+.bottomRightCenter:hover {
+    background-color: #0056b3; /* Slightly lighter color on hover */
+}
+
+
+/* Prevent checkbox from getting the default input styles 
+form input:not([type="checkbox"]) {
+    box-sizing: border-box;
+    flex-grow: 1;
+    min-width: 0;
+    height: 50px;
+    padding: 1em;
+    font: inherit;
+    border-radius: 0 10px 10px 0;
+    border: 2px solid var(--input-color);
+    border-left: none;
+    background-color: var(--input-color);
+    transition: 150ms ease;
+}
+
+ Ensure checkboxes don't get styled like text inputs 
+form input:not([type="checkbox"]) {
+    box-sizing: border-box;
+    flex-grow: 1;
+    min-width: 0;
+    height: 50px;
+    padding: 1em;
+    font: inherit;
+    border-radius: 0 10px 10px 0;
+    border: 2px solid var(--input-color);
+    border-left: none;
+    background-color: var(--input-color);
+    transition: 150ms ease;
+}*/
+
+/* Wrapper for checkbox alignment */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 50%;
+    gap: 1px;
+    margin-top: 10px;
+}
+
+/* Ensure the checkbox has proper sizing */
+.checkbox-wrapper input[type="checkbox"] {
+    width: 10px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--accent-color); /* Use theme color if needed */
+}
+
+/* Reset weird label styles */
+.checkbox-wrapper label {
+    color: white; /* Or another color that fits your theme */
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
+    background: none; /* Removes any unwanted background */
+    width: auto;
+    height: auto;
+    display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*sams stuff start we are using this to make the top title logo*/
 .header-main {
     background-color: rgba(26, 99, 70,0.9);
     height: 100px;

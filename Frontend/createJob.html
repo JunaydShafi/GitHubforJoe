@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Junstyle.css">
     <title>Create New Job</title>
 </head>
 <body>
-    <div>
-        <h1>Administator</h1>
-    </div>
 
-    <form>
-        
-        <label for="vehicle">Vehicle</label><br>
-        <input id="vehicle" readonly value="Subaru Impreza STI 2003"><br>
-        <label for="assignMechanic">Assign Mechanic</label><br>
-        <input id="assignMechanic"><br>
-        <label for="appointmentDate">Appointment Date</label><br>
-        <input type="datetime-local" id="appointmentDate"><br>
-        <input type="submit" onclick="location.href='appointments'">
-    </form>
+    <div class="wrapper">
+        <div>
+            <h1>Administator</h1>
+        </div>
+    
+        <form id = "form">
+            
+            <label for="vehicle">Vehicle</label><br>
+            <input id="vehicle" readonly value="Subaru Impreza STI 2003"><br>
+            <label for="assignMechanic">Assign Mechanic</label><br>
+            <input id="assignMechanic"><br>
+            <label for="appointmentDate">Appointment Date</label><br>
+            <input type="datetime-local" id="appointmentDate"><br>
+            <input type="submit" onclick="location.href='appointments'">
+        </form>
+    </div>
 </body>
 </html>
