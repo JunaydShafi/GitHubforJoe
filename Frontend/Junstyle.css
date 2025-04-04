@@ -252,7 +252,7 @@ bottom-Left{
     right: 20%;
 }
 
-.bottomLeftCenter {
+.bottomLeftCenter {/* This is ment to be bottom left center button*/
     position: absolute;
     left: 18%;  /* Adjust as needed */
     bottom: 8%; /* Adjust as needed */
@@ -273,7 +273,7 @@ bottom-Left{
 }
 
 
-.bottomRightCenter {
+.topLeftCenter {/* This is ment to be Top Left center button*/
     position: absolute;
     left: 18%;  /* Adjust as needed */
     top: 24%; /* Adjust as needed */
@@ -289,10 +289,30 @@ bottom-Left{
     font-size: 16px; /* Adjust text size */
 }
 
-.bottomRightCenter:hover {
+.topLeftCenter:hover {
     background-color: #0056b3; /* Slightly lighter color on hover */
 }
 
+
+.bottomRightCenter {/* This is ment to be bottom right center button*/
+    position: absolute;
+    right: 18%;  /* Adjust as needed */
+    bottom: 8%; /* Adjust as needed */
+    transform: translateY(0%); /* Ensures it aligns properly */
+    padding: 10px 20px; /* Keeps button size manageable */
+    width: auto; /* Prevents stretching */
+
+    background-color: #2e302b; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* Removes default border */
+    border-radius: 5px; /* Rounds edges slightly */
+    cursor: pointer; /* Changes cursor to indicate it's clickable */
+    font-size: 16px; /* Adjust text size */
+}
+
+.bottomRightCenter:hover {
+    background-color: #0056b3; /* Slightly lighter color on hover */
+}
 
 /* Prevent checkbox from getting the default input styles 
 form input:not([type="checkbox"]) {
