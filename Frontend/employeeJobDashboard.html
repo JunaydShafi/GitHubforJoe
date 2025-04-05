@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Junstyle.css">
+    <title>Employee Job Dashboard</title>
+</head>
+<body>
+
+    <div class="header-main"><!--this is for the top footer of the page-->
+        <div class="logo">
+          <img src="images/WhiteLogo.png" alt="Logo">
+        </div>
+        <div class = "Title">
+          <div class="title-container">
+              <div class="shop-name">Joe's AutoShop</div>
+              <div class="tagline">If it ain't Joe don't fix it!</div>
+          </div>
+            <div class="account-box-left">
+                <button onclick="location.href='index.html'">Log Out</button>
+            </div>
+        </div>
+      </div>
+
+      <div class="wrapper">
+        <div>
+            <h1>Assigned Jobs</h1>
+            <p>Date Assigned: xx/xx/xx</p>
+
+            <div>
+                <label for="vehicleAssigned"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M240-200v40q0 17-11.5 28.5T200-120h-40q-17 0-28.5-11.5T120-160v-320l84-240q6-18 21.5-29t34.5-11h440q19 0 34.5 11t21.5 29l84 240v320q0 17-11.5 28.5T800-120h-40q-17 0-28.5-11.5T720-160v-40H240Zm-8-360h496l-42-120H274l-42 120Zm-32 80v200-200Zm100 160q25 0 42.5-17.5T360-380q0-25-17.5-42.5T300-440q-25 0-42.5 17.5T240-380q0 25 17.5 42.5T300-320Zm360 0q25 0 42.5-17.5T720-380q0-25-17.5-42.5T660-440q-25 0-42.5 17.5T600-380q0 25 17.5 42.5T660-320Zm-460 40h560v-200H200v200Z"/></svg></label>
+                <input id="vehicleAssigned" readonly value="Subaru Impreza STI 2003">
+
+            </div>
+
+            <div class="account-box">
+                <button onclick="location.href='employee-job-view.html'">View</button>
+            </div>
+        </div>
+
+        <div>
+            <h1>Started Jobs</h1>
+            <p>Date Started: xx/xx/xx</p>
+
+            <div>
+                <label for="vehicleStarted"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M240-200v40q0 17-11.5 28.5T200-120h-40q-17 0-28.5-11.5T120-160v-320l84-240q6-18 21.5-29t34.5-11h440q19 0 34.5 11t21.5 29l84 240v320q0 17-11.5 28.5T800-120h-40q-17 0-28.5-11.5T720-160v-40H240Zm-8-360h496l-42-120H274l-42 120Zm-32 80v200-200Zm100 160q25 0 42.5-17.5T360-380q0-25-17.5-42.5T300-440q-25 0-42.5 17.5T240-380q0 25 17.5 42.5T300-320Zm360 0q25 0 42.5-17.5T720-380q0-25-17.5-42.5T660-440q-25 0-42.5 17.5T600-380q0 25 17.5 42.5T660-320Zm-460 40h560v-200H200v200Z"/></svg></label>
+                <input id="vehicleStarted" readonly value="1999 Nissan R34">
+
+            </div>
+
+            <div class="account-box">
+                <button onclick="location.href='employee-job-view.html'">View</button>
+            </div>
+        </div>
+
+
+        <div>
+            <h1>Recent Reviews</h1>
+            <div>
+                <input id="reviewOne" type="text" value="ReviewOne....">
+            </div>
+            
+            <div>
+                <input id="reviewTwo" type="text" readonly value="ReviewTwo....">
+            </div>
+
+            <div class="account-box">
+                <button onclick="location.href='reviews.html'">Reviews</button>
+            </div>
+        </div>
+
+        <button class="bottomLeftCenter" type= "button" onclick="history.back()">Go Back</button>
+      </div>
+    
+</body>
+</html>

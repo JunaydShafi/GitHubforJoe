@@ -25,27 +25,36 @@
           </div>
           
         <div class = "wrapper">
+            <button class="topLeftCenter" type= "button" onclick="history.back()">Close</button>
             <h1>2003 STI Subare Impreza</h1>
+
+            <h1>&nbsp;</h1><!--Used to space the wrappers-->
 
         <h3>Vehicle Make</h3>
         <!--add vehicle make text box-->
+        <div><textarea id="vehicleMake"  rows="2" placeholder="Subaru"></textarea></div>
+
         <h3>Vehicle Model</h3>
         <!--add vehicle model text box-->
+        <div><textarea id="vehicleModel"  rows="2" placeholder="STI Impreza"></textarea>
+        </div>
         <h3>Vehicle Color</h3>
         <!--add vehicle color text box-->
+        <div><textarea id="vehicleColor"  rows="2" placeholder="Blue"></textarea></div>
+
         <h3>Vehicle Year</h3>
         <!--add vehicle year text box-->
+        <div><textarea id="vehicleYear"  rows="2" placeholder="2003"></textarea></div>
 
         <h3>Comments / Vehicle Notes:</h3>
         <!--add comments/notes text box-->
+        <div><textarea id="vehicleNotes"  rows="8" placeholder="I brought the car in for a wheel seal change but have notaced oil over the transmission as well. Can you check the transmission."></textarea></div>
 
-        <div class="account-box">
-            <button onclick="location.href='myCars'">Delete Vehicle</button>
-        </div>
+            <button class="bottomLeftCenter" onclick="location.href='myCars'">Delete Vehicle</button>
 
-        <div class="account-box">
-            <button onclick="location.href='myCars'">Update Vehicle Information</button>
-        </div>
+
+            <button class="bottomRightCenter" onclick="location.href='myCars'">Update Vehicle Information</button>
+
         
         
 
