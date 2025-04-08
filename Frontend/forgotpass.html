@@ -3,21 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Junstyle.css">
     <title>Forgot password</title>
 </head>
     <body>
         <div class="wrapper">
-        <link rel="stylesheet" href="style.css" />
 
         <h1>Forgot Password?</h1>
-        <form onsubmit="redirecttoConfirmation(event)">
-        <h2>Email</h2>
-            <label for="email"></label>
-            <input type="email" id="email" name="email" required>
-          <br><br>
-          <button type= "button" onclick="history.back()">Go Back</button>
-            <input type="submit" value="Send">
+        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+       
+        <form id="form">
+        <h2>Enter Your Email</h2>
+
+        <div>
+            <label for="eeemail-input">
+                <span style="color:black">@</span>
+            </label>
+    
+            <input type="email" name = "email" id = "eeemail-input" placeholder="Email">
+              
+        </div>
+
+            <button class="bottomLeftCenter" type= "button" onclick="history.back()">Go Back</button>
+
+            <input class="account-box" type="submit" value="Send">
+            <h1>&nbsp;</h1><!--Used to space the wrappers-->
+            <h1>&nbsp;</h1><!--Used to space the wrappers-->
         </form>
+        
+        <button class="bottomRightCenter" onclick="location.href='resetpass.html'">Next Page After Email Link</button>
         </div>
 
             <script>
@@ -29,4 +43,3 @@
             </script>
         </body>
 </html>
-

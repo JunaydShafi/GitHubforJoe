@@ -5,24 +5,42 @@
         <link rel="icon" type="image/svg+xml" href="/vite.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Joes Auto Shop</title>
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="Junstyle.css" />
     
       </head>
       <body>
+
+        <div class="header-main"><!--this is for the top footer of the page-->
+          <div class="logo">
+            <img src="images/WhiteLogo.png" alt="Logo">
+          </div>
+          <div class = "Title">
+            <div class="title-container">
+                <div class="shop-name">Joe's AutoShop</div>
+                <div class="tagline">If it ain't Joe don't fix it!</div>
+            </div>
+          </div>
+        </div>
+
+
         <div class="wrapper">
-    
-        <div id="root..."></div>
-    
-    
-        <button onclick="location.href='forgotpass'" style="float: right" >Forgot Password</button>
-    
-        <button onclick="location.href='signup'" style="float: right;">Login / Sign Up</button>
-    
-        <button onclick="location.href='adminMain'">Log In</button>
-    
-        <div id="root"></div>
-        <button onclick="location.href='customerMainPage'">main page</button>
-        <script type="module" src="/src/main.jsx"></script>
+
+          <div class = "account-box">
+            <button onclick="location.href='signup'" style="float: right;">Login / Sign Up</button>
+          </div>
+
+          <div class = "account-box">
+            <button onclick="location.href='adminMain'">Admin Dashboard</button>
+          </div>
+
+          <div class = "account-box">
+            <button onclick="location.href='employee-dashboard'" style="float: right" >Employee Dashboard</button>
+          </div>
+
+          <div class = "account-box">
+            <button onclick="location.href='customerMainPage'">User Dashboard</button>
+          </div>
+          
           </div>
         </div>
       </body>

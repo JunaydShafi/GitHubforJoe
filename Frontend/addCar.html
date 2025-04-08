@@ -3,24 +3,52 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/Junstyle.css">
         <title>Car Info</title>
     </head>
     <body>
-        <h1>Add Vehicle Information</h1>
 
-        <h3>Vehicle Make</h3>
-        <!--add vehicle make user input text box-->
-        <h3>Vehicle Model</h3>
-        <!--add vehicle model user input text box-->
-        <h3>Vehicle Color</h3>
-        <!--add vehicle color user input text box-->
-        <h3>Vehicle Year</h3>
-        <!--add vehicle year user input text box-->
+        <div class="header-main"><!--this is for the top footer of the page-->
+            <div class="logo">
+              <img src="images/WhiteLogo.png" alt="Logo">
+            </div>
+            <div class = "Title">
+              <div class="title-container">
+                  <div class="shop-name">Joe's AutoShop</div>
+                  <div class="tagline">If it ain't Joe don't fix it!</div>
+              </div>
+                <div class="account-box-left">
+                    <button onclick="location.href='index.html'">Log Out</button>
+                </div>
+            </div>
+          </div>
+          
+        <div class = "wrapper">
+            <h1>Add Vehicle Information</h1>
 
-        <h3>Comments / Vehicle Notes:</h3>
-        <!--add comments/notes user input text box-->
+            <h1>&nbsp;</h1><!--Used to space the wrappers-->
 
-        <button onclick="location.href='myCars'">Back</button>
-        <button onclick="location.href='myCars'">Add Vehicle</button>
+            <h3>Vehicle Make</h3>
+            <!--add vehicle make user input text box-->
+            <div><textarea name="" placeholder=""></textarea></div>
+            <h3>Vehicle Model</h3>
+            <!--add vehicle model user input text box-->
+            <div><textarea name="" placeholder=""></textarea></div>
+            <h3>Vehicle Color</h3>
+            <!--add vehicle color user input text box-->
+            <div><textarea name="" placeholder=""></textarea></div>
+            <h3>Vehicle Year</h3>
+            <!--add vehicle year user input text box-->
+            <div><textarea name="" placeholder=""></textarea></div>
+
+            <h3>Comments / Vehicle Notes:</h3>
+            <!--add comments/notes user input text box-->
+            <div><textarea name="" placeholder=""></textarea></div>
+
+                <button class = "bottomLeftCenter" type= "button" onclick="history.back()">Back</button>
+
+                <button class="bottomRightCenter" onclick="location.href='myCars'">Add Vehicle</button>
+        
+        </div>
     </body>
 </html>

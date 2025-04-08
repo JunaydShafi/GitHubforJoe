@@ -1,51 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payroll</title>
-  <link rel="stylesheet" href="/css/empstyle.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
+  <title>Document</title>
 </head>
 <body>
-  <header class="payroll-banner">
-    <div class="banner-left">
-      <img src="/img/logo.png" alt="Joe's Auto Shop Logo" class="logo" />
-      <h1>JOE’S AUTO SHOP</h1>
+
+  <div class="header-main"><!--this is for the top footer of the page-->
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
     </div>
-    <div class="corner-buttons">
-      <a href="/login.html" class="gold-button small">Log Out</a>
-      <a href="/main-employee.html" class="gold-button small">Main Page</a>
+    <div class = "Title">
+      <div class="title-container">
+          <div class="shop-name">Joe's AutoShop</div>
+          <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+        <div class="account-box-left">
+            <button onclick="location.href='index.html'">Log Out</button>
+        </div>
     </div>
-  </header>
+  </div>
 
-  <main class="payroll-content">
-    <h2 class="section-title">Expected Upcoming Payroll</h2>
+  <div class="wrapper">
+    <h1>Expected Upcoming Payrool</h1>
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
+    
 
-    <div class="payroll-grid">
-      <div class="payroll-box">
-        <h3>Hours</h3>
-        <div class="info-box">Hours recorded within 2 weeks</div>
-      </div>
+    <table bgcolor="black" width="800">
+      <tr bgcolor="darkgray">
+        <th width="200">Hours Worked</th>
+        <th width="200">Pay Rate</th>
+        <th width="200">Expected Pay</th>
+        <th width="200">Overtime Pay</th>
+      </tr>
 
-      <div class="payroll-box">
-        <h3>Rate</h3>
-        <div class="info-box">Employee rate from database</div>
-      </div>
+      <tr bgcolor="gray" align="center">
+        <td>Hours recorded in 2 week span.</td>
+        <td>Employee pay rate.</td>
+        <td>Total Expected Pay.</td>
+        <td>Overtime work hours.</td>
+      </tr>
 
-      <div class="payroll-box">
-        <h3>Expected</h3>
-        <div class="info-box">Shows Calculation</div>
-      </div>
+    </table>
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
 
-      <div class="payroll-box">
-        <h3>Overtime</h3>
-        <div class="info-box">hrs - 40 (db)</div>
-      </div>
-    </div>
+    <button class="bottomLeftCenter" type= "button" onclick="history.back()">Go Back</button>
+  </div>
 
-    <a href="/employee-dashboard.html" class="back-button">Back</a>
-  </main>
-
-  <script src="/js/script.js"></script>
+  
 </body>
 </html>
