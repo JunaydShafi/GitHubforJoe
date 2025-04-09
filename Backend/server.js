@@ -62,31 +62,28 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post('/api/signup', async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-
-    // Check for existing user
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).send('User already exists');
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Save user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role: 'customer'
-    });
-
-    await newUser.save();
-    res.status(201).send('Signup successful');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
-});
+    try {
+      const { email, password } = req.body;
+  
+      const existingUser = await User.findOne({ email });
+      if (existingUser) return res.status(400).send('User already exists');
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const newUser = new User({
+        email,
+        password: hashedPassword,
+        role: 'customer'
+      });
+  
+      await newUser.save();
+      res.status(201).send('Signup successful');
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+    }
+  });
+  
 
 
 

@@ -103,3 +103,36 @@ allInputs.forEach(input =>{// remove error message
         }
     })
 })
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form');
+  
+    if (form && window.location.pathname === '/signup') {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+  
+        const email = document.getElementById('email-input').value;
+        const password = document.getElementById('password-input').value;
+  
+        try {
+          const res = await fetch('/api/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+  
+          const text = await res.text();
+  
+          if (res.status === 201) {
+            alert('Signup successful! Redirecting to login...');
+            window.location.href = '/login';
+          } else {
+            document.getElementById('error-message').innerText = text || 'Signup failed.';
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById('error-message').innerText = 'Error during signup.';
+        }
+      });
+    }
+  });
+  
