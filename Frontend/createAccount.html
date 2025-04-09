@@ -54,5 +54,54 @@
             </form>
             <button class="bottomLeftCenter" type= "button" onclick="history.back()">Go Back</button>
         </div>
+        <p id="success-message" style="color: green; font-weight: bold;"></p>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form');
+
+    if (form && window.location.pathname === '/createAccount') {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email-input').value;
+        const password = document.getElementById('password-input').value;
+        const confirmPassword = document.getElementById('confirm-password-input').value;
+        const username = document.getElementById('firstname-input').value;
+        const phone = document.getElementById('phonenumber-input').value;
+
+        if (password !== confirmPassword) {
+          document.getElementById('error-message').innerText = 'Passwords do not match.';
+          document.getElementById('success-message').innerText = '';
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, username, phone })
+          });
+
+          const text = await res.text();
+
+          if (res.status === 201) {
+            document.getElementById('success-message').innerText = 'Account created successfully!';
+            document.getElementById('error-message').innerText = '';
+            form.reset();
+          } else {
+            document.getElementById('error-message').innerText = text || 'Signup failed.';
+            document.getElementById('success-message').innerText = '';
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById('error-message').innerText = 'Server error during signup.';
+          document.getElementById('success-message').innerText = '';
+        }
+      });
+    }
+  });
+</script>
+
     </body>
 </html>

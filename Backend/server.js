@@ -63,7 +63,7 @@ app.use(express.json());
 
 app.post('/api/signup', async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, password, username, phone } = req.body;
   
       const existingUser = await User.findOne({ email });
       if (existingUser) return res.status(400).send('User already exists');
@@ -73,6 +73,8 @@ app.post('/api/signup', async (req, res) => {
       const newUser = new User({
         email,
         password: hashedPassword,
+        username,
+        phone,
         role: 'customer'
       });
   
@@ -83,7 +85,6 @@ app.post('/api/signup', async (req, res) => {
       res.status(500).send('Server error');
     }
   });
-  
 
 
 
