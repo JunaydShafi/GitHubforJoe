@@ -4,6 +4,10 @@ import { connectDB } from "./config/db.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import Job from './models/Job.js';
+import User from './models/User.js';
+import Vehicle from './models/Vehicle.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,9 +19,23 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 
 app.use(express.static(path.join(__dirname,'..?frontend')));
 
+app.use('/js', express.static(path.join(__dirname, '../Frontend/js')));
 
 
 // Main landing page
+
+// API route: Get all jobs for a specific customer
+app.get('/api/jobs/customer/:id', async (req, res) => {
+    try {
+      const jobs = await Job.find({ customerId: req.params.id })
+        .populate('vehicleId')
+        .populate('mechanicId');
+      res.json(jobs);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend", "index.html"));
@@ -35,6 +53,39 @@ app.get('/backend/website.js', (req, res) => {
 // a test page for main->make appt
 app.get('/appointment', (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend", "appointment.html"));
+});
+
+import bcrypt from 'bcrypt';
+
+// Parse form body
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.post('/api/signup', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Check for existing user
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).send('User already exists');
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Save user
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'customer'
+    });
+
+    await newUser.save();
+    res.status(201).send('Signup successful');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
 });
 
 

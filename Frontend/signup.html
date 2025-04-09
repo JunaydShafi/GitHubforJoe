@@ -1,45 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup Page</title>
-    <link rel="stylesheet" href="/Junstyle.css">
-    <script type="text/javascript" src = "/Backend/website.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup Page</title>
+  <link rel="stylesheet" href="/Junstyle.css">
 </head>
-    <body>
-        <div class="wrapper">
-            <img src="images/WhiteLogo.png" alt="IMG not working" height = "150">
-            <h1>Joe's Auto Shop</h1>
-            <p id = "error-message"></p>
-            <form id="form">
+<body>
+  <div class="wrapper">
+    <img src="images/WhiteLogo.png" alt="IMG not working" height="150" />
+    <h1>Joe's Auto Shop</h1>
+    <p id="error-message"></p>
 
-                <div>
+    <form id="signup-form">
+      <div>
+        <input type="text" name="name" id="name-input" placeholder="Full Name" required />
+      </div>
 
-                    <label for="email-input">
-                        <span style="color:black">@</span>
-                    </label>
+      <div>
+        <input type="email" name="email" id="email-input" placeholder="Email" required />
+      </div>
 
-                    <input type="email" name = "email" id = "email-input" placeholder="Email">
-                </div>
+      <div>
+        <input type="password" name="password" id="password-input" placeholder="Password" required />
+      </div>
 
-                <div>
+      <button type="submit">Sign Up</button>
+    </form>
 
-                    <label for="password-input"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z"/></svg></label>
+    <div class="account-box">
+      <p>Already have an account?
+        <button onclick="location.href='login'">Login</button>
+      </p>
+    </div>
+  </div>
 
-                    <input type="password" name = "password" id = "password-input" placeholder="Password">
-                </div>
+  <script>
+    console.log("Signup JS loaded");
 
-                <button type="submit">Login</button>
-            </form>
-            <div class="account-box">
-                <p>Don't have an Account? 
-                    <button onclick="location.href='createAccount'">Create An Account</button>  
-                </p>
-            </div>
-            <div>
-                <button class="bottomRightCenter" onclick="location.href='forgotpass'">Forgot Password?</button>
-            </div>
-        </div>
-    </body>
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name-input').value;
+      const email = document.getElementById('email-input').value;
+      const password = document.getElementById('password-input').value;
+
+      try {
+        const res = await fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        if (res.status === 201) {
+          alert('Signup successful! You can now log in.');
+          window.location.href = '/login';
+        } else {
+          const text = await res.text();
+          document.getElementById('error-message').innerText = text || 'Signup failed.';
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('error-message').innerText = 'Error during signup.';
+      }
+    });
+  </script>
+</body>
 </html>
