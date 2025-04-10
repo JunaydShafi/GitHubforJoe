@@ -103,3 +103,65 @@ allInputs.forEach(input =>{// remove error message
         }
     })
 })
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form');
+  
+    if (form && window.location.pathname === '/signup') {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+  
+        const email = document.getElementById('email-input').value;
+        const password = document.getElementById('password-input').value;
+  
+        try {
+          const res = await fetch('/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+  
+          const text = await res.text();
+  
+          if (res.status === 201) {
+            alert('Signup successful! Redirecting to login...');
+          } else {
+            document.getElementById('error-message').innerText = text || 'Signup failed.';
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById('error-message').innerText = 'Error during signup.';
+        }
+      });
+    }
+  
+    //  ADD THIS FOR LOGIN PAGE
+    if (form && window.location.pathname === '/login') {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+  
+        const email = document.getElementById('email-input').value;
+        const password = document.getElementById('password-input').value;
+  
+        try {
+          const res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+  
+          const text = await res.text();
+  
+          if (res.status === 200) {
+            alert('Login successful!');
+
+        } else {
+            document.getElementById('error-message').innerText = text || 'Login failed.';
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById('error-message').innerText = 'Error during login.';
+        }
+      });
+    }
+  });
+      

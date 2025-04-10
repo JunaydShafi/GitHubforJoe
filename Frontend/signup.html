@@ -38,5 +38,39 @@
                 </p>
             </div>
         </div>
-    </body>
-</html>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+              const form = document.getElementById('form');
+      
+              if (form && window.location.pathname === '/signup') {
+                form.addEventListener('submit', async function (e) {
+                  e.preventDefault();
+      
+                  const email = document.getElementById('email-input').value;
+                  const password = document.getElementById('password-input').value;
+      
+                  try {
+                    const res = await fetch('/api/login', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email, password })
+                    });
+      
+                    const text = await res.text();
+      
+                    if (res.status === 200) {
+                     window.location.href = '/home'; // Change this if needed
+                    } else {
+                      document.getElementById('error-message').innerText = text || 'Login failed.';
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    document.getElementById('error-message').innerText = 'Server error during login.';
+                  }
+                });
+              }
+            });
+          </script>
+      </body>
+      </html>
+      
