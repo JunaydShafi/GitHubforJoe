@@ -10,27 +10,67 @@ import User from './models/User.js';
 import bcrypt from "bcrypt";
 app.use(express.json());
 
+app.post('/api/employees/create', async (req, res) => {
+    try {
+      const { email, password, username, phone, isAdmin } = req.body;
+  
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const newUser = new User({
+        email,
+        password: hashedPassword,
+        username,
+        phone,
+        role: isAdmin ? 'admin' : 'employee'
+      });
+  
+      await newUser.save();
+      res.status(201).json({ success: true, message: 'Employee account created successfully.' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  
 // Inline login route
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
   
     try {
       const user = await User.findOne({ email });
-      if (!user) return res.status(400).json({ success: false, message: 'User not found' });
+      if (!user) {
+        return res.status(400).json({ success: false, message: 'User not found' });
+      }
   
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: 'Invalid credentials' });
+      }
   
-      res.status(200).json({ 
+      // 🔁 Role-based redirect logic
+      let redirectPage = '/customerMainPage.html';
+      if (user.role === 'employee') {
+        redirectPage = '/employee-dashboard.html';
+      } else if (user.role === 'admin') {
+        redirectPage = '/adminMain.html';
+      }
+  
+      res.status(200).json({
         success: true,
-        redirect: '/customerMainPage.html'
+        redirect: redirectPage
       });
     } catch (err) {
+      console.error(err);
       res.status(500).json({ success: false, message: 'Server error' });
     }
-});
-
-
+  });
+  
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

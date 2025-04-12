@@ -1,77 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Junstyle.css">
-    <title>New Employee</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
+  <title>New Employee</title>
 </head>
 <body>
 
-    <div class="header-main"><!--this is for the top footer of the page-->
-        <div class="logo">
-          <img src="images/WhiteLogo.png" alt="Logo">
-        </div>
-        <div class = "Title">
-          <div class="title-container">
-              <div class="shop-name">Joe's AutoShop</div>
-              <div class="tagline">If it ain't Joe don't fix it!</div>
-          </div>
-            <div class="account-box-left">
-                <button onclick="location.href='index.html'">Log Out</button>
-            </div>
-        </div>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <button class="topLeftCenter" type="button" onclick="history.back()">Close</button>
+    <div>
+      <h1>Add Employee</h1>
+    </div>
+
+    <form id="new-employee-form">
+      <p>Input New Employee Info</p>
+
+      <div>
+        <input type="text" name="username" id="fname-input" placeholder="Full Name (First Last)" required>
       </div>
 
-      <div class="wrapper">
-        <button class="topLeftCenter" type= "button" onclick="history.back()">Close</button>
-        <div>
-            <h1>Add Employee</h1>
-        </div>
-    
-        <form id="form">
-            <p>Input New Employee Info</p>
-            
-            <div>
-                <label for="fname-input"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg></label>
-                
-                <input type="text" name = "fname" id = "fname-input" placeholder="First Name">
-            </div>
-
-            <div>
-                <label for="lname-input"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg></label>
-                
-                <input type="text" name = "lname" id = "lname-input" placeholder="Last Name">
-            </div>
-
-            <div>
-
-                <label for="eemail-input">
-                    <span style="color:black">@</span>
-                </label>
-
-                <input type="email" name = "email" id = "eemail-input" placeholder="Email">
-            </div>
-
-            <div>
-                <label for="id-input"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M160-80q-33 0-56.5-23.5T80-160v-440q0-33 23.5-56.5T160-680h200v-120q0-33 23.5-56.5T440-880h80q33 0 56.5 23.5T600-800v120h200q33 0 56.5 23.5T880-600v440q0 33-23.5 56.5T800-80H160Zm0-80h640v-440H600q0 33-23.5 56.5T520-520h-80q-33 0-56.5-23.5T360-600H160v440Zm80-80h240v-18q0-17-9.5-31.5T444-312q-20-9-40.5-13.5T360-330q-23 0-43.5 4.5T276-312q-17 8-26.5 22.5T240-258v18Zm320-60h160v-60H560v60Zm-200-60q25 0 42.5-17.5T420-420q0-25-17.5-42.5T360-480q-25 0-42.5 17.5T300-420q0 25 17.5 42.5T360-360Zm200-60h160v-60H560v60ZM440-600h80v-200h-80v200Zm40 220Z"/></svg></label>
-                <input type="number" name = "id" id = "id-input" placeholder = "Employee ID">
-            </div>
-
-            <div>
-                <label for="payRate-input"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M441-120v-86q-53-12-91.5-46T293-348l74-30q15 48 44.5 73t77.5 25q41 0 69.5-18.5T587-356q0-35-22-55.5T463-458q-86-27-118-64.5T313-614q0-65 42-101t86-41v-84h80v84q50 8 82.5 36.5T651-650l-74 32q-12-32-34-48t-60-16q-44 0-67 19.5T393-614q0 33 30 52t104 40q69 20 104.5 63.5T667-358q0 71-42 108t-104 46v84h-80Z"/></svg></label>
-                <input type="number" name = "payRate" id = "payRate-input" placeholder = "Hourly payrate">
-            </div>
-            
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="isadmin">
-                <label for="isadmin">Employee Is Admin?</label>
-            </div>
-    
-            <button type="submit">Create Account</button>
-        </form>
-        <button class="bottomLeftCenter" onclick="location.href='adminMain.html'">Delete</button>
+      <div>
+        <input type="email" name="email" id="email-input" placeholder="Email" required>
       </div>
-    
+
+      <div>
+        <input type="password" name="password" id="password-input" placeholder="Password" required>
+      </div>
+
+      <div>
+        <input type="text" name="phone" id="phone-input" placeholder="Phone Number">
+      </div>
+
+      <div>
+        <input type="number" name="payRate" id="payRate-input" placeholder="Hourly Payrate">
+      </div>
+
+      <div class="checkbox-wrapper">
+        <input type="checkbox" id="isAdmin" name="isAdmin">
+        <label for="isAdmin">Employee Is Admin?</label>
+      </div>
+
+      <button type="submit">Create Account</button>
+    </form>
+
+    <p id="message" style="margin-top: 10px; color: green;"></p>
+
+    <button class="bottomLeftCenter" onclick="location.href='adminMain.html'">Back to Admin Dashboard</button>
+  </div>
+
+  <script src="/js/newEmployee.js" defer></script>
 </body>
 </html>
