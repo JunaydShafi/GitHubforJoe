@@ -1,4 +1,5 @@
 import express from "express";
+const app = express();
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import path from "path";
@@ -6,13 +7,16 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import Job from './models/Job.js';
 import User from './models/User.js';
-import Vehicle from './models/Vehicle.js';
+import loginRoutes from './routes/login.js';
+app.use(express.json());
+app.use(loginRoutes);
+
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const app = express();
+
 
 
 app.use(express.static(path.join(__dirname, "../frontend")));
