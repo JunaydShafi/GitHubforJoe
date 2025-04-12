@@ -21,7 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         alert(data.message);
       }
-    } catch (error) {
+      console.log("Logging in with:", email, password);
+      console.log("Response:", data);
+    } 
+    catch (error) {
       console.error(error);
       alert('Something went wrong.');
     }

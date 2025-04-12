@@ -13,7 +13,7 @@
         <p id="error-message" style="color: red;"></p>
 
         <!-- ✅ Original Styled Form Submitting Directly -->
-        <form action="/api/signup" method="POST">
+        <form id="login-form" onsubmit="return false;">
             <div>
                 <label for="email">
                     <span style="color:black">@</span>
@@ -43,5 +43,6 @@
             <button class="bottomRightCenter" onclick="location.href='forgotpass'">Forgot Password?</button>
         </div>
     </div>
+    <script src="/js/loginhandler.js" defer></script>
 </body>
 </html>
