@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Joes Auto Shop</title>
+    <link rel="stylesheet" href="Junstyle.css" />
+  </head>
+  <body>
+
+    <div class="header-main"><!--this is for the top footer of the page-->
+      <div class="logo">
+        <img src="images/WhiteLogo.png" alt="Logo">
+      </div>
+      <div class="Title">
+        <div class="title-container">
+          <div class="shop-name">Joe's AutoShop</div>
+          <div class="tagline">If it ain't Joe don't fix it!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+      <div class="account-box">
+        <button onclick="location.href='login.html'" style="float: right;">Login / Sign Up</button>
+      </div>
+
+      <div class="account-box">
+        <button onclick="location.href='adminMain.html'">Admin Dashboard</button>
+      </div>
+
+      <div class="account-box">
+        <button onclick="location.href='employee-dashboard.html'" style="float: right">Employee Dashboard</button>
+      </div>
+
+      <div class="account-box">
+        <button onclick="location.href='customerMainPage.html'">User Dashboard</button>
+      </div>
+    </div>
+
+    <!-- ✅ Clean login form placed below wrapper -->
+    <div class="login-container" style="margin: 40px auto; max-width: 400px; text-align: center;">
+      <form id="login-form" class="login-form" onsubmit="return false;" style="background: #f2f2f2; padding: 20px; border-radius: 8px;">
+        <h2>Customer Login</h2>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required style="width: 100%; padding: 8px; margin-top: 5px;"><br><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required style="width: 100%; padding: 8px; margin-top: 5px;"><br><br>
+
+        <button type="submit" style="padding: 10px 20px;">Login</button>
+      </form>
+    </div>
+
+    <!-- ✅ JavaScript for handling login logic -->
+    <script src="/js/loginhandler.js" defer></script>
+
+  </body>
+</html>
