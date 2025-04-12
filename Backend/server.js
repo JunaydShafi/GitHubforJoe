@@ -8,6 +8,7 @@ import { dirname } from 'path';
 import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
+app.use(express.json());
 
 // Inline login route
 app.post('/api/login', async (req, res) => {
@@ -29,7 +30,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-app.use(express.json());
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
