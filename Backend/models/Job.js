@@ -6,12 +6,16 @@ const jobSchema = new mongoose.Schema({
   mechanicId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: String,
   description: String,
+  startDate: Date,
+  completedDate: Date,
   updates: [
     {
       message: String,
       date: { type: Date, default: Date.now }
     }
   ]
+}, {
+  timestamps: true // Adds createdAt and updatedAt fields automatically
 });
 
 const Job = mongoose.model('Job', jobSchema);

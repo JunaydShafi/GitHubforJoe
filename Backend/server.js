@@ -166,6 +166,45 @@ app.get('/api/users/employees', async (req, res) => {
   }
 });
 
+app.patch('/api/jobs/:id/status', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    job.status = req.body.status;
+    if (req.body.status === 'in progress' && !job.startDate) {
+      job.startDate = new Date();
+    }
+
+    await job.save();
+    res.json({ message: 'Status updated', job });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error updating status' });
+  }
+});
+
+app.patch('/api/jobs/:id/complete', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    job.status = 'complete';
+    job.completedDate = new Date();
+
+    if (req.body.updateMessage) {
+      job.updates.push({ message: req.body.updateMessage });
+    }
+
+    await job.save();
+    res.json({ message: 'Job marked complete', job });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error completing job' });
+  }
+});
+
+
 // Admin: Create a job
 app.post('/api/jobs/create', async (req, res) => {
   try {
