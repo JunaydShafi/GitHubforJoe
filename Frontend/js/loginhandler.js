@@ -16,17 +16,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await response.json();
 
+      console.log("Logging in with:", email, password);
+      console.log("Login response from server:", data);
+
       if (data.success) {
-        window.location.href = data.redirect;
+        localStorage.setItem('userId', data.userId);
+        console.log("Saved userId to localStorage:", data.userId);
+
+        const check = localStorage.getItem('userId');
+        console.log("Retrieved from localStorage after save:", check);
+
+        if (check) {
+          window.location.href = data.redirect;
+        } else {
+          alert("Login failed: could not save session. Try again.");
+        }
       } else {
         alert(data.message);
       }
-      console.log("Logging in with:", email, password);
-      console.log("Response:", data);
     } 
     catch (error) {
-      console.error(error);
-      alert('Something went wrong.');
+      console.error("Login error:", error);
+      alert('Something went wrong during login.');
     }
   });
 });

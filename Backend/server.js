@@ -8,7 +8,29 @@ import { dirname } from 'path';
 import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
+import Vehicle from './models/Vehicles.js';
 app.use(express.json());
+
+app.post('/api/vehicles/add', async (req, res) => {
+    try {
+      const { customerId, make, model, year, vin, licensePlate } = req.body;
+  
+      const newVehicle = new Vehicle({
+        customerId,
+        make,
+        model,
+        year,
+        vin,
+        licensePlate
+      });
+  
+      await newVehicle.save();
+      res.status(201).json({ success: true, message: 'Vehicle added successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
 
 app.post('/api/employees/create', async (req, res) => {
     try {
@@ -44,27 +66,21 @@ app.post('/api/login', async (req, res) => {
   
     try {
       const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ success: false, message: 'User not found' });
-      }
+      if (!user) return res.status(400).json({ success: false, message: 'User not found' });
   
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ success: false, message: 'Invalid credentials' });
-      }
+      if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
   
-      // 🔁 Role-based redirect logic
       let redirectPage = '/customerMainPage.html';
-      if (user.role === 'employee') {
-        redirectPage = '/employee-dashboard.html';
-      } else if (user.role === 'admin') {
-        redirectPage = '/adminMain.html';
-      }
+      if (user.role === 'employee') redirectPage = '/employee-dashboard.html';
+      if (user.role === 'admin') redirectPage = '/adminMain.html';
   
       res.status(200).json({
         success: true,
-        redirect: redirectPage
+        redirect: "/customerMainPage.html",
+        userId: user._id // ✅ must be inside this object
       });
+  
     } catch (err) {
       console.error(err);
       res.status(500).json({ success: false, message: 'Server error' });
