@@ -108,6 +108,93 @@ app.get('/api/jobs/customer/:id', async (req, res) => {
     }
 });
 
+// API route: Get all jobs for a specific employee (mechanic)
+app.get('/api/jobs/employee/:id', async (req, res) => {
+  try {
+    const jobs = await Job.find({ mechanicId: req.params.id })
+      .populate('vehicleId')
+      .populate('customerId');
+    res.json(jobs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching jobs for employee' });
+  }
+});
+
+
+// Admin: Get all vehicles
+app.get('/api/vehicles', async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find().populate('customerId', 'username');
+    res.json(vehicles);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching vehicles' });
+  }
+});
+
+// Admin: Get all employees
+app.get('/api/users/employees', async (req, res) => {
+  try {
+    const employees = await User.find({ role: 'employee' });
+    res.json(employees);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching employees' });
+  }
+});
+
+// Admin: Get all vehicles
+app.get('/api/vehicles', async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find().populate('customerId', 'username');
+    res.json(vehicles);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching vehicles' });
+  }
+});
+
+// Admin: Get all employees
+app.get('/api/users/employees', async (req, res) => {
+  try {
+    const employees = await User.find({ role: 'employee' });
+    res.json(employees);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching employees' });
+  }
+});
+
+// Admin: Create a job
+app.post('/api/jobs/create', async (req, res) => {
+  try {
+    const { vehicleId, mechanicId, description, status, appointmentDate } = req.body;
+
+    const vehicle = await Vehicle.findById(vehicleId);
+    const mechanic = await User.findById(mechanicId);
+
+    if (!vehicle) return res.status(400).json({ message: 'Vehicle not found' });
+    if (!mechanic || mechanic.role !== 'employee') return res.status(400).json({ message: 'Invalid mechanic' });
+
+    const newJob = new Job({
+      customerId: vehicle.customerId,
+      vehicleId,
+      mechanicId,
+      description,
+      status,
+      appointmentDate
+    });
+
+    await newJob.save();
+    res.status(201).json({ message: 'Job created successfully', job: newJob });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error creating job' });
+  }
+});
+
+
 // Landing page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "index.html"));

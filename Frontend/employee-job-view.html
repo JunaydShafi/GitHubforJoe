@@ -24,21 +24,18 @@
 
   <div class="wrapper">
 
-      <button class="topLeftCenter" type ="submit"> Start</button>
-
+    <button id="completeBtn" class="bottomRightCenter" type="button"> Mark Complete</button>
 
     <div>
-    
-    <div>
-      <p>Vehicle Info</p>
+      <div>
+        <p>Vehicle Info</p>
+        <textarea id="vehicleInfo" rows="2" placeholder="1999 Nissan GTR R34"></textarea>
+      </div>
 
-      <textarea id="vehicleInfo" rows="2" placeholder="1999 Nissan GTR R34"></textarea>
-    </div>
+      <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
 
-    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
-
-    <p>Reason For Appointment</p>
-    <textarea id="appointmentReason" rows="2" placeholder="Front Driveline Balljoint Replacement."></textarea>
+      <p>Reason For Appointment</p>
+      <textarea id="appointmentReason" rows="2" placeholder="Front Driveline Balljoint Replacement."></textarea>
 
       <h1>&nbsp;</h1><!--Used to space the wrappers-->
 
@@ -58,18 +55,73 @@
 
       <div>
         <P>Start Date: xx/xx/xx   &nbsp; &nbsp;  Day Complete: xx/xx/xx</P>
-        
         <p>Estimated Completion Date: xx/xx/xx</p>
       </div>
-
     </div>
 
- 
-      <button class="bottomLeftCenter" type= "button" onclick="history.back()">Go Back</button>
-      <button class="bottomRightCenter" type ="submit"> Mark Complete</button>
-  
+    <button class="bottomLeftCenter" type="button" onclick="history.back()">Go Back</button>
 
   </div>
-  
+
+  <script>
+    let currentJobId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const employeeId = localStorage.getItem('userId');
+
+      if (!employeeId) {
+        alert("Not logged in.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/jobs/employee/${employeeId}`);
+        const jobs = await res.json();
+
+        if (!jobs.length) {
+          alert("No jobs assigned to you yet.");
+          return;
+        }
+
+        const job = jobs[0];
+        currentJobId = job._id;
+
+        document.getElementById('vehicleInfo').value = `${job.vehicleId.year} ${job.vehicleId.make} ${job.vehicleId.model}`;
+        document.getElementById('appointmentReason').value = job.description;
+        document.getElementById('mechanicAssigned').value = job.customerId.username;
+        document.getElementById('mechanicNotes').value = job.updates?.[0]?.message || '';
+
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load job data.");
+      }
+    });
+
+    document.getElementById('completeBtn').addEventListener('click', async () => {
+      const notes = document.getElementById('mechanicNotes').value;
+      if (!currentJobId) return;
+
+      try {
+        const res = await fetch(`/api/jobs/${currentJobId}/complete`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'complete',
+            updateMessage: notes
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("Job marked as complete!");
+        } else {
+          alert("Error: " + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to complete job.");
+      }
+    });
+  </script>
 </body>
 </html>
