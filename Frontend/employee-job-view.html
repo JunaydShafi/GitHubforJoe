@@ -1,55 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
   <title>Employee Job View</title>
-  <link rel="stylesheet" href="/css/empstyle.css" />
+  <style>
+    .job-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 20px;
+    }
+
+    .job-start-btn,
+    .job-complete-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2e302b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .job-start-btn:hover,
+    .job-complete-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-  <header>Employee Job View</header>
-
-  <div class="container">
-    <!-- Job Info Panel -->
-    <div class="job-panel">
-      <label for="vehicle-info">Vehicle Info</label>
-      <textarea id="vehicle-info" rows="2" placeholder="Details..."></textarea>
-
-      <label for="reason">Reason for</label>
-      <textarea id="reason" rows="2" placeholder="Details..."></textarea>
-
-      <label for="mechanic">Mechanic</label>
-      <textarea id="mechanic" rows="2" placeholder="Mechanic name..."></textarea>
-
-      <label for="note">Mechanic note</label>
-      <input type="text" id="note" placeholder="Optional note..." />
-
-      <div class="dates">
-        <div>
-          <strong>Start Date</strong><br />
-          xx/xx/xxxx
-        </div>
-        <div>
-          <strong>Complete</strong><br />
-          xx/xx/xxxx
-        </div>
-      </div>
-
-      <div class="est-date">
-        <strong>Estimated Completion Date</strong><br />
-        xx/xx/xxxx
-      </div>
-
-      <a href="/employee-dashboard.html" class="back-button">Back</a>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
     </div>
-
-    <!-- Action Buttons -->
-    <div class="side-buttons">
-      <button class="gold-button" id="startBtn">Start</button>
-      <button class="gold-button" id="completeBtn">Mark Complete</button>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
     </div>
   </div>
 
-  <script src="/js/script.js"></script>
+  <div class="wrapper">
+    <h2>Assigned Jobs</h2>
+
+    <label style="margin-bottom: 1em; display: block;">
+      <input type="checkbox" id="hideCompleted">
+      Hide Completed Jobs
+    </label>
+
+    <div id="jobList"></div>
+
+    <button class="bottomLeftCenter" type="button" onclick="history.back()">Go Back</button>
+  </div>
+
+  <script>
+    let allJobs = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const employeeId = localStorage.getItem('userId');
+      const jobList = document.getElementById('jobList');
+      const hideCheckbox = document.getElementById('hideCompleted');
+
+      if (!employeeId) {
+        alert("Not logged in.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/jobs/employee/${employeeId}`);
+        const jobs = await res.json();
+
+        if (!jobs.length) {
+          jobList.innerHTML = "<p>No jobs assigned to you yet.</p>";
+          return;
+        }
+
+        allJobs = jobs;
+        renderJobs();
+
+        hideCheckbox.addEventListener('change', renderJobs);
+      } catch (err) {
+        console.error(err);
+        jobList.innerHTML = "<p>Error loading jobs.</p>";
+      }
+    });
+
+    function renderJobs() {
+      const jobList = document.getElementById('jobList');
+      const hideCompleted = document.getElementById('hideCompleted').checked;
+      jobList.innerHTML = '';
+
+      const formatDate = (date) =>
+        date ? new Date(date).toLocaleString() : 'Not recorded';
+
+      const filteredJobs = hideCompleted
+        ? allJobs.filter(job => job.status !== 'complete')
+        : allJobs;
+
+      if (filteredJobs.length === 0) {
+        jobList.innerHTML = "<p>No visible jobs match your filter.</p>";
+        return;
+      }
+
+      filteredJobs.forEach(job => {
+        const container = document.createElement('div');
+        container.className = 'job-card';
+
+        container.innerHTML = `
+          <div>
+            <p><strong>Vehicle Info</strong></p>
+            <textarea rows="2" readonly>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</textarea>
+          </div>
+
+          <div>
+            <p><strong>Reason for Appointment</strong></p>
+            <textarea rows="2" readonly>${job.description}</textarea>
+          </div>
+
+          <div>
+            <p><strong>Customer Assigned</strong></p>
+            <textarea rows="2" readonly>${job.customerId?.username || ''}</textarea>
+          </div>
+
+          <div>
+            <p><strong>Mechanic's Notes</strong></p>
+            <textarea rows="2" id="notes-${job._id}" placeholder="Enter update here...">${job.updates?.[0]?.message || ''}</textarea>
+          </div>
+
+          <div>
+            <p><strong>Status:</strong> ${job.status}</p>
+            <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
+            <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>
+            <p><strong>Completed:</strong> ${formatDate(job.completedDate)}</p>
+          </div>
+
+          <div class="job-buttons">
+            <button class="job-start-btn" onclick="startJob('${job._id}')">Start Job</button>
+            <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
+          </div>
+
+          <hr />
+        `;
+
+        jobList.appendChild(container);
+      });
+    }
+
+    async function startJob(jobId) {
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'in progress' })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("Job started.");
+          location.reload();
+        } else {
+          alert("Error: " + (data.message || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to start job.");
+      }
+    }
+
+    async function markComplete(jobId) {
+      const notes = document.getElementById(`notes-${jobId}`).value;
+
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/complete`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'complete',
+            updateMessage: notes
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("Job marked as complete.");
+          location.reload();
+        } else {
+          alert("Error: " + (data.message || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to complete job.");
+      }
+    }
+  </script>
 </body>
 </html>

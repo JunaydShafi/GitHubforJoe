@@ -1,26 +1,156 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Car Info</title>
-    </head>
-    <body>
-        <h1>Add Vehicle Information</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/Junstyle.css" />
+  <title>Car Info</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .page-content {
+      padding-top: 60px;
+      padding-bottom: 100px;
+    }
+
+    .wrapper {
+      background-color: rgba(0, 77, 51, 0.95);
+      max-width: 700px;
+      min-height: 900px;
+      height: 1600px;
+      margin: 0 auto;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    h3 {
+      color: white;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    input,
+    textarea {
+      padding: 8px;
+      font-size: 0.95rem;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    #car-message {
+      color: lightgreen;
+      text-align: center;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .bottomLeftCenter,
+    .bottomRightCenter {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      background-color: #222;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      position: static !important;
+      float: none !important;
+    }
+
+    .bottomLeftCenter:hover,
+    .bottomRightCenter:hover {
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="wrapper">
+      <h1>Add Vehicle Information</h1>
+      <form id="add-car-form">
 
         <h3>Vehicle Make</h3>
-        <!--add vehicle make user input text box-->
+        <input type="text" name="make" id="make" placeholder="Toyota" required />
+
         <h3>Vehicle Model</h3>
-        <!--add vehicle model user input text box-->
+        <input type="text" name="model" id="model" placeholder="Camry" required />
+
         <h3>Vehicle Color</h3>
-        <!--add vehicle color user input text box-->
+        <input type="text" name="color" id="color" placeholder="Silver" />
+
         <h3>Vehicle Year</h3>
-        <!--add vehicle year user input text box-->
+        <input type="number" name="year" id="year" placeholder="2020" required />
+
+        <h3>VIN</h3>
+        <input type="text" name="vin" id="vin" placeholder="1HGCM82633A123456" />
+
+        <h3>License Plate</h3>
+        <input type="text" name="licensePlate" id="licensePlate" placeholder="ABC1234" />
 
         <h3>Comments / Vehicle Notes:</h3>
-        <!--add comments/notes user input text box-->
+        <textarea name="notes" id="notes" placeholder="Any special notes or comments..." rows="4"></textarea>
 
-        <button onclick="location.href='myCars'">Back</button>
-        <button onclick="location.href='myCars'">Add Vehicle</button>
-    </body>
+        <p id="car-message"></p>
+
+        <div class="button-row">
+          <button type="button" class="bottomLeftCenter" onclick="history.back()">Back</button>
+          <button type="submit" class="bottomRightCenter">Add Vehicle</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/addCar.js" defer></script>
+</body>
 </html>

@@ -1,30 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Employee</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
+  <title>New Employee</title>
 </head>
 <body>
+
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <button class="topLeftCenter" type="button" onclick="history.back()">Close</button>
     <div>
-        <h1>Administator</h1>
+      <h1>Add Employee</h1>
     </div>
 
-    <form>
-        <p>Input Employee Info</p>
-        <label for="fname">First Name</label><br>
-        <input id="fname" required><br>
-        <label for="lname">Last Name</label><br>
-        <input id="lname" required><br>
-        <label for="eemail">Email</label><br>
-        <input type="email" id="eemail" required><br>
-        <label for="eid">Employee ID Number</label><br>
-        <input id="eid" minlength="7" maxlength="7" size="7" required><br>
-        <label for="prate">Hourly Rate</label><br>
-        <input id="prate" maxlength="5" size="5" required><br>
-        <label for="isadmin">Employee is Admin</label><br>
-        <input type="checkbox" id="isadmin"><br>
-        <input type="submit" onclick="location.href='payroll'">
+    <form id="new-employee-form">
+      <p>Input New Employee Info</p>
+
+      <div>
+        <input type="text" name="username" id="fname-input" placeholder="Full Name (First Last)" required>
+      </div>
+
+      <div>
+        <input type="email" name="email" id="email-input" placeholder="Email" required>
+      </div>
+
+      <div>
+        <input type="password" name="password" id="password-input" placeholder="Password" required>
+      </div>
+
+      <div>
+        <input type="text" name="phone" id="phone-input" placeholder="Phone Number">
+      </div>
+
+      <div>
+        <input type="number" name="payRate" id="payRate-input" placeholder="Hourly Payrate">
+      </div>
+
+      <div class="checkbox-wrapper">
+        <input type="checkbox" id="isAdmin" name="isAdmin">
+        <label for="isAdmin">Employee Is Admin?</label>
+      </div>
+
+      <button type="submit">Create Account</button>
     </form>
+
+    <p id="message" style="margin-top: 10px; color: green;"></p>
+
+    <button class="bottomLeftCenter" onclick="location.href='adminMain.html'">Back to Admin Dashboard</button>
+  </div>
+
+  <script src="/js/newEmployee.js" defer></script>
 </body>
 </html>
