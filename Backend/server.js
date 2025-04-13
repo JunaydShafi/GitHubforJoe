@@ -72,14 +72,15 @@ app.post('/api/login', async (req, res) => {
       if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
   
       let redirectPage = '/customerMainPage.html';
-      if (user.role === 'employee') redirectPage = '/employee-dashboard.html';
-      if (user.role === 'admin') redirectPage = '/adminMain.html';
-  
-      res.status(200).json({
-        success: true,
-        redirect: "/customerMainPage.html",
-        userId: user._id // ✅ must be inside this object
-      });
+if (user.role === 'employee') redirectPage = '/employee-dashboard.html';
+if (user.role === 'admin') redirectPage = '/adminMain.html';
+
+res.status(200).json({
+  success: true,
+  redirect: redirectPage, // ✅ use the correct path based on role
+  userId: user._id
+});
+
   
     } catch (err) {
       console.error(err);
