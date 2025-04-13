@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
   <title>Employee Dashboard</title>
-  <link rel="stylesheet" href="/css/empstyle.css" />
 </head>
 <body>
-  <header>Employee Dashboard</header>
 
-  <main class="dashboard-content">
-    <!-- ASSIGNED JOBS -->
-    <section class="job-section">
-      <h2 class="section-title">Assigned Jobs</h2>
-      <p class="job-date">Assigned: x/x/x</p>
-
-      <div class="job-card">
-        <h3>Vehicle</h3>
-        <a href="/employee-job-view.html" class="gold-button">View</a>
+  <div class="header-main"><!--this is for the top footer of the page-->
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class = "Title">
+      <div class="title-container">
+          <div class="shop-name">Joe's AutoShop</div>
+          <div class="tagline">If it ain't Joe don't fix it!</div>
       </div>
-    </section>
+        <div class="account-box-left">
+            <button onclick="location.href='index.html'">Log Out</button>
+        </div>
+    </div>
+  </div>
 
-    <!-- STARTED JOBS -->
-    <section class="job-section">
-      <h2 class="section-title">Started Jobs</h2>
-      <p class="job-date">Started: x/x/x</p>
+  <div class ="wrapper">
+    <h1>Employee</h1>
 
-      <div class="job-card">
-        <h3>Vehicle</h3>
-        <a href="/employee-job-view.html" class="gold-button">View</a>
-      </div>
-    </section>
+    <div class="account-box">
+      <button onclick="location.href='employeeJobDashboard.html'">Dashboard</button>
+    </div>
 
-    <a href="/main-employee.html" class="back-button">Back</a>
-  </main>
+    <div class="account-box">
+      <button onclick="location.href='payroll-display.html'">Upcoming Payroll</button>
+    </div>
 
-  <script src="/js/script.js"></script>
+  </div>
+  
 </body>
 </html>

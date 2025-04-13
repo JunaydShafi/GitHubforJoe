@@ -3,26 +3,57 @@
     <head>
         <meta charset="UTF8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/Junstyle.css">
         <title>Request Appointment</title>
     </head>
     <body>
-        <h1>Request Appointment</h1>
+        <div class="header-main"><!--this is for the top footer of the page-->
+            <div class="logo">
+              <img src="images/WhiteLogo.png" alt="Logo">
+            </div>
+            <div class = "Title">
+              <div class="title-container">
+                  <div class="shop-name">Joe's AutoShop</div>
+                  <div class="tagline">If it ain't Joe don't fix it!</div>
+              </div>
+                <div class="account-box-left">
+                    <button onclick="location.href='index.html'">Log Out</button>
+                </div>
+            </div>
+          </div>
 
-        <h3>User Information:</h3>
-        <h4>Name (First and Last)</h4>
-        <!--user input name text box here-->
-        <h4>Email</h4>
-        <!--user input email text box here-->
-        <h4>Phone Number</h4>
-        <!--user input phone number text box here-->
+        <div class ="wrapper">
+            <h1>Request Appointment</h1>
 
-        <h3>Vehicle</h3>
-        <!--car selection dropdown here-->
+            <h1>&nbsp;</h1><!--Used to space the wrappers-->
 
-        <h3>Reason for appointment:</h3>
-        <!--customer input appointment reason text box here-->
+            <h4>Name (First and Last)</h4>
+            <!--user input name text box here-->
+            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
+            <h4>Email</h4>
+            <!--user input email text box here-->
+            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
+            <h4>Phone Number</h4>
+            <!--user input phone number text box here-->
+            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
 
-        <button onclick="location.href='customerMainPage'">Back</button>
-        <button onclick="location.href='requestSent'">Send Request</button>
+            <h3>Vehicle</h3>
+            <!--car selection dropdown here-->
+            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
+
+            <h3>Reason for appointment:</h3>
+            <!--customer input appointment reason text box here-->
+            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
+                <div>
+                    <button class="bottomLeftCenter" onclick="location.href='customerMainPage'">Back</button>
+                </div>
+
+                <div class="account-box">
+                    <button onclick="location.href='requestSent'">Send Request</button>
+                </div>
+
+        </div>
+
+        
     </body>
 </html>
