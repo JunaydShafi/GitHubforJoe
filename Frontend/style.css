@@ -30,6 +30,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     padding-left: 380px; 
     padding-right: 380px;
     position: fixed;
@@ -150,17 +151,20 @@ p {
 
 .button {
     background: linear-gradient(to top, #9c2121, #ff4a4a);
+    height: 50px;
+    width: 220px;
     color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); 
     border:inset 2px solid;
     border-color: #d43232;
-    padding: 15px 25px;
-    font-size: 28px;
+    font-size: 18px;
     font-weight: lighter;
     cursor: pointer;
-    border-radius: 10px;
-    margin-left: auto; 
+    margin-left: auto;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
 }
 
 .button:hover {

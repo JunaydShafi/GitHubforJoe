@@ -374,6 +374,28 @@ app.get("/payroll-display", (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend/payroll-display.html"));
 });
 
+  //customerRequestAppointment start----------------
+
+  import Appointment from "./Models/AppointmentRequest.js";
+app.use(express.urlencoded({extended: true}));
+
+//test appointment router
+app.post("/createAppointment", async (req, res) => {
+  console.log("📥 Incoming appointment:", req.body); // ADD THIS LINE
+
+  try {
+    const appointment = new Appointment(req.body);
+    await appointment.save();
+    //res.status(201).json({ message: "Appointment saved!", appointment });
+    res.redirect("/customerMainPage");
+  } catch (err) {
+    console.error("❌ Error saving appointment:", err);
+    res.status(500).json({ error: "Failed to save appointment" });
+  }
+});
+  //customerRequestAppointment end--------------
+
+
 dotenv.config();
 
 app.listen(5000, () => {

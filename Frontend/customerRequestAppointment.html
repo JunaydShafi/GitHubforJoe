@@ -27,31 +27,23 @@
 
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
 
-            <h4>Name (First and Last)</h4>
-            <!--user input name text box here-->
-            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
-            <h4>Email</h4>
-            <!--user input email text box here-->
-            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
-            <h4>Phone Number</h4>
-            <!--user input phone number text box here-->
-            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
-
-            <h3>Vehicle</h3>
-            <!--car selection dropdown here-->
-            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
-
-            <h3>Reason for appointment:</h3>
-            <!--customer input appointment reason text box here-->
-            <div><textarea id="userName" rows="2" placeholder=" "></textarea></div>
-                <div>
-                    <button class="bottomLeftCenter" onclick="location.href='customerMainPage'">Back</button>
-                </div>
-
-                <div class="account-box">
-                    <button onclick="location.href='requestSent'">Send Request</button>
-                </div>
-
+            <form action="createAppointment" method="post" id="appointmentForm">
+                <input type="text" name="firstName" placeholder="First Name" required />
+                <input type="text" name="lastName" placeholder="Last Name" required />
+                <input type="email" name="email" placeholder="Email" required />
+                <input type="tel" name="phone" placeholder="Phone Number" required />
+                
+                <select name="vehicleId" id="vehicleDropdown" required>
+                    <option value="" disabled selected>Select your vehicle</option>
+                    <!-- Future dynamic options go here -->
+                    <option value="test-vehicle">Test Vehicle</option>
+                  </select>
+                
+                <textarea name="reason" placeholder="Reason for appointment..." required></textarea>
+                <button type="submit">Submit</button>
+              </form>
+            
+              <script></script>
         </div>
 
         
