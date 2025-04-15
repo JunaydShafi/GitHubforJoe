@@ -376,17 +376,26 @@ app.get("/payroll-display", (req, res) => {
 
   //customerRequestAppointment start----------------
 
-  import Appointment from "./Models/AppointmentRequest.js";
+  import Appointment from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
-//test appointment router
 app.post("/createAppointment", async (req, res) => {
-  console.log("📥 Incoming appointment:", req.body); // ADD THIS LINE
+  console.log("📥 Incoming appointment:", req.body);
 
   try {
-    const appointment = new Appointment(req.body);
+    const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
+
+    const appointment = new Appointment({
+      firstName,
+      lastName,
+      email,
+      phone,
+      vehicleId,
+      reason,
+      date: new Date(appointmentDate),  // <-- Parse date properly
+    });
+
     await appointment.save();
-    //res.status(201).json({ message: "Appointment saved!", appointment });
     res.redirect("/customerMainPage");
   } catch (err) {
     console.error("❌ Error saving appointment:", err);
