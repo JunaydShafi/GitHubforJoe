@@ -127,11 +127,12 @@
             <p><strong>Customer Assigned</strong></p>
             <textarea rows="2" readonly>${job.customerId?.username || ''}</textarea>
           </div>
+<div class="job-notes-wrapper">
+  <p><strong>Mechanic's Notes</strong></p>
+  <textarea id="notes-${job._id}" rows="2" placeholder="Enter update here...">${job.updates?.[job.updates.length - 1]?.message || ''}</textarea>
+  <button class="job-update-btn" onclick="addUpdate('${job._id}')">Update</button>
+</div>
 
-          <div>
-            <p><strong>Mechanic's Notes</strong></p>
-            <textarea rows="2" id="notes-${job._id}" placeholder="Enter update here...">${job.updates?.[0]?.message || ''}</textarea>
-          </div>
 
           <div>
             <p><strong>Status:</strong> ${job.status}</p>
@@ -198,6 +199,47 @@
         alert("Failed to complete job.");
       }
     }
+
+    async function addUpdate(jobId) {
+  const textarea = document.getElementById(`notes-${jobId}`);
+  const updateText = textarea.value.trim();
+
+  if (!updateText) {
+    alert("Please enter an update.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/jobs/${jobId}/add-update`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: updateText })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Update added successfully!");
+
+      // ✅ Reflect the new update immediately
+      const latest = data.job.updates[data.job.updates.length - 1];
+      textarea.value = latest.message;
+
+      // OPTIONAL: If you want to show a history list below it
+      // const updateLog = document.getElementById(`update-log-${jobId}`);
+      // updateLog.innerHTML = data.job.updates.map(u => `<li>${u.message}</li>`).join('');
+
+    } else {
+      alert("Error: " + (data.message || 'Unknown error'));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Failed to add update.");
+  }
+}
+
   </script>
 </body>
 </html>

@@ -184,6 +184,25 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
   }
 });
 
+app.patch('/api/jobs/:id/add-update', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    if (!req.body.message || req.body.message.trim() === "") {
+      return res.status(400).json({ message: 'Update message cannot be empty' });
+    }
+
+    job.updates.push({ message: req.body.message });
+    await job.save();
+
+    res.json({ message: 'Update added successfully', job });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error adding update' });
+  }
+});
+
 app.patch('/api/jobs/:id/complete', async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
