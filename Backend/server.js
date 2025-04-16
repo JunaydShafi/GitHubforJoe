@@ -404,6 +404,52 @@ app.post("/createAppointment", async (req, res) => {
 });
   //customerRequestAppointment end--------------
 
+  // retreive customerRequestAppointment to output on admins view appointment START
+
+
+  app.get("/api/admin/appointments", async (req, res) => {
+    try {
+      const appointments = await Appointment.find({ status: "pending" });
+      res.json(appointments);
+    } catch (error) {
+      console.error("❌ Failed to fetch appointments:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  //retreive customerRequestAppointment to output on admins view appointment END
+
+  // Backend Points STart
+  app.post("/api/admin/appointments/:id/approve", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Appointment.findByIdAndUpdate(id, { status: "approved" });
+      res.json({ message: "Appointment approved" });
+    } catch (err) {
+      console.error("❌ Error approving:", err);
+      res.status(500).json({ error: "Failed to approve" });
+    }
+  });
+  
+  app.post("/api/admin/appointments/:id/deny", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Appointment.findByIdAndUpdate(id, { status: "denied" });
+      res.json({ message: "Appointment denied" });
+    } catch (err) {
+      console.error("❌ Error denying:", err);
+      res.status(500).json({ error: "Failed to deny" });
+    }
+  });
+  //Backend points ENd
+  app.get('/api/appointments', async (req, res) => {
+    try {
+        const appointments = await Appointment.find({});
+        res.json(appointments);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 dotenv.config();
 
