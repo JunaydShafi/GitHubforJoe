@@ -35,55 +35,84 @@
       try {
         const res = await fetch('/api/appointments');
         const data = await res.json();
-
+  
         const container = document.getElementById('appointments');
         container.innerHTML = '';
-
+  
         if (data.length === 0) {
           container.innerHTML = '<p>No appointments found.</p>';
           return;
         }
-
+  
         data.forEach(appointment => {
           const dateObj = new Date(appointment.date);
           const formattedDate = isNaN(dateObj) ? "Invalid Date" : dateObj.toLocaleString();
-
+  
           const div = document.createElement('div');
           div.className = 'account-box';
           div.innerHTML = `
-  <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
-  <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
-  <div class="details" style="display:none; margin-top:10px;">
-    <p><strong>Email:</strong> ${appointment.email}</p>
-    <p><strong>Phone:</strong> ${appointment.phone}</p>
-    <p><strong>Reason:</strong> ${appointment.reason}</p>
-    <p><strong>Vehicle ID:</strong> ${appointment.vehicleId}</p>
-    <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="approve('${appointment._id}')">Approve</button>
-    <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="deny('${appointment._id}')">Deny</button>
-  </div>
-`;
+            <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
+            <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
+            <div class="details" style="display:none; margin-top:10px;">
+              <p><strong>Email:</strong> ${appointment.email}</p>
+              <p><strong>Phone:</strong> ${appointment.phone}</p>
+              <p><strong>Reason:</strong> ${appointment.reason}</p>
+              <p><strong>Vehicle ID:</strong> ${appointment.vehicleId}</p>
+            </div>
+          `;
+  
+          const detailsDiv = div.querySelector('.details');
+  
+          // Approve button
+          const approveBtn = document.createElement('button');
+          approveBtn.textContent = 'Approve';
+          approveBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px; margin-right: 5px;';
+          approveBtn.onclick = () => approve(appointment._id);
+  
+          // Deny button
+          const denyBtn = document.createElement('button');
+          denyBtn.textContent = 'Deny';
+          denyBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;';
+          denyBtn.addEventListener('click', () => deny(appointment._id, div));
+  
+          detailsDiv.appendChild(approveBtn);
+          detailsDiv.appendChild(denyBtn);
+  
           container.appendChild(div);
         });
       } catch (err) {
         console.error('Error fetching appointments:', err);
       }
     }
-
+  
     function toggleDetails(button) {
       const details = button.nextElementSibling;
       details.style.display = details.style.display === 'none' ? 'block' : 'none';
     }
-
+  
     function approve(id) {
       alert(`Approved appointment ${id}`);
-      // Later: Send email + redirect to create job page
+      // TODO: Later: Redirect to create-job.html with appointment data
     }
-
-    function deny(id) {
-      alert(`Denied appointment ${id}`);
-      // Later: Send denial email
+  
+    function deny(apptId, card) {
+      const confirmed = confirm("Are you sure you want to deny this appointment?");
+      if (!confirmed) return;
+  
+      fetch(`/api/appointments/${apptId}`, {
+        method: 'DELETE'
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert('Appointment denied and email sent.');
+        card.remove(); // remove the appointment card from the UI
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error denying appointment.');
+      });
     }
-
+  
     fetchAppointments();
   </script>
 </body>

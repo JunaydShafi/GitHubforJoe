@@ -441,6 +441,8 @@ app.post("/createAppointment", async (req, res) => {
     }
   });
   //Backend points ENd
+
+  //Page to view the database objects on admin/appointments
   app.get('/api/appointments', async (req, res) => {
     try {
         const appointments = await Appointment.find({});
@@ -451,7 +453,62 @@ app.post("/createAppointment", async (req, res) => {
     }
 });
 
+
 dotenv.config();
+
+//import stuff for email senger START
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+//ENd of email import
+
+//Used to delete appointments is admin/appointments Start
+
+app.delete('/api/appointments/:id', async (req, res) => {
+  try {
+    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    // SEND EMAIL HERE:
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: appointment.email,
+      subject: 'Appointment Denied - Joe\'s AutoShop',
+      text: `Hi ${appointment.firstName},
+
+Unfortunately, your appointment request for ${appointment.date} has been denied.
+
+If you have any questions or would like to reschedule, please contact us at (916) 553-4249.
+
+Best,
+Joe's AutoShop Team`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email sending failed:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+    res.json({ message: 'Appointment denied and deleted', appointment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+//Used to delete appointments is admin/appointments END
+
 
 app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
