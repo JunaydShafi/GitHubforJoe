@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   phone: String,
   password: String,
+  resetOtp: String,
+  otpExpires: Date,
+  canReset: Boolean,
+
   role: {
     type: String,
     enum: ['customer', 'employee', 'admin'], // ✅ all valid roles included

@@ -9,6 +9,9 @@ import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
+import nodemailer from 'nodemailer';
+
+
 app.use(express.json());
 
 app.post('/api/vehicles/add', async (req, res) => {
@@ -181,25 +184,6 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error updating status' });
-  }
-});
-
-app.patch('/api/jobs/:id/add-update', async (req, res) => {
-  try {
-    const job = await Job.findById(req.params.id);
-    if (!job) return res.status(404).json({ message: 'Job not found' });
-
-    if (!req.body.message || req.body.message.trim() === "") {
-      return res.status(400).json({ message: 'Update message cannot be empty' });
-    }
-
-    job.updates.push({ message: req.body.message });
-    await job.save();
-
-    res.json({ message: 'Update added successfully', job });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error adding update' });
   }
 });
 
@@ -413,7 +397,82 @@ app.post("/createAppointment", async (req, res) => {
   }
 });
   //customerRequestAppointment end--------------
-
+  app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) return res.status(404).json({ message: 'Email not found' });
+  
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  
+      user.resetOtp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
+  
+      // ✉️ Send OTP via email using Nodemailer
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,     // your email
+          pass: process.env.EMAIL_PASS      // app password or email pass
+        }
+      });
+  
+      await transporter.sendMail({
+        from: `"Joe's Auto" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Your Password Reset OTP',
+        text: `Your OTP code is: ${otp} — valid for 10 minutes.`
+      });
+  
+      res.json({ message: 'OTP sent' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error sending OTP' });
+    }
+  });
+  
+  // ✅ 2. Verify OTP
+  app.post('/api/verify-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user || user.resetOtp !== otp || user.otpExpires < new Date()) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+      }
+  
+      user.resetOtp = null;
+      user.otpExpires = null;
+      user.canReset = true; // flag to allow reset
+      await user.save();
+  
+      res.json({ message: 'OTP verified' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Verification error' });
+    }
+  });
+  
+  // ✅ 3. Reset password
+  app.post('/api/reset-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user || !user.canReset) return res.status(403).json({ message: 'Not authorized to reset password' });
+  
+      const hashed = await bcrypt.hash(newPassword, 10);
+      user.password = hashed;
+      user.canReset = false;
+      await user.save();
+  
+      res.json({ message: 'Password reset successful' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Password reset failed' });
+    }
+  });
+  
 
 dotenv.config();
 

@@ -41,23 +41,31 @@
 
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
         
-        <script>
-            function confirmPassword() {
-                const newPassword = document.getElementById("newPassword-input").value;
-                const confirmPassword = document.getElementById("confirmNewPassword-input").value;
-            
-                if (!newPassword || !confirmPassword) {
-                alert("Please fill in both password fields.");
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-            window.location.href = "success";
-        }
-            </script>
-    
+            <script>
+                async function confirmPassword() {
+                    const newPassword = document.getElementById("newPassword-input").value;
+                    const confirmPassword = document.getElementById("confirmNewPassword-input").value;
+                    const email = localStorage.getItem("resetEmail");
+                
+                    if (newPassword !== confirmPassword) {
+                        alert("Passwords do not match.");
+                        return;
+                    }
+                
+                    const res = await fetch("/api/reset-password", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, newPassword })
+                    });
+                
+                    if (res.ok) {
+                        alert("Password reset successful!");
+                        window.location.href = "/login";
+                    } else {
+                        alert("Error resetting password.");
+                    }
+                }
+                </script>
+                            
     </body>
 </html>
