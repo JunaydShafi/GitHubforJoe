@@ -486,7 +486,6 @@ app.delete('/api/appointments/:id', async (req, res) => {
       text: `Hello ${appointment.firstName} ${appointment.lastName},
 
 Unfortunately, your appointment request for ${appointment.date} has been denied.
-
 If you have any questions or would like to reschedule, please contact us at (916) 553-4249.
 
 Best,
