@@ -9,7 +9,8 @@ import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
-app.use(express.json());
+import AppointmentRequest from "./models/AppointmentRequest.js";
+app.use(express.json());  
 
 app.post('/api/vehicles/add', async (req, res) => {
     try {
@@ -375,24 +376,37 @@ app.get("/payroll-display", (req, res) => {
 });
 
   //customerRequestAppointment start----------------
-
-  import Appointment from "./Models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
 //test appointment router
-app.post("/createAppointment", async (req, res) => {
-  console.log("📥 Incoming appointment:", req.body); // ADD THIS LINE
+app.post('/createAppointment', async (req, res) => {
+  const { firstName, lastName, email, phone, vehicleId, reason } = req.body;
+
+  console.log('Received data:', req.body); // Log incoming data
 
   try {
-    const appointment = new Appointment(req.body);
-    await appointment.save();
-    //res.status(201).json({ message: "Appointment saved!", appointment });
-    res.redirect("/customerMainPage");
-  } catch (err) {
-    console.error("❌ Error saving appointment:", err);
-    res.status(500).json({ error: "Failed to save appointment" });
+    // Ensure vehicleId is set to a placeholder if not provided
+    const newAppointment = new AppointmentRequest({
+      firstName,
+      lastName,
+      email,
+      phone,
+      vehicleId: vehicleId || 'placeholder-vehicle-id', // Default to placeholder if vehicleId is missing
+      reason
+    });
+
+    // Save the new appointment to the database
+    await newAppointment.save();
+
+    // Send a success response
+    res.redirect('/customerMainPage'); // Or res.status(200).json({ message: "Appointment created!" });
+  } catch (error) {
+    console.error("❌ Error creating appointment:", error.message); // Log the specific error
+    res.status(500).json({ error: error.message || 'Failed to save appointment' });
   }
 });
+
+
   //customerRequestAppointment end--------------
 
 
