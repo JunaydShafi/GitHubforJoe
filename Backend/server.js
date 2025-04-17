@@ -483,14 +483,15 @@ app.delete('/api/appointments/:id', async (req, res) => {
       from: process.env.EMAIL_USER,
       to: appointment.email,
       subject: 'Appointment Denied - Joe\'s AutoShop',
-      text: `Hi ${appointment.firstName},
+      text: `Hello ${appointment.firstName} ${appointment.lastName},
 
 Unfortunately, your appointment request for ${appointment.date} has been denied.
 
 If you have any questions or would like to reschedule, please contact us at (916) 553-4249.
 
 Best,
-Joe's AutoShop Team`
+Joe's AutoShop Team
+`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
