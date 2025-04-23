@@ -28,6 +28,33 @@
     .job-complete-btn:hover {
       background-color: #0056b3;
     }
+
+    .job-layout {
+      display: flex;
+      gap: 20px;
+    }
+
+    .job-sidebar {
+      width: 250px;
+      max-height: 70vh;
+      overflow-y: auto;
+      border-right: 1px solid #ccc;
+      padding-right: 10px;
+    }
+
+    .job-sidebar-item {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+
+    .job-sidebar-item:hover {
+      background-color: #f0f0f0;
+    }
+
+    .job-details {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -54,7 +81,12 @@
       Hide Completed Jobs
     </label>
 
-    <div id="jobList"></div>
+    <div class="job-layout">
+      <div class="job-sidebar" id="jobSidebar"></div>
+      <div class="job-details" id="jobDetails">
+        <p>Select a job to view details</p>
+      </div>
+    </div>
 
     <button class="bottomLeftCenter" type="button" onclick="history.back()">Go Back</button>
   </div>
@@ -64,7 +96,6 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       const employeeId = localStorage.getItem('userId');
-      const jobList = document.getElementById('jobList');
       const hideCheckbox = document.getElementById('hideCompleted');
 
       if (!employeeId) {
@@ -77,7 +108,7 @@
         const jobs = await res.json();
 
         if (!jobs.length) {
-          jobList.innerHTML = "<p>No jobs assigned to you yet.</p>";
+          document.getElementById('jobSidebar').innerHTML = "<p>No jobs assigned to you yet.</p>";
           return;
         }
 
@@ -87,70 +118,64 @@
         hideCheckbox.addEventListener('change', renderJobs);
       } catch (err) {
         console.error(err);
-        jobList.innerHTML = "<p>Error loading jobs.</p>";
+        document.getElementById('jobSidebar').innerHTML = "<p>Error loading jobs.</p>";
       }
     });
 
     function renderJobs() {
-      const jobList = document.getElementById('jobList');
+      const sidebar = document.getElementById('jobSidebar');
+      const details = document.getElementById('jobDetails');
       const hideCompleted = document.getElementById('hideCompleted').checked;
-      jobList.innerHTML = '';
 
-      const formatDate = (date) =>
-        date ? new Date(date).toLocaleString() : 'Not recorded';
+      sidebar.innerHTML = '';
+      details.innerHTML = '<p>Select a job to view details</p>';
 
       const filteredJobs = hideCompleted
         ? allJobs.filter(job => job.status !== 'complete')
         : allJobs;
 
       if (filteredJobs.length === 0) {
-        jobList.innerHTML = "<p>No visible jobs match your filter.</p>";
+        sidebar.innerHTML = '<p>No visible jobs match your filter.</p>';
         return;
       }
 
       filteredJobs.forEach(job => {
-        const container = document.createElement('div');
-        container.className = 'job-card';
+        const item = document.createElement('div');
+        item.className = 'job-sidebar-item';
+        item.textContent = `${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''} — ${job.status}`;
 
-        container.innerHTML = `
-          <div>
-            <p><strong>Vehicle Info</strong></p>
-            <textarea rows="2" readonly>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</textarea>
-          </div>
+        item.addEventListener('click', () => {
+          showJobDetails(job);
+        });
 
-          <div>
-            <p><strong>Reason for Appointment</strong></p>
-            <textarea rows="2" readonly>${job.description}</textarea>
-          </div>
-
-          <div>
-            <p><strong>Customer Assigned</strong></p>
-            <textarea rows="2" readonly>${job.customerId?.username || ''}</textarea>
-          </div>
-<div class="job-notes-wrapper">
-  <p><strong>Mechanic's Notes</strong></p>
-  <textarea id="notes-${job._id}" rows="2" placeholder="Enter update here...">${job.updates?.[job.updates.length - 1]?.message || ''}</textarea>
-  <button class="job-update-btn" onclick="addUpdate('${job._id}')">Update</button>
-</div>
-
-
-          <div>
-            <p><strong>Status:</strong> ${job.status}</p>
-            <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
-            <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>
-            <p><strong>Completed:</strong> ${formatDate(job.completedDate)}</p>
-          </div>
-
-          <div class="job-buttons">
-            <button class="job-start-btn" onclick="startJob('${job._id}')">Start Job</button>
-            <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
-          </div>
-
-          <hr />
-        `;
-
-        jobList.appendChild(container);
+        sidebar.appendChild(item);
       });
+    }
+
+    function showJobDetails(job) {
+      const details = document.getElementById('jobDetails');
+      const formatDate = (date) => date ? new Date(date).toLocaleString() : 'Not recorded';
+
+      details.innerHTML = `
+        <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
+        <p><strong>Customer:</strong> ${job.customerId?.username || ''}</p>
+        <p><strong>Reason:</strong> ${job.description}</p>
+        <p><strong>Status:</strong> ${job.status}</p>
+        <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
+        <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>
+        <p><strong>Completed:</strong> ${formatDate(job.completedDate)}</p>
+
+        <div class="job-notes-wrapper">
+          <p><strong>Mechanic's Notes:</strong></p>
+          <textarea id="notes-${job._id}" rows="3" placeholder="Enter update here...">${job.updates?.[job.updates.length - 1]?.message || ''}</textarea>
+          <button class="job-update-btn" onclick="addUpdate('${job._id}')">Update</button>
+        </div>
+
+        <div class="job-buttons">
+          <button class="job-start-btn" onclick="startJob('${job._id}')">Start Job</button>
+          <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
+        </div>
+      `;
     }
 
     async function startJob(jobId) {
@@ -201,45 +226,37 @@
     }
 
     async function addUpdate(jobId) {
-  const textarea = document.getElementById(`notes-${jobId}`);
-  const updateText = textarea.value.trim();
+      const textarea = document.getElementById(`notes-${jobId}`);
+      const updateText = textarea.value.trim();
 
-  if (!updateText) {
-    alert("Please enter an update.");
-    return;
-  }
+      if (!updateText) {
+        alert("Please enter an update.");
+        return;
+      }
 
-  try {
-    const res = await fetch(`/api/jobs/${jobId}/add-update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ message: updateText })
-    });
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/add-update`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: updateText })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (res.ok) {
-      alert("Update added successfully!");
-
-      // ✅ Reflect the new update immediately
-      const latest = data.job.updates[data.job.updates.length - 1];
-      textarea.value = latest.message;
-
-      // OPTIONAL: If you want to show a history list below it
-      // const updateLog = document.getElementById(`update-log-${jobId}`);
-      // updateLog.innerHTML = data.job.updates.map(u => `<li>${u.message}</li>`).join('');
-
-    } else {
-      alert("Error: " + (data.message || 'Unknown error'));
+        if (res.ok) {
+          alert("Update added successfully!");
+          const latest = data.job.updates[data.job.updates.length - 1];
+          textarea.value = latest.message;
+        } else {
+          alert("Error: " + (data.message || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to add update.");
+      }
     }
-  } catch (err) {
-    console.error(err);
-    alert("Failed to add update.");
-  }
-}
-
   </script>
 </body>
 </html>

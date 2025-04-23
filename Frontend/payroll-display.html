@@ -35,14 +35,6 @@
         <th width="200">Expected Pay</th>
         <th width="200">Overtime Pay</th>
       </tr>
-
-      <tr bgcolor="gray" align="center">
-        <td>Hours recorded in 2 week span.</td>
-        <td>Employee pay rate.</td>
-        <td>Total Expected Pay.</td>
-        <td>Overtime work hours.</td>
-      </tr>
-
     </table>
     <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
     <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
@@ -50,7 +42,42 @@
 
     <button class="bottomLeftCenter" type= "button" onclick="history.back()">Go Back</button>
   </div>
-
+  <script>
+    window.addEventListener('DOMContentLoaded', async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        alert("User not found. Please log in again.");
+        return;
+      }
+    
+      try {
+        const res = await fetch(`/api/payroll/${userId}`);
+        const { minutes, rate, total, overtime, otPay } = await res.json();
+    
+        const table = document.querySelector('table');
+    
+        // Remove the placeholder row
+        const testRow = table.querySelector('tr:nth-child(2)');
+        if (testRow) testRow.remove();
+    
+        // Insert actual data
+        const row = document.createElement('tr');
+        row.setAttribute('bgcolor', 'gray');
+        row.setAttribute('align', 'center');
+        row.innerHTML = `
+<td>${Math.floor(minutes / 60)}h ${Math.round(minutes % 60)}m</td>
+          <td>$${rate}</td>
+          <td>$${total.toFixed(2)}</td>
+          <td>$${otPay.toFixed(2)}</td>
+        `;
+        table.appendChild(row);
+    
+      } catch (err) {
+        console.error('Error loading payroll data:', err);
+      }
+    });
+    </script>
+    
   
 </body>
 </html>

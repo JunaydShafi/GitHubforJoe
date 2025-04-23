@@ -14,6 +14,31 @@ import nodemailer from 'nodemailer';
 
 app.use(express.json());
 
+app.get('/api/payroll', async (req, res) => {
+  try {
+    const employees = await User.find({ role: 'employee' });
+    const data = employees.map(emp => {
+      const { minutes, overtime, rate } = emp.payroll || {};
+      const basePay = ((minutes || 0) / 60) * (rate || 0);
+      const otPay = (overtime || 0) * (rate || 0) * 1.5;
+      const total = basePay + otPay;
+
+
+
+      return {
+        name: emp.username,
+        minutes,
+        overtime,
+        rate,
+        total
+      };
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load payroll' });
+  }
+});
+
 app.post('/api/vehicles/add', async (req, res) => {
     try {
       const { customerId, make, model, year, vin, licensePlate } = req.body;
@@ -51,9 +76,14 @@ app.post('/api/employees/create', async (req, res) => {
         password: hashedPassword,
         username,
         phone,
-        role: isAdmin ? 'admin' : 'employee'
+        role: isAdmin ? 'admin' : 'employee',
+        payroll: {
+          hours: 0,
+          overtime: 0,
+          rate: 20
+        }
       });
-  
+        
       await newUser.save();
       res.status(201).json({ success: true, message: 'Employee account created successfully.' });
     } catch (err) {
@@ -124,6 +154,30 @@ app.get('/api/jobs/employee/:id', async (req, res) => {
   }
 });
 
+app.get('/api/payroll/:id', async (req, res) => {
+  try {
+    const emp = await User.findById(req.params.id);
+    if (!emp || emp.role !== 'employee') return res.status(404).json({ error: 'Not found' });
+
+    const { minutes, overtime, rate } = emp.payroll || {};
+    const basePay = ((minutes || 0) / 60) * (rate || 0);
+    const otPay = (overtime || 0) * (rate || 0) * 1.5;
+    const total = basePay + otPay;
+
+    res.json({ minutes, rate, total, overtime, otPay });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load payroll' });
+  }
+});
+
+
+
+
+
+
+
+
+
 
 // Admin: Get all vehicles
 app.get('/api/vehicles', async (req, res) => {
@@ -186,6 +240,24 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
     res.status(500).json({ message: 'Error updating status' });
   }
 });
+app.patch('/api/jobs/:id/add-update', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    if (!req.body.message || req.body.message.trim() === "") {
+      return res.status(400).json({ message: 'Update message cannot be empty' });
+    }
+
+    job.updates.push({ message: req.body.message });
+    await job.save();
+
+    res.json({ message: 'Update added successfully', job });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error adding update' });
+  }
+});
 
 app.patch('/api/jobs/:id/complete', async (req, res) => {
   try {
@@ -199,6 +271,19 @@ app.patch('/api/jobs/:id/complete', async (req, res) => {
       job.updates.push({ message: req.body.updateMessage });
     }
 
+    // Calculate hours worked
+    const start = new Date(job.startDate);
+    const end = new Date(job.completedDate);
+    const minutesWorked = (end - start) / (1000 * 60);
+
+    // Add to employee's payroll
+    const mechanic = await User.findById(job.mechanicId);
+    if (mechanic && mechanic.role === 'employee') {
+      mechanic.payroll.minutes = (mechanic.payroll.minutes || 0) + minutesWorked;
+      await mechanic.save();
+    }
+
+
     await job.save();
     res.json({ message: 'Job marked complete', job });
   } catch (err) {
@@ -206,6 +291,24 @@ app.patch('/api/jobs/:id/complete', async (req, res) => {
     res.status(500).json({ message: 'Error completing job' });
   }
 });
+
+app.patch('/api/payroll/:id', async (req, res) => {
+  try {
+    const { hours, overtime, rate } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user || user.role !== 'employee') return res.status(404).json({ message: 'Employee not found' });
+
+    user.payroll = { hours, overtime, rate };
+    await user.save();
+
+    res.json({ message: 'Payroll updated', user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error updating payroll' });
+  }
+});
+
+
+
 
 
 // Admin: Create a job

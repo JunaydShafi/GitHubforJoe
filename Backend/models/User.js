@@ -9,13 +9,19 @@ const userSchema = new mongoose.Schema({
   otpExpires: Date,
   canReset: Boolean,
 
+  payroll: {
+    minutes: { type: Number, default: 0 },
+    overtime: { type: Number, default: 0 },
+    rate: { type: Number, default: 20 } // or whatever base rate you want
+  },
+
   role: {
     type: String,
-    enum: ['customer', 'employee', 'admin'], // ✅ all valid roles included
+    enum: ['customer', 'employee', 'admin'],
     default: 'customer'
   }
 }, {
-  timestamps: true // ✅ belongs here, inside the second argument to Schema
+  timestamps: true
 });
 
 const User = mongoose.model('User', userSchema);

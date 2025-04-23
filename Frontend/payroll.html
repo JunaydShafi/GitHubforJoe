@@ -42,13 +42,6 @@
                     <th>Rate</th>
                     <th>Wages</th>
                 </tr>
-                <tr bgcolor="gray" align="center">
-                    <td>Schmoe, Joe</td>
-                    <td>92</td>
-                    <td>12</td>
-                    <td>$35</td>
-                    <td>$2863.00</td>
-                </tr>
             </table>
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
@@ -56,6 +49,31 @@
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
         </div>
       </div>
-    
+      <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+          try {
+            const res = await fetch('/api/payroll');
+            const data = await res.json();
+        
+            const table = document.querySelector('table');
+        
+            data.forEach(emp => {
+              const row = document.createElement('tr');
+              row.setAttribute('bgcolor', 'gray');
+              row.setAttribute('align', 'center');
+              row.innerHTML = `
+                <td>${emp.name}</td>
+<td>${Math.floor(emp.minutes / 60)}h ${Math.round(emp.minutes % 60)}m</td>
+                <td>${emp.overtime}</td>
+                <td>$${emp.rate}</td>
+                <td>$${emp.total.toFixed(2)}</td>
+              `;
+              table.appendChild(row);
+            });
+          } catch (err) {
+            console.error("Failed to load payroll data:", err);
+          }
+        });
+        </script>        
 </body>
 </html>
