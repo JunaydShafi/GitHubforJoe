@@ -1,38 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Junstyle.css">
-    <title>Create New Job</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
+  <title>Create New Job</title>
+  <style>
+    .viewbox {
+      background-color:#222;
+      border: 2px solid #FFD700;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 25px auto;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      color: white; /* <-- added for dark readable text */
+    }
+  
+    .viewbox p {
+      margin: 15px 0;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+  
+    .viewbox p strong {
+      width: 140px;
+      font-weight: 600;
+    }
+  
+    .viewbox select {
+      padding: 5px;
+      font-size: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div>
-            <button class="topLeftCenter" type="button" onclick="history.back()">Close</button>
-            <h1>Administator</h1>
-            <h1>&nbsp;</h1><!--Used to space the wrappers-->
-        </div>
-    
-        <form id="form">
-            <div>
-                <label for="vehicle"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="..."/></svg></label>
-                <select id="vehicle" required></select>
-            </div>
-    
-            <div>
-                <label for="assignMechanic"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="..."/></svg></label>
-                <select id="assignMechanic" required></select>
-            </div>
-
-            <div>
-                <label for="appointmentDate"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="..."/></svg></label>
-                <input type="datetime-local" id="appointmentDate" required>
-            </div>
-                
-            <input class="account-box" type="submit" value="Submit Job">
-        </form>
+  <div class="wrapper">
+    <div>
+      <button class="topLeftCenter" type="button" onclick="history.back()">Close</button>
+      <h1>Administrator</h1>
+      <h1>&nbsp;</h1><!--Used to space the wrappers-->
     </div>
-    <script src="/js/createJob.js" defer></script>
+
+    <div id="job-info" class="viewbox">
+      <!-- Job info will be injected by JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const vehicle = params.get('vehicle');
+      const reason = params.get('reason');
+      const dateStr = params.get('date');
+      const timeStr = params.get('time');
+      const firstName = params.get('firstName');
+      const lastName = params.get('lastName');
+
+      const dateObj = new Date(dateStr);
+      const formattedDateTime = isNaN(dateObj) ? 'Invalid Date' : dateObj.toLocaleString();
+
+      const container = document.getElementById('job-info');
+      container.innerHTML = `
+        <p><strong>Customer:</strong> ${firstName || ''} ${lastName || ''}</p>
+        <p><strong>Vehicle:</strong> ${vehicle || ''}</p>
+        <p><strong>Reason:</strong> ${reason || ''}</p>
+        <p><strong>Date/Time:</strong> ${formattedDateTime}</p>
+        <p><strong>Assign Mechanic:</strong>
+          <select id="mechanicSelect" style="margin-left: 10px;"></select>
+        </p>
+      `;
+
+      fetch('/api/mechanics')
+        .then(res => res.json())
+        .then(mechanics => {
+          const select = document.getElementById('mechanicSelect');
+          mechanics.forEach(m => {
+            const option = document.createElement('option');
+            option.value = m._id;
+            option.textContent = m.username;
+            select.appendChild(option);
+          });
+        })
+        .catch(err => {
+          console.error('Error loading mechanics:', err);
+        });
+    });
+  </script>
 </body>
 </html>

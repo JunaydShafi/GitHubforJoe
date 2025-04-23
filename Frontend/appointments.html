@@ -67,7 +67,15 @@
           const approveBtn = document.createElement('button');
           approveBtn.textContent = 'Approve';
           approveBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px; margin-right: 5px;';
-          approveBtn.onclick = () => approve(appointment._id);
+          approveBtn.onclick = () => approve(
+  appointment._id,
+  appointment.vehicleName || appointment.vehicleId,  // adapt if your model uses vehicleName
+  appointment.reason,
+  appointment.date,
+  appointment.time,
+  appointment.firstName,
+  appointment.lastName
+);
   
           // Deny button
           const denyBtn = document.createElement('button');
@@ -90,10 +98,34 @@
       details.style.display = details.style.display === 'none' ? 'block' : 'none';
     }
   
-    function approve(id) {
-      alert(`Approved appointment ${id}`);
-      // TODO: Later: Redirect to create-job.html with appointment data
-    }
+    function approve(id, vehicle, reason, date, time, firstName, lastName) {
+  const confirmed = confirm(`Are you sure you want to approve this appointment for ${firstName}?`);
+  if (!confirmed) return;
+
+  fetch('/approve-appointment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ appointmentId: id })
+  })
+  .then(res => res.text())
+  .then(message => {
+    alert('Appointment approved and email sent.');
+
+    const url = new URL('/createJob.html', window.location.origin);
+    url.searchParams.set('vehicle', vehicle);
+    url.searchParams.set('reason', reason);
+    url.searchParams.set('date', date);
+    url.searchParams.set('time', time);
+    url.searchParams.set('firstName', firstName);
+    url.searchParams.set('lastName', lastName); // ✅ This will now work
+
+    window.location.href = url.toString();
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Error approving appointment.');
+  });
+}
   
     function deny(apptId, card) {
       const confirmed = confirm("Are you sure you want to deny this appointment?");

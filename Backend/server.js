@@ -509,6 +509,79 @@ Joe's AutoShop Team
 });
 //Used to delete appointments is admin/appointments END
 
+//approve email sent start
+app.post('/approve-appointment', async (req, res) => {
+  const { appointmentId } = req.body;
+
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) return res.status(404).send('Appointment not found');
+
+    // Send approval email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: appointment.email,
+      subject: 'Your Appointment Has Been Approved',
+      text: `Hello ${appointment.firstName} ${appointment.lastName},
+
+Your appointment for your ${appointment.vehicleName} on ${appointment.date} at ${appointment.time} has been approved.
+
+We look forward to seeing you!
+
+Best,
+Joe's Auto Shop Team`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).send('Email sent successfully');
+  } catch (err) {
+    console.error('Error approving appointment or sending email:', err);
+    res.status(500).send('Error sending email');
+  }
+});
+// end of email approve sent
+
+//
+app.post('/approve-appointment', async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+
+    // Update status
+    const appt = await AppointmentRequest.findByIdAndUpdate(appointmentId, { status: 'approved' }, { new: true });
+
+    if (!appt) {
+      return res.status(404).send("Appointment not found");
+    }
+
+    // Send email to customer
+    await transporter.sendMail({
+      from: '"Repair Shop" <your@email.com>',
+      to: appt.email,
+      subject: 'Appointment Approved',
+      text: `Hi ${appt.firstName} ${appt.lastName}, your appointment on ${new Date(appt.date).toLocaleString()} has been approved.`
+    });
+
+    res.send('Appointment approved and email sent');
+  } catch (err) {
+    console.error("Error approving appointment:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post('/approve-appointment', async (req, res) => {
+  console.log("Approve appointment hit!", req.body); // 👈 log here
+
+  // rest of the logic...
+})
+//
+
+//grab mechanics for createJob.html
+app.get('/api/mechanics', async (req, res) => {
+  const mechanics = await User.find({ role: 'employee' });
+  res.json(mechanics);
+});
+
 
 app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
