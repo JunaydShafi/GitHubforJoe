@@ -141,6 +141,9 @@ app.get('/api/jobs/customer/:id', async (req, res) => {
     }
 });
 
+
+
+
 // API route: Get all jobs for a specific employee (mechanic)
 app.get('/api/jobs/employee/:id', async (req, res) => {
   try {
@@ -170,6 +173,44 @@ app.get('/api/payroll/:id', async (req, res) => {
   }
 });
 
+app.get('/api/payroll/:id/week', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { start, end } = req.query;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const emp = await User.findById(id);
+    if (!emp || emp.role !== 'employee') return res.status(404).json({ error: 'Not found' });
+
+    const jobs = await Job.find({
+      mechanicId: id,
+      status: 'complete',
+      completedDate: { $gte: startDate, $lte: endDate }
+    });
+
+    const totalMinutes = jobs.reduce((sum, job) => {
+      const start = new Date(job.startDate);
+      const end = new Date(job.completedDate);
+      return sum + (end - start) / (1000 * 60);
+    }, 0);
+
+    const rate = emp.payroll?.rate || 0;
+    const total = (totalMinutes / 60) * rate;
+    const otPay = (emp.payroll?.overtime || 0) * rate * 1.5;
+
+    res.json({
+      minutes: totalMinutes,
+      rate,
+      total,
+      overtime: emp.payroll?.overtime || 0,
+      otPay
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to load weekly payroll for employee' });
+  }
+});
 
 
 
@@ -240,6 +281,53 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
     res.status(500).json({ message: 'Error updating status' });
   }
 });
+
+app.get('/api/payroll/week', async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const employees = await User.find({ role: 'employee' });
+    const jobs = await Job.find({
+      status: 'complete',
+      completedDate: { $gte: startDate, $lte: endDate }
+    });
+
+    const payrollMap = {};
+
+    for (const job of jobs) {
+      const start = new Date(job.startDate);
+      const end = new Date(job.completedDate);
+      const mins = (end - start) / (1000 * 60);
+      const empId = job.mechanicId.toString();
+
+      payrollMap[empId] = (payrollMap[empId] || 0) + mins;
+    }
+
+    const results = employees.map(emp => {
+      const minutes = payrollMap[emp._id.toString()] || 0;
+      const rate = emp?.payroll?.rate || 0;
+      const total = (minutes / 60) * rate;
+      return {
+        name: emp.username,
+        minutes,
+        rate,
+        total: total.toFixed(2)
+      };
+    });
+
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load weekly payroll' });
+  }
+});
+
+
+
+
+
+
 app.patch('/api/jobs/:id/add-update', async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
