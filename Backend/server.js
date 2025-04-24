@@ -9,6 +9,7 @@ import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
+import AppointmentRequest from './models/AppointmentRequest.js';
 app.use(express.json());
 
 app.post('/api/vehicles/add', async (req, res) => {
@@ -456,20 +457,19 @@ app.post("/createAppointment", async (req, res) => {
 
 dotenv.config();
 
-//import stuff for email senger START
+// Import nodemailer for email sending START
 import nodemailer from 'nodemailer';
 
+// Create transporter once and reuse
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    pass: process.env.EMAIL_PASS,
   }
 });
-//ENd of email import
 
-//Used to delete appointments is admin/appointments Start
-
+// DELETE appointment route (used in admin/appointments)
 app.delete('/api/appointments/:id', async (req, res) => {
   try {
     const appointment = await Appointment.findByIdAndDelete(req.params.id);
@@ -478,7 +478,7 @@ app.delete('/api/appointments/:id', async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found' });
     }
 
-    // SEND EMAIL HERE:
+    // Send denial email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: appointment.email,
@@ -489,15 +489,14 @@ Unfortunately, your appointment request for ${appointment.date} has been denied.
 If you have any questions or would like to reschedule, please contact us at (916) 553-4249.
 
 Best,
-Joe's AutoShop Team
-`
+Joe's AutoShop Team`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Email sending failed:', error);
       } else {
-        console.log('Email sent:', info.response);
+        console.log('Denial email sent:', info.response);
       }
     });
 
@@ -507,74 +506,69 @@ Joe's AutoShop Team
     res.status(500).json({ error: 'Server error' });
   }
 });
-//Used to delete appointments is admin/appointments END
 
-//approve email sent start
+// POST route to approve appointment and send approval email
 app.post('/approve-appointment', async (req, res) => {
   const { appointmentId } = req.body;
 
   try {
-    const appointment = await Appointment.findById(appointmentId);
-    if (!appointment) return res.status(404).send('Appointment not found');
+    const appointment = await AppointmentRequest.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).send('Appointment not found');
+    }
 
-    // Send approval email
+    console.log(`Appointment ${appointmentId} approved.`);
+
+    // Step 1: Send approval email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: appointment.email,
-      subject: 'Your Appointment Has Been Approved',
-      text: `Hello ${appointment.firstName} ${appointment.lastName},
+      subject: 'Appointment Approved - Joe\'s AutoShop',
+      text: `Hi ${appointment.firstName} ${appointment.lastName},
 
-Your appointment for your ${appointment.vehicleName} on ${appointment.date} at ${appointment.time} has been approved.
-
+Your appointment on ${appointment.date} has been approved.
 We look forward to seeing you!
 
 Best,
-Joe's Auto Shop Team`,
+Joe's AutoShop Team`
     };
 
-    await transporter.sendMail(mailOptions);
-
-    res.status(200).send('Email sent successfully');
-  } catch (err) {
-    console.error('Error approving appointment or sending email:', err);
-    res.status(500).send('Error sending email');
-  }
-});
-// end of email approve sent
-
-//
-app.post('/approve-appointment', async (req, res) => {
-  try {
-    const { appointmentId } = req.body;
-
-    // Update status
-    const appt = await AppointmentRequest.findByIdAndUpdate(appointmentId, { status: 'approved' }, { new: true });
-
-    if (!appt) {
-      return res.status(404).send("Appointment not found");
-    }
-
-    // Send email to customer
-    await transporter.sendMail({
-      from: '"Repair Shop" <your@email.com>',
-      to: appt.email,
-      subject: 'Appointment Approved',
-      text: `Hi ${appt.firstName} ${appt.lastName}, your appointment on ${new Date(appt.date).toLocaleString()} has been approved.`
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Approval email failed:', error);
+        return res.status(500).send('Email failed to send');
+      } else {
+        console.log('Approval email sent:', info.response);
+      }
     });
 
-    res.send('Appointment approved and email sent');
+    // Step 2: Delete the appointment from the DB after email is sent
+    await AppointmentRequest.findByIdAndDelete(appointmentId);
+    console.log(`Appointment ${appointmentId} deleted after approval.`);
+
+    res.send('Approval and email sent, appointment deleted');
   } catch (err) {
-    console.error("Error approving appointment:", err);
-    res.status(500).send("Internal Server Error");
+    console.error(err);
+    res.status(500).send('Error approving appointment');
   }
 });
+// Approve appointment route END
 
-app.post('/approve-appointment', async (req, res) => {
-  console.log("Approve appointment hit!", req.body); // 👈 log here
+//cleanup on email
+app.delete('/api/appointments/clean/:id', async (req, res) => {
+  try {
+    const appointment = await AppointmentRequest.findByIdAndDelete(req.params.id);
 
-  // rest of the logic...
-})
-//
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    res.json({ message: 'Appointment deleted after approval', appointment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting appointment after approval' });
+  }
+});
 
 //grab mechanics for createJob.html
 app.get('/api/mechanics', async (req, res) => {
