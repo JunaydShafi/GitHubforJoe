@@ -529,6 +529,8 @@ app.post('/approve-appointment', async (req, res) => {
 Your appointment on ${appointment.date} has been approved.
 We look forward to seeing you!
 
+Bring your car down to the shop on the requested date and time, if you need more information on where we are located check the homepage for more information.
+
 Best,
 Joe's AutoShop Team`
     };
@@ -569,6 +571,32 @@ app.delete('/api/appointments/clean/:id', async (req, res) => {
     res.status(500).json({ error: 'Error deleting appointment after approval' });
   }
 });
+
+
+//to send info to database in createJob.html
+
+app.post('/api/createJob', async (req, res) => {
+  try {
+    const { customerId, vehicleId, mechanicId, status, description, startDate } = req.body;
+
+    const newJob = new Job({
+      customerId,
+      vehicleId,
+      mechanicId,
+      status,
+      description,
+      startDate
+    });
+
+    await newJob.save();
+
+    res.status(201).json({ message: 'Job created successfully' });
+  } catch (err) {
+    console.error('Error creating job:', err);
+    res.status(500).json({ error: 'Failed to create job' });
+  }
+});
+
 
 //grab mechanics for createJob.html
 app.get('/api/mechanics', async (req, res) => {

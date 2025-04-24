@@ -60,10 +60,12 @@
       const timeStr = params.get('time');
       const firstName = params.get('firstName');
       const lastName = params.get('lastName');
-
-      const dateObj = new Date(dateStr);
+      const customerId = params.get('customerId');
+      const vehicleId = params.get('vehicleId');
+  
+      const dateObj = new Date(dateStr + 'T' + timeStr);
       const formattedDateTime = isNaN(dateObj) ? 'Invalid Date' : dateObj.toLocaleString();
-
+  
       const container = document.getElementById('job-info');
       container.innerHTML = `
         <p><strong>Customer:</strong> ${firstName || ''} ${lastName || ''}</p>
@@ -73,8 +75,11 @@
         <p><strong>Assign Mechanic:</strong>
           <select id="mechanicSelect" style="margin-left: 10px;"></select>
         </p>
+        <button id="createJobBtn" style="margin-top: 20px; padding: 10px 20px; background-color: #FFD700; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+          Create Job
+        </button>
       `;
-
+  
       fetch('/api/mechanics')
         .then(res => res.json())
         .then(mechanics => {
@@ -89,7 +94,43 @@
         .catch(err => {
           console.error('Error loading mechanics:', err);
         });
+  
+      document.addEventListener('click', async (e) => {
+        if (e.target.id === 'createJobBtn') {
+          const mechanicId = document.getElementById('mechanicSelect').value;
+  
+          const jobData = {
+            customerId,
+            vehicleId,
+            mechanicId,
+            status: 'Pending',
+            description: reason,
+            startDate: dateObj
+          };
+  
+          try {
+            const res = await fetch('/api/createJob', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(jobData)
+            });
+  
+            if (res.ok) {
+              alert('Job created successfully!');
+              window.location.href = '/adminappointments.html'; // Redirect after success
+            } else {
+              alert('Failed to create job.');
+            }
+          } catch (err) {
+            console.error('Error creating job:', err);
+            alert('An error occurred while creating the job.');
+          }
+        }
+      });
     });
   </script>
+  
 </body>
 </html>
