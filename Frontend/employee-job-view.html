@@ -157,26 +157,30 @@
       const formatDate = (date) => date ? new Date(date).toLocaleString() : 'Not recorded';
 
       details.innerHTML = `
-        <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
-        <p><strong>Customer:</strong> ${job.customerId?.username || ''}</p>
-        <p><strong>Reason:</strong> ${job.description}</p>
-        <p><strong>Status:</strong> ${job.status}</p>
-        <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
-        <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>
-        <p><strong>Completed:</strong> ${formatDate(job.completedDate)}</p>
+    <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
+    <p><strong>Customer:</strong> ${job.customerId?.username || ''}</p>
+    <p><strong>Reason:</strong> ${job.description}</p>
+    <p><strong>Status:</strong> ${job.status}</p>
+    <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
+    <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>
+    <p><strong>Completed:</strong> ${formatDate(job.completedDate)}</p>
 
-        <div class="job-notes-wrapper">
-          <p><strong>Mechanic's Notes:</strong></p>
-          <textarea id="notes-${job._id}" rows="3" placeholder="Enter update here...">${job.updates?.[job.updates.length - 1]?.message || ''}</textarea>
-          <button class="job-update-btn" onclick="addUpdate('${job._id}')">Update</button>
-        </div>
+    <div class="job-notes-wrapper">
+      <p><strong>Mechanic's Notes:</strong></p>
+      <textarea id="notes-${job._id}" rows="3" placeholder="Enter update here...">${job.updates?.[job.updates.length - 1]?.message || ''}</textarea>
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+        <button class="job-update-btn" onclick="addUpdate('${job._id}')">Update</button>
+        <button class="job-update-btn" onclick='showUpdateHistory(${JSON.stringify(job.updates || [])})'>View History</button>
+      </div>
+    </div>
 
-        <div class="job-buttons">
-          <button class="job-start-btn" onclick="startJob('${job._id}')">Start Job</button>
-          <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
-        </div>
-      `;
-    }
+    <div class="job-buttons">
+      <button class="job-start-btn" onclick="startJob('${job._id}')">Start Job</button>
+      <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
+    </div>
+  `;
+}
+
 
     async function startJob(jobId) {
       try {
@@ -257,6 +261,38 @@
         alert("Failed to add update.");
       }
     }
+    function showUpdateHistory(updates) {
+  const list = document.getElementById('updateList');
+  list.innerHTML = '';
+
+  if (updates.length === 0) {
+    list.innerHTML = '<li>No update history found.</li>';
+  } else {
+    updates.forEach(update => {
+      const item = document.createElement('li');
+      const time = new Date(update.timestamp || update.date || Date.now()).toLocaleString();
+      item.textContent = `"${update.message}" — ${time}`;
+      list.appendChild(item);
+    });
+  }
+
+  document.getElementById('modalOverlay').style.display = 'block';
+  document.getElementById('updateHistoryModal').style.display = 'block';
+}
+
+function closeUpdateHistory() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.getElementById('updateHistoryModal').style.display = 'none';
+}
+
   </script>
+  <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.5); z-index:1000;" onclick="closeUpdateHistory()"></div>
+
+  <div id="updateHistoryModal" class="update-modal">
+    <h3>Update History</h3>
+    <ul id="updateList" style="padding-left: 20px;"></ul>
+    <button onclick="closeUpdateHistory()" style="margin-top: 15px; padding: 5px 15px;">Close</button>
+  </div>
+  
 </body>
 </html>

@@ -497,4 +497,69 @@ form select:focus {
   .job-update-btn:hover {
     background-color: #0056b3;
   }
+  .update-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2e302b;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 1001;
+  }
+  /* Existing styles... */
+  
+  /* Add these for the popup */
+  #updateHistoryModal {
+    background-color: #2e302b; /* match your site’s dark background */
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 1001;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+
+  #updateHistoryModal h3 {
+    font-size: 20px;
+    margin-top: 0;
+    color: white;
+  }
+
+  #updateList {
+    padding-left: 20px;
+  }
+
+  #updateList li {
+    margin-bottom: 10px;
+    color: white;
+  }
+
+  #modalOverlay {
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+  }
+
+  #updateHistoryModal button {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #updateHistoryModal button:hover {
+    background-color: #666;
+  }
+
+  
   
