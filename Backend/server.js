@@ -5,12 +5,15 @@ import { connectDB } from "./config/db.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import bodyParser from 'body-parser';
+import loginRouter from './routes/login.js'; // Import the login route
+import jobsRoutes from './routes/jobs.js'; // Import the jobs route
 import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
 import nodemailer from 'nodemailer';
-
+import AppointmentRequest from './models/AppointmentRequest.js';
 
 app.use(express.json());
 
@@ -92,7 +95,7 @@ app.post('/api/employees/create', async (req, res) => {
     }
   });
 
-  
+  /*
 // Inline login route
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
@@ -120,7 +123,13 @@ res.status(200).json({
       res.status(500).json({ success: false, message: 'Server error' });
     }
   });
-  
+  */
+
+  // Middleware
+app.use(bodyParser.json());
+
+// Use the login route
+app.use('/api/auth', loginRouter);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -130,16 +139,18 @@ app.use(express.static(path.join(__dirname,'..?frontend')));
 app.use('/js', express.static(path.join(__dirname, '../Frontend/js')));
 
 // API route: Get all jobs for a specific customer
-app.get('/api/jobs/customer/:id', async (req, res) => {
-    try {
-      const jobs = await Job.find({ customerId: req.params.id })
-        .populate('vehicleId')
-        .populate('mechanicId');
-      res.json(jobs);
-    } catch (err) {
-      res.status(500).json({ message: 'Server error' });
-    }
-});
+// app.get('/api/jobs/customer/:id', async (req, res) => {
+//     try {
+//       const jobs = await Job.find({ customerId: req.params.id })
+//         .populate('vehicleId')
+//         .populate('mechanicId');
+//       res.json(jobs);
+//     } catch (err) {
+//       res.status(500).json({ message: 'Server error' });
+//     }
+// });
+app.use('/api/jobs',jobsRoutes);
+
 
 
 
@@ -263,6 +274,9 @@ app.get('/api/users/employees', async (req, res) => {
     res.status(500).json({ message: 'Error fetching employees' });
   }
 });
+
+
+
 
 app.patch('/api/jobs/:id/status', async (req, res) => {
   try {
@@ -570,17 +584,26 @@ app.get("/payroll-display", (req, res) => {
 
   //customerRequestAppointment start----------------
 
-  import Appointment from "./Models/AppointmentRequest.js";
+  import Appointment from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
-//test appointment router
 app.post("/createAppointment", async (req, res) => {
-  console.log("📥 Incoming appointment:", req.body); // ADD THIS LINE
+  console.log("📥 Incoming appointment:", req.body);
 
   try {
-    const appointment = new Appointment(req.body);
+    const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
+
+    const appointment = new Appointment({
+      firstName,
+      lastName,
+      email,
+      phone,
+      vehicleId,
+      reason,
+      date: new Date(appointmentDate),  // <-- Parse date properly
+    });
+
     await appointment.save();
-    //res.status(201).json({ message: "Appointment saved!", appointment });
     res.redirect("/customerMainPage");
   } catch (err) {
     console.error("❌ Error saving appointment:", err);
@@ -588,6 +611,7 @@ app.post("/createAppointment", async (req, res) => {
   }
 });
   //customerRequestAppointment end--------------
+
   app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
     try {
@@ -665,7 +689,207 @@ app.post("/createAppointment", async (req, res) => {
   });
   
 
+
+  // retreive customerRequestAppointment to output on admins view appointment START
+
+
+  app.get("/api/admin/appointments", async (req, res) => {
+    try {
+      const appointments = await Appointment.find({ status: "pending" });
+      res.json(appointments);
+    } catch (error) {
+      console.error("❌ Failed to fetch appointments:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  //retreive customerRequestAppointment to output on admins view appointment END
+
+  // Backend Points STart
+  app.post("/api/admin/appointments/:id/approve", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Appointment.findByIdAndUpdate(id, { status: "approved" });
+      res.json({ message: "Appointment approved" });
+    } catch (err) {
+      console.error("❌ Error approving:", err);
+      res.status(500).json({ error: "Failed to approve" });
+    }
+  });
+  
+  app.post("/api/admin/appointments/:id/deny", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Appointment.findByIdAndUpdate(id, { status: "denied" });
+      res.json({ message: "Appointment denied" });
+    } catch (err) {
+      console.error("❌ Error denying:", err);
+      res.status(500).json({ error: "Failed to deny" });
+    }
+  });
+  //Backend points ENd
+
+  //Page to view the database objects on admin/appointments
+  app.get('/api/appointments', async (req, res) => {
+    try {
+        const appointments = await Appointment.find({});
+        res.json(appointments);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+
 dotenv.config();
+
+// Import nodemailer for email sending START
+import nodemailer from 'nodemailer';
+
+// Create transporter once and reuse
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  }
+});
+
+// DELETE appointment route (used in admin/appointments)
+app.delete('/api/appointments/:id', async (req, res) => {
+  try {
+    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    // Send denial email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: appointment.email,
+      subject: 'Appointment Denied - Joe\'s AutoShop',
+      text: `Hello ${appointment.firstName} ${appointment.lastName},
+
+Unfortunately, your appointment request for ${appointment.date} has been denied.
+If you have any questions or would like to reschedule, please contact us at (916) 553-4249.
+
+Best,
+Joe's AutoShop Team`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email sending failed:', error);
+      } else {
+        console.log('Denial email sent:', info.response);
+      }
+    });
+
+    res.json({ message: 'Appointment denied and deleted', appointment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// POST route to approve appointment and send approval email
+app.post('/approve-appointment', async (req, res) => {
+  const { appointmentId } = req.body;
+
+  try {
+    const appointment = await AppointmentRequest.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).send('Appointment not found');
+    }
+
+    console.log(`Appointment ${appointmentId} approved.`);
+
+    // Step 1: Send approval email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: appointment.email,
+      subject: 'Appointment Approved - Joe\'s AutoShop',
+      text: `Hi ${appointment.firstName} ${appointment.lastName},
+
+Your appointment on ${appointment.date} has been approved.
+We look forward to seeing you!
+
+Bring your car down to the shop on the requested date and time, if you need more information on where we are located check the homepage for more information.
+
+Best,
+Joe's AutoShop Team`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Approval email failed:', error);
+        return res.status(500).send('Email failed to send');
+      } else {
+        console.log('Approval email sent:', info.response);
+      }
+    });
+
+    // Step 2: Delete the appointment from the DB after email is sent
+    await AppointmentRequest.findByIdAndDelete(appointmentId);
+    console.log(`Appointment ${appointmentId} deleted after approval.`);
+
+    res.send('Approval and email sent, appointment deleted');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error approving appointment');
+  }
+});
+// Approve appointment route END
+
+//cleanup on email
+app.delete('/api/appointments/clean/:id', async (req, res) => {
+  try {
+    const appointment = await AppointmentRequest.findByIdAndDelete(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    res.json({ message: 'Appointment deleted after approval', appointment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting appointment after approval' });
+  }
+});
+
+
+//to send info to database in createJob.html
+
+app.post('/api/createJob', async (req, res) => {
+  try {
+    const { customerId, vehicleId, mechanicId, status, description, startDate } = req.body;
+
+    const newJob = new Job({
+      customerId,
+      vehicleId,
+      mechanicId,
+      status,
+      description,
+      startDate
+    });
+
+    await newJob.save();
+
+    res.status(201).json({ message: 'Job created successfully' });
+  } catch (err) {
+    console.error('Error creating job:', err);
+    res.status(500).json({ error: 'Failed to create job' });
+  }
+});
+
+
+//grab mechanics for createJob.html
+app.get('/api/mechanics', async (req, res) => {
+  const mechanics = await User.find({ role: 'employee' });
+  res.json(mechanics);
+});
+
 
 app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");

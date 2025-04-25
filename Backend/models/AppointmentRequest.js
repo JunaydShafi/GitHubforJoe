@@ -11,6 +11,10 @@ const appointmentRequestSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'denied'],
     default: 'pending'
+  },
+  date: {
+    type: Date,
+    required: true
   }
 });
 
