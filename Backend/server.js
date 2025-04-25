@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import Job from './models/Job.js';
+import jobRoutes from './routes/jobs.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
@@ -165,6 +166,10 @@ app.get('/api/users/employees', async (req, res) => {
     res.status(500).json({ message: 'Error fetching employees' });
   }
 });
+
+// employees view jobs
+app.use('/api/jobs', jobRoutes);
+
 
 app.patch('/api/jobs/:id/status', async (req, res) => {
   try {
