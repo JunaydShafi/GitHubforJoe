@@ -1,42 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Junstyle.css">
-    <title>Appointmnets</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="/Junstyle.css" />
+  <title>Appointments</title>
 </head>
 <body>
-
-    <div class="header-main"><!--this is for the top footer of the page-->
-        <div class="logo">
-          <img src="images/WhiteLogo.png" alt="Logo">
-        </div>
-        <div class = "Title">
-          <div class="title-container">
-              <div class="shop-name">Joe's AutoShop</div>
-              <div class="tagline">If it ain't Joe don't fix it!</div>
-          </div>
-            <div class="account-box-left">
-                <button onclick="location.href='index.html'">Log Out</button>
-                <button onclick="location.href='adminMain.html'">Main Page</button>
-            </div>
-        </div>
-      </div>
-
-    <div class ="wrapperAdmin">
-
-        <div>
-            <p>Appointments Awaiting Approval</p>
-
-            <h1>&nbsp;</h1><!--Used to space the wrappers-->
-            
-            <div class="account-box">
-                <button onclick="location.href='approval'">View</button>
-            </div>
-            
-        </div>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
     </div>
-    
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+        <button onclick="location.href='adminMain.html'">Main Page</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapperAdmin">
+    <div class="appointments-container">
+      <h2>Appointments Awaiting Approval</h2>
+      <div id="appointments"></div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchAppointments() {
+  try {
+    const res = await fetch('/api/appointments');
+    const data = await res.json();
+
+    const container = document.getElementById('appointments');
+    container.innerHTML = '';
+
+    if (data.length === 0) {
+      container.innerHTML = '<p>No appointments found.</p>';
+      return;
+    }
+
+    data.forEach(appointment => {
+      const dateObj = new Date(appointment.date);
+      const formattedDate = isNaN(dateObj) ? "Invalid Date" : dateObj.toLocaleString();
+
+      const div = document.createElement('div');
+      div.className = 'account-box';
+      div.id = `appointment-${appointment._id}`; // Add ID for easy removal
+      div.innerHTML = `
+        <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
+        <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
+        <div class="details" style="display:none; margin-top:10px;">
+          <p><strong>Email:</strong> ${appointment.email}</p>
+          <p><strong>Phone:</strong> ${appointment.phone}</p>
+          <p><strong>Reason:</strong> ${appointment.reason}</p>
+          <p><strong>Vehicle ID:</strong> ${appointment.vehicleId}</p>
+        </div>
+      `;
+
+      const detailsDiv = div.querySelector('.details');
+
+      // Approve button
+      const approveBtn = document.createElement('button');
+      approveBtn.textContent = 'Approve';
+      approveBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px; margin-right: 5px;';
+      approveBtn.onclick = () => approve(
+        appointment._id,
+        appointment.vehicleName || appointment.vehicleId,  // adapt if your model uses vehicleName
+        appointment.reason,
+        appointment.date,
+        appointment.time,
+        appointment.firstName,
+        appointment.lastName
+      );
+
+      // Deny button
+      const denyBtn = document.createElement('button');
+      denyBtn.textContent = 'Deny';
+      denyBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;';
+      denyBtn.addEventListener('click', () => deny(appointment._id, div));
+
+      detailsDiv.appendChild(approveBtn);
+      detailsDiv.appendChild(denyBtn);
+
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Error fetching appointments:', err);
+  }
+}
+  
+    function toggleDetails(button) {
+      const details = button.nextElementSibling;
+      details.style.display = details.style.display === 'none' ? 'block' : 'none';
+    }
+  
+    function approve(id, vehicle, reason, date, time, firstName) {
+  const confirmed = confirm(`Are you sure you want to approve this appointment for ${firstName}?`);
+  if (!confirmed) return;
+
+  // Step 1: Send POST to server to trigger approval and send email
+  fetch('/approve-appointment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ appointmentId: id })
+  })
+  .then(res => res.text())
+  .then(message => {
+    alert('Appointment approved and email sent.');
+
+    // ✅ Step 2: Remove the approved appointment from the UI
+    const appointmentCard = document.querySelector(`#appointment-${id}`);
+    if (appointmentCard) appointmentCard.remove(); // Remove the appointment card
+
+    // ✅ Step 3: Redirect to createJob.html with query parameters
+    const url = new URL('/createJob.html', window.location.origin);
+    url.searchParams.set('vehicle', vehicle);
+    url.searchParams.set('reason', reason);
+    url.searchParams.set('date', date);
+    url.searchParams.set('time', time);
+    url.searchParams.set('firstName', firstName);
+
+    window.location.href = url.toString();
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Error approving appointment.');
+  });
+}
+  
+    function deny(apptId, card) {
+      const confirmed = confirm("Are you sure you want to deny this appointment?");
+      if (!confirmed) return;
+
+      fetch(`/api/appointments/${apptId}`, {
+        method: 'DELETE'
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert('Appointment denied and email sent.');
+        card.remove(); // remove the appointment card from the UI
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error denying appointment.');
+      });
+    }
+  
+    fetchAppointments();
+  </script>
 </body>
 </html>
