@@ -5,8 +5,10 @@ import { connectDB } from "./config/db.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import bodyParser from 'body-parser';
+import loginRouter from './routes/login.js'; // Import the login route
+import jobsRoutes from './routes/jobs.js'; // Import the jobs route
 import Job from './models/Job.js';
-import jobRoutes from './routes/jobs.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
@@ -60,7 +62,7 @@ app.post('/api/employees/create', async (req, res) => {
     }
   });
 
-  
+  /*
 // Inline login route
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
@@ -88,7 +90,13 @@ res.status(200).json({
       res.status(500).json({ success: false, message: 'Server error' });
     }
   });
-  
+  */
+
+  // Middleware
+app.use(bodyParser.json());
+
+// Use the login route
+app.use('/api/auth', loginRouter);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -98,16 +106,18 @@ app.use(express.static(path.join(__dirname,'..?frontend')));
 app.use('/js', express.static(path.join(__dirname, '../Frontend/js')));
 
 // API route: Get all jobs for a specific customer
-app.get('/api/jobs/customer/:id', async (req, res) => {
-    try {
-      const jobs = await Job.find({ customerId: req.params.id })
-        .populate('vehicleId')
-        .populate('mechanicId');
-      res.json(jobs);
-    } catch (err) {
-      res.status(500).json({ message: 'Server error' });
-    }
-});
+// app.get('/api/jobs/customer/:id', async (req, res) => {
+//     try {
+//       const jobs = await Job.find({ customerId: req.params.id })
+//         .populate('vehicleId')
+//         .populate('mechanicId');
+//       res.json(jobs);
+//     } catch (err) {
+//       res.status(500).json({ message: 'Server error' });
+//     }
+// });
+app.use('/api/jobs',jobsRoutes);
+
 
 // API route: Get all jobs for a specific employee (mechanic)
 app.get('/api/jobs/employee/:id', async (req, res) => {
@@ -167,8 +177,7 @@ app.get('/api/users/employees', async (req, res) => {
   }
 });
 
-// employees view jobs
-app.use('/api/jobs', jobRoutes);
+
 
 
 app.patch('/api/jobs/:id/status', async (req, res) => {
