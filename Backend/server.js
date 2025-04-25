@@ -17,6 +17,7 @@ import AppointmentRequest from './models/AppointmentRequest.js';
 
 app.use(express.json());
 
+
 app.get('/api/payroll', async (req, res) => {
   try {
     const employees = await User.find({ role: 'employee' });
@@ -583,7 +584,19 @@ app.get("/payroll-display", (req, res) => {
 });
 
   //customerRequestAppointment start----------------
+app.use(express.urlencoded({extended: true}));
 
+//test appointment router
+app.post('/createAppointment', async (req, res) => {
+  const { firstName, lastName, email, phone, vehicleId, reason } = req.body;
+
+  console.log('Received data:', req.body); // Log incoming data
+
+  try {
+    // Ensure vehicleId is set to a placeholder if not provided
+    const newAppointment = new AppointmentRequest({
+
+/*
   import Appointment from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
@@ -594,6 +607,7 @@ app.post("/createAppointment", async (req, res) => {
     const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
 
     const appointment = new Appointment({
+    */
       firstName,
       lastName,
       email,
@@ -608,8 +622,11 @@ app.post("/createAppointment", async (req, res) => {
   } catch (err) {
     console.error("❌ Error saving appointment:", err);
     res.status(500).json({ error: "Failed to save appointment" });
+
   }
 });
+
+
   //customerRequestAppointment end--------------
 
   app.post('/api/forgot-password', async (req, res) => {

@@ -5,7 +5,10 @@ const appointmentRequestSchema = new mongoose.Schema({
   lastName: String,
   email: String,
   phone: String,
-  vehicleId: String,
+  vehicleId: {
+    type: String,
+    default: 'placeholder-vehicle-id', // Default value if vehicleId is not provided
+  },
   reason: String,
   status: {
     type: String,
@@ -21,3 +24,4 @@ const appointmentRequestSchema = new mongoose.Schema({
 const AppointmentRequest = mongoose.model('AppointmentRequest', appointmentRequestSchema);
 
 export default AppointmentRequest;
+
