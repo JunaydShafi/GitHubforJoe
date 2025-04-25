@@ -12,8 +12,35 @@ import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
+import nodemailer from 'nodemailer';
 import AppointmentRequest from './models/AppointmentRequest.js';
+
 app.use(express.json());
+
+app.get('/api/payroll', async (req, res) => {
+  try {
+    const employees = await User.find({ role: 'employee' });
+    const data = employees.map(emp => {
+      const { minutes, overtime, rate } = emp.payroll || {};
+      const basePay = ((minutes || 0) / 60) * (rate || 0);
+      const otPay = (overtime || 0) * (rate || 0) * 1.5;
+      const total = basePay + otPay;
+
+
+
+      return {
+        name: emp.username,
+        minutes,
+        overtime,
+        rate,
+        total
+      };
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load payroll' });
+  }
+});
 
 app.post('/api/vehicles/add', async (req, res) => {
     try {
@@ -52,9 +79,14 @@ app.post('/api/employees/create', async (req, res) => {
         password: hashedPassword,
         username,
         phone,
-        role: isAdmin ? 'admin' : 'employee'
+        role: isAdmin ? 'admin' : 'employee',
+        payroll: {
+          hours: 0,
+          overtime: 0,
+          rate: 20
+        }
       });
-  
+        
       await newUser.save();
       res.status(201).json({ success: true, message: 'Employee account created successfully.' });
     } catch (err) {
@@ -120,6 +152,9 @@ app.use('/js', express.static(path.join(__dirname, '../Frontend/js')));
 app.use('/api/jobs',jobsRoutes);
 
 
+
+
+
 // API route: Get all jobs for a specific employee (mechanic)
 app.get('/api/jobs/employee/:id', async (req, res) => {
   try {
@@ -132,6 +167,68 @@ app.get('/api/jobs/employee/:id', async (req, res) => {
     res.status(500).json({ message: 'Error fetching jobs for employee' });
   }
 });
+
+app.get('/api/payroll/:id', async (req, res) => {
+  try {
+    const emp = await User.findById(req.params.id);
+    if (!emp || emp.role !== 'employee') return res.status(404).json({ error: 'Not found' });
+
+    const { minutes, overtime, rate } = emp.payroll || {};
+    const basePay = ((minutes || 0) / 60) * (rate || 0);
+    const otPay = (overtime || 0) * (rate || 0) * 1.5;
+    const total = basePay + otPay;
+
+    res.json({ minutes, rate, total, overtime, otPay });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load payroll' });
+  }
+});
+
+app.get('/api/payroll/:id/week', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { start, end } = req.query;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const emp = await User.findById(id);
+    if (!emp || emp.role !== 'employee') return res.status(404).json({ error: 'Not found' });
+
+    const jobs = await Job.find({
+      mechanicId: id,
+      status: 'complete',
+      completedDate: { $gte: startDate, $lte: endDate }
+    });
+
+    const totalMinutes = jobs.reduce((sum, job) => {
+      const start = new Date(job.startDate);
+      const end = new Date(job.completedDate);
+      return sum + (end - start) / (1000 * 60);
+    }, 0);
+
+    const rate = emp.payroll?.rate || 0;
+    const total = (totalMinutes / 60) * rate;
+    const otPay = (emp.payroll?.overtime || 0) * rate * 1.5;
+
+    res.json({
+      minutes: totalMinutes,
+      rate,
+      total,
+      overtime: emp.payroll?.overtime || 0,
+      otPay
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to load weekly payroll for employee' });
+  }
+});
+
+
+
+
+
+
+
 
 
 // Admin: Get all vehicles
@@ -199,6 +296,71 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
   }
 });
 
+app.get('/api/payroll/week', async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const employees = await User.find({ role: 'employee' });
+    const jobs = await Job.find({
+      status: 'complete',
+      completedDate: { $gte: startDate, $lte: endDate }
+    });
+
+    const payrollMap = {};
+
+    for (const job of jobs) {
+      const start = new Date(job.startDate);
+      const end = new Date(job.completedDate);
+      const mins = (end - start) / (1000 * 60);
+      const empId = job.mechanicId.toString();
+
+      payrollMap[empId] = (payrollMap[empId] || 0) + mins;
+    }
+
+    const results = employees.map(emp => {
+      const minutes = payrollMap[emp._id.toString()] || 0;
+      const rate = emp?.payroll?.rate || 0;
+      const total = (minutes / 60) * rate;
+      return {
+        name: emp.username,
+        minutes,
+        rate,
+        total: total.toFixed(2)
+      };
+    });
+
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load weekly payroll' });
+  }
+});
+
+
+
+
+
+
+app.patch('/api/jobs/:id/add-update', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    if (!req.body.message || req.body.message.trim() === "") {
+      return res.status(400).json({ message: 'Update message cannot be empty' });
+    }
+
+    job.updates.push({ message: req.body.message });
+    await job.save();
+
+    res.json({ message: 'Update added successfully', job });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error adding update' });
+  }
+});
+
 app.patch('/api/jobs/:id/complete', async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
@@ -211,6 +373,19 @@ app.patch('/api/jobs/:id/complete', async (req, res) => {
       job.updates.push({ message: req.body.updateMessage });
     }
 
+    // Calculate hours worked
+    const start = new Date(job.startDate);
+    const end = new Date(job.completedDate);
+    const minutesWorked = (end - start) / (1000 * 60);
+
+    // Add to employee's payroll
+    const mechanic = await User.findById(job.mechanicId);
+    if (mechanic && mechanic.role === 'employee') {
+      mechanic.payroll.minutes = (mechanic.payroll.minutes || 0) + minutesWorked;
+      await mechanic.save();
+    }
+
+
     await job.save();
     res.json({ message: 'Job marked complete', job });
   } catch (err) {
@@ -218,6 +393,24 @@ app.patch('/api/jobs/:id/complete', async (req, res) => {
     res.status(500).json({ message: 'Error completing job' });
   }
 });
+
+app.patch('/api/payroll/:id', async (req, res) => {
+  try {
+    const { hours, overtime, rate } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user || user.role !== 'employee') return res.status(404).json({ message: 'Employee not found' });
+
+    user.payroll = { hours, overtime, rate };
+    await user.save();
+
+    res.json({ message: 'Payroll updated', user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error updating payroll' });
+  }
+});
+
+
+
 
 
 // Admin: Create a job
@@ -419,6 +612,84 @@ app.post("/createAppointment", async (req, res) => {
 });
   //customerRequestAppointment end--------------
 
+  app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) return res.status(404).json({ message: 'Email not found' });
+  
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  
+      user.resetOtp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
+  
+      // ✉️ Send OTP via email using Nodemailer
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,     // your email
+          pass: process.env.EMAIL_PASS      // app password or email pass
+        }
+      });
+  
+      await transporter.sendMail({
+        from: `"Joe's Auto" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Your Password Reset OTP',
+        text: `Your OTP code is: ${otp} — valid for 10 minutes.`
+      });
+  
+      res.json({ message: 'OTP sent' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error sending OTP' });
+    }
+  });
+  
+  // ✅ 2. Verify OTP
+  app.post('/api/verify-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user || user.resetOtp !== otp || user.otpExpires < new Date()) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+      }
+  
+      user.resetOtp = null;
+      user.otpExpires = null;
+      user.canReset = true; // flag to allow reset
+      await user.save();
+  
+      res.json({ message: 'OTP verified' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Verification error' });
+    }
+  });
+  
+  // ✅ 3. Reset password
+  app.post('/api/reset-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user || !user.canReset) return res.status(403).json({ message: 'Not authorized to reset password' });
+  
+      const hashed = await bcrypt.hash(newPassword, 10);
+      user.password = hashed;
+      user.canReset = false;
+      await user.save();
+  
+      res.json({ message: 'Password reset successful' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Password reset failed' });
+    }
+  });
+  
+
+
   // retreive customerRequestAppointment to output on admins view appointment START
 
 
@@ -467,6 +738,7 @@ app.post("/createAppointment", async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 dotenv.config();

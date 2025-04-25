@@ -30,17 +30,31 @@
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
         </form>
-        
-        <button class="bottomRightCenter" onclick="location.href='resetpass.html'">Next Page After Email Link</button>
-        </div>
-
             <script>
                 function redirecttoConfirmation(event) {
                     event.preventDefault();
                     window.location.href = "forgotpassconf";
                 }
+    function redirecttoConfirmation(event) {
+        event.preventDefault();
+        window.location.href = "forgotpassconf";
+    }
 
-            </script>
+    document.getElementById("form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const email = document.getElementById("eeemail-input").value;
+        const res = await fetch("/api/forgot-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        });
+        if (res.ok) {
+            localStorage.setItem("resetEmail", email);
+            window.location.href = "/forgotpassconf";
+        } else {
+            alert("Email not found.");
+        }
+    });
+</script>
         </body>
 </html>
-

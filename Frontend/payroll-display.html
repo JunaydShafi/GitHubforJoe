@@ -4,29 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/Junstyle.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <title>Document</title>
 </head>
 <body>
 
-  <div class="header-main"><!--this is for the top footer of the page-->
+  <div class="header-main">
     <div class="logo">
       <img src="images/WhiteLogo.png" alt="Logo">
     </div>
-    <div class = "Title">
+    <div class="Title">
       <div class="title-container">
-          <div class="shop-name">Joe's AutoShop</div>
-          <div class="tagline">If it ain't Joe don't fix it!</div>
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
       </div>
-        <div class="account-box-left">
-            <button onclick="location.href='index.html'">Log Out</button>
-        </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
     </div>
   </div>
 
   <div class="wrapper">
     <h1>Expected Upcoming Payrool</h1>
-    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
-    
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1>
+
+    <!-- Week picker + buttons -->
+    <div style="margin-bottom: 20px;">
+      <label for="empWeekPicker"><strong>Select a Week:</strong></label>
+      <input id="empWeekPicker" placeholder="Select Mon–Fri">
+      <button onclick="loadEmployeeWeek()">View</button>
+      <button onclick="resetEmployeeView()">Clear</button>
+    </div>
 
     <table bgcolor="black" width="800">
       <tr bgcolor="darkgray">
@@ -35,22 +43,97 @@
         <th width="200">Expected Pay</th>
         <th width="200">Overtime Pay</th>
       </tr>
-
-      <tr bgcolor="gray" align="center">
-        <td>Hours recorded in 2 week span.</td>
-        <td>Employee pay rate.</td>
-        <td>Total Expected Pay.</td>
-        <td>Overtime work hours.</td>
-      </tr>
-
     </table>
-    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
-    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
-    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1><!--Used to space the wrappers-->
 
-    <button class="bottomLeftCenter" type= "button" onclick="history.back()">Go Back</button>
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1>
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1>
+    <h1>&nbsp;&nbsp;&nbsp;&nbsp;</h1>
+
+    <button class="bottomLeftCenter" type="button" onclick="history.back()">Go Back</button>
   </div>
 
-  
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        alert("User not found. Please log in again.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/payroll/${userId}`);
+        const { minutes, rate, total, overtime, otPay } = await res.json();
+
+        const table = document.querySelector('table');
+        const testRow = table.querySelector('tr:nth-child(2)');
+        if (testRow) testRow.remove();
+
+        const row = document.createElement('tr');
+        row.setAttribute('bgcolor', 'gray');
+        row.setAttribute('align', 'center');
+        row.innerHTML = `
+          <td>${Math.floor(minutes / 60)}h ${Math.round(minutes % 60)}m</td>
+          <td>$${rate}</td>
+          <td>$${total.toFixed(2)}</td>
+          <td>$${otPay.toFixed(2)}</td>
+        `;
+        table.appendChild(row);
+
+      } catch (err) {
+        console.error('Error loading payroll data:', err);
+      }
+    });
+
+    flatpickr("#empWeekPicker", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      disable: [
+        function(date) {
+          return (date.getDay() === 0 || date.getDay() === 6);
+        }
+      ],
+      maxDate: new Date(), // ✅ disable selection beyond today
+
+    });
+
+    async function loadEmployeeWeek() {
+      const picker = document.getElementById('empWeekPicker')._flatpickr;
+      const dates = picker.selectedDates;
+      if (dates.length !== 2) return alert("Please select a Mon–Fri range.");
+
+      const [start, end] = dates;
+      const userId = localStorage.getItem('userId');
+
+      try {
+        const res = await fetch(`/api/payroll/${userId}/week?start=${start.toISOString()}&end=${end.toISOString()}`);
+        const { minutes, rate, total, overtime, otPay } = await res.json();
+
+        const table = document.querySelector('table');
+        table.querySelector("tr:nth-child(2)")?.remove();
+        const row = document.createElement('tr');
+        row.setAttribute('bgcolor', 'gray');
+        row.setAttribute('align', 'center');
+        row.innerHTML = `
+          <td>${Math.floor(minutes / 60)}h ${Math.round(minutes % 60)}m</td>
+          <td>$${rate}</td>
+          <td>$${total.toFixed(2)}</td>
+          <td>$${otPay.toFixed(2)}</td>
+        `;
+        table.appendChild(row);
+
+      } catch (err) {
+        console.error("Failed to load weekly data", err);
+      }
+    }
+
+    function resetEmployeeView() {
+      const picker = document.getElementById('empWeekPicker')._flatpickr;
+      picker.clear();
+      window.dispatchEvent(new Event('DOMContentLoaded'));
+    }
+  </script>
+
 </body>
 </html>
