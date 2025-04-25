@@ -14,13 +14,32 @@
     <h1>Forgot Password?</h1>
     <h2 class="left-align">Check your email to reset password.</h2>
     
-    <div class="account-box">
-    <button type="button" onclick="window.location.href='/'">Return to Login</button>
-    </div>
 
+    <form id="otp-form">
+        <h2>Enter OTP Code</h2>
+        <input type="text" id="otp-input" placeholder="Enter OTP" required>
+        <input type="submit" value="Verify OTP">
+    </form>
     <div class="account-box">
-        <button type="button" onclick="window.location.href='resetpass'">Test Reset PW</button>  <!--TEST BUTTON FOR THE MEAN TIME UNTIL DATABASE IS CREATED -->
-    </div>
-
-<body>
-   
+        <button type="button" onclick="window.location.href='/login'">Return to Login</button>
+      </div>
+            
+    <script>
+    document.getElementById("otp-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const email = localStorage.getItem("resetEmail");
+        const otp = document.getElementById("otp-input").value;
+        const res = await fetch("/api/verify-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, otp })
+        });
+    
+        if (res.ok) {
+            alert("OTP verified. Resetting password...");
+            window.location.href = "/resetpass";
+        } else {
+            alert("Invalid or expired OTP.");
+        }
+    });
+    </script>

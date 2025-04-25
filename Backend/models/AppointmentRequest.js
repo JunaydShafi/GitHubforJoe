@@ -5,15 +5,23 @@ const appointmentRequestSchema = new mongoose.Schema({
   lastName: String,
   email: String,
   phone: String,
-  vehicleId: String,
+  vehicleId: {
+    type: String,
+    default: 'placeholder-vehicle-id', // Default value if vehicleId is not provided
+  },
   reason: String,
   status: {
     type: String,
     enum: ['pending', 'approved', 'denied'],
     default: 'pending'
+  },
+  date: {
+    type: Date,
+    required: true
   }
 });
 
 const AppointmentRequest = mongoose.model('AppointmentRequest', appointmentRequestSchema);
 
 export default AppointmentRequest;
+
