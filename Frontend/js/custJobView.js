@@ -30,14 +30,17 @@ async function loadJobs() {
       const div = document.createElement('div');
       div.className = 'job-card';
 
+      const createdAt = new Date(job.createdAt);
+      const formattedDate = `${createdAt.getMonth() + 1}/${createdAt.getDate()}/${createdAt.getFullYear()}`;
+
       div.innerHTML = `
-        <h2>Job ID: ${job._id}</h2>
+        <h2>Job Created: ${formattedDate}</h2>
         <p><strong>Status:</strong> ${job.status}</p>
         <p><strong>Description:</strong> ${job.description}</p>
         <p><strong>Vehicle:</strong> ${job.vehicleId.make} ${job.vehicleId.model} (${job.vehicleId.year}) - Plate: ${job.vehicleId.licensePlate}</p>
-        <p><strong>Mechanic:</strong> ${job.mechanicId.name}</p>
+        <p><strong>Mechanic:</strong> ${job.mechanicId.username}</p>
         <h4>Updates:</h4>
-        <ul>${job.updates.map(update => `<li>${update}</li>`).join('')}</ul>
+        <ul>${job.updates.map(update => `<li>${update.message}</li>`).join('')}</ul>
       `;
 
       container.appendChild(div);
