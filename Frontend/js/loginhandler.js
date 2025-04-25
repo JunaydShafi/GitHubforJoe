@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = form.password.value;
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -18,21 +18,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       console.log("Logging in with:", email, password);
       console.log("Login response from server:", data);
+      console.log("Redirect URL from server:", data.redirect);  // Log the redirect URL
 
       if (data.success) {
-        localStorage.setItem('userId', data.userId);
-        console.log("Saved userId to localStorage:", data.userId);
+        // Save the JWT token to localStorage (or sessionStorage)
+        localStorage.setItem('authToken', data.token);  // Store the token, not userId
+        console.log("Saved token to localStorage:", data.token);
 
-        const check = localStorage.getItem('userId');
-        console.log("Retrieved from localStorage after save:", check);
+        // Optionally save the user's role or other data if needed
+        localStorage.setItem('userRole', data.user?.role);
 
-        if (check) {
-          window.location.href = data.redirect;
-        } else {
-          alert("Login failed: could not save session. Try again.");
-        }
+        // Redirect to the dashboard or homepage after successful login
+        window.location.href = data.redirect;
       } else {
-        alert(data.message);
+        alert(data.error || 'Login failed');
       }
     } 
     catch (error) {
