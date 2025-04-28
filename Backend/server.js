@@ -45,7 +45,7 @@ app.get('/api/payroll', async (req, res) => {
 
 app.post('/api/vehicles/add', async (req, res) => {
     try {
-      const { customerId, make, model, year, vin, licensePlate } = req.body;
+      const { customerId, make, model, year, vin, color, licensePlate } = req.body;
   
       const newVehicle = new Vehicle({
         customerId,
@@ -53,6 +53,7 @@ app.post('/api/vehicles/add', async (req, res) => {
         model,
         year,
         vin,
+        color,
         licensePlate
       });
   
@@ -761,7 +762,7 @@ app.post("/createAppointment", async (req, res) => {
 dotenv.config();
 
 // Import nodemailer for email sending START
-import nodemailer from 'nodemailer';
+//import nodemailer from 'nodemailer';
 
 // Create transporter once and reuse
 const transporter = nodemailer.createTransport({

@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/Junstyle.css">
+        <script src="js/carInfo.js"></script>
         <title>Car Info</title>
     </head>
     <body>
@@ -30,20 +31,44 @@
 
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
 
+            <div>
+                <label for="vehicle"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><!--<path d="..."/>--></svg></label>
+                <select id="vehicle" required></select>
+            </div>
 
-        <h3>Vehicle Make</h3>
+        <h3>Vehicle Make: </h3>
+        <h3 id="vehMake"></h3>
+        <script>
+            let makeText = localStorage.getItem('carMake');
+            document.getElementById('vehMake').innerHTML = makeText;
+        </script>
         <!--add vehicle make text box-->
         <div><textarea id="vehicleMake"  rows="2" placeholder="Subaru"></textarea></div>
 
-        <h3>Vehicle Model</h3>
+        <h3>Vehicle Model: </h3>
+        <h3 id="vehModel"></h3>
+        <script>
+            let modelText = localStorage.getItem('carModel');
+            document.getElementById('vehModel').innerHTML = modelText;
+        </script>
         <!--add vehicle model text box-->
         <div><textarea id="vehicleModel"  rows="2" placeholder="STI Impreza"></textarea>
         </div>
-        <h3>Vehicle Color</h3>
+        <h3>Vehicle Color: </h3>
+        <h3 id="vehColor"></h3>
+        <script>
+            let colorText = localStorage.getItem('carColor');
+            document.getElementById('vehColor').innerHTML = colorText;
+        </script>
         <!--add vehicle color text box-->
         <div><textarea id="vehicleColor"  rows="2" placeholder="Blue"></textarea></div>
 
-        <h3>Vehicle Year</h3>
+        <h3>Vehicle Year: </h3>
+        <h3 id="vehYear"></h3>
+        <script>
+            let yearText =localStorage.getItem('carYear');
+            document.getElementById('vehYear').innerHTML = yearText;
+        </script>
         <!--add vehicle year text box-->
         <div><textarea id="vehicleYear"  rows="2" placeholder="2003"></textarea></div>
 
@@ -61,6 +86,6 @@
 
         </div>
 
-        <!--<script src="/js/addCar.js" defer></script>-->
+        <!--<script src="/js/carInfo.js" defer></script>-->
     </body>
 </html>
