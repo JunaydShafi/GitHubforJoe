@@ -15,7 +15,10 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     "googleapis": "^148.0.0",
     "jsonwebtoken": "^9.0.2",
 >>>>>>> Stashed changes
