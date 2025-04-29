@@ -710,7 +710,7 @@ app.post('/createAppointment', async (req, res) => {
   app.post("/api/admin/appointments/:id/approve", async (req, res) => {
     try {
       const { id } = req.params;
-      await Appointment.findByIdAndUpdate(id, { status: "approved" });
+      await AppointmentRequest.findByIdAndUpdate(id, { status: "approved" });
       res.json({ message: "Appointment approved" });
     } catch (err) {
       console.error("❌ Error approving:", err);
@@ -733,13 +733,14 @@ app.post('/createAppointment', async (req, res) => {
   //Page to view the database objects on admin/appointments
   app.get('/api/appointments', async (req, res) => {
     try {
-        const appointments = await Appointment.find({});
-        res.json(appointments);
+      const appointments = await AppointmentRequest.find({ status: 'pending' });
+      res.json(appointments);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+      console.error(err);
+      res.status(500).json({ error: 'Server error fetching appointments' });
     }
-});
+  });
+  
 
 
 
@@ -757,7 +758,7 @@ const transporter = nodemailer.createTransport({
 // DELETE appointment route (used in admin/appointments)
 app.delete('/api/appointments/:id', async (req, res) => {
   try {
-    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+    const appointment = await AppointmentRequest.findByIdAndDelete(req.params.id);
 
     if (!appointment) {
       return res.status(404).json({ error: 'Appointment not found' });
