@@ -588,43 +588,28 @@ app.use(express.urlencoded({extended: true}));
 
 //test appointment router
 app.post('/createAppointment', async (req, res) => {
-  const { firstName, lastName, email, phone, vehicleId, reason } = req.body;
-
-  console.log('Received data:', req.body); // Log incoming data
-
-  try {
-    // Ensure vehicleId is set to a placeholder if not provided
-    const newAppointment = new AppointmentRequest({
-
-/*
-  import Appointment from "./models/AppointmentRequest.js";
-app.use(express.urlencoded({extended: true}));
-
-app.post("/createAppointment", async (req, res) => {
-  console.log("📥 Incoming appointment:", req.body);
-
   try {
     const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
 
-    const appointment = new Appointment({
-    */
+    const newAppointment = new AppointmentRequest({
       firstName,
       lastName,
       email,
       phone,
       vehicleId,
       reason,
-      date: new Date(appointmentDate),  // <-- Parse date properly
+      date: new Date(appointmentDate),
+      status: "pending"
     });
 
-    await appointment.save();
+    await newAppointment.save();
     res.redirect("/customerMainPage");
   } catch (err) {
-    console.error("❌ Error saving appointment:", err);
+    console.error("Error saving appointment:", err);
     res.status(500).json({ error: "Failed to save appointment" });
-
   }
 });
+
 
 
   //customerRequestAppointment end--------------
@@ -712,10 +697,10 @@ app.post("/createAppointment", async (req, res) => {
 
   app.get("/api/admin/appointments", async (req, res) => {
     try {
-      const appointments = await Appointment.find({ status: "pending" });
+      const appointments = await AppointmentRequest.find({ status: "pending" });
       res.json(appointments);
     } catch (error) {
-      console.error("❌ Failed to fetch appointments:", error);
+      console.error("Failed to fetch appointments:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
@@ -733,14 +718,14 @@ app.post("/createAppointment", async (req, res) => {
     }
   });
   
-  app.post("/api/admin/appointments/:id/deny", async (req, res) => {
+  app.post("/api/admin/appointments/:id/approve", async (req, res) => {
     try {
       const { id } = req.params;
-      await Appointment.findByIdAndUpdate(id, { status: "denied" });
-      res.json({ message: "Appointment denied" });
+      await AppointmentRequest.findByIdAndUpdate(id, { status: "approved" });
+      res.json({ message: "Appointment approved" });
     } catch (err) {
-      console.error("❌ Error denying:", err);
-      res.status(500).json({ error: "Failed to deny" });
+      console.error("Error approving appointment:", err);
+      res.status(500).json({ error: "Failed to approve" });
     }
   });
   //Backend points ENd
