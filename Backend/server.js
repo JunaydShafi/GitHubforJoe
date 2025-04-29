@@ -760,9 +760,6 @@ app.post("/createAppointment", async (req, res) => {
 
 dotenv.config();
 
-// Import nodemailer for email sending START
-import nodemailer from 'nodemailer';
-
 // Create transporter once and reuse
 const transporter = nodemailer.createTransport({
   service: 'gmail',
