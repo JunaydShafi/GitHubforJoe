@@ -18,17 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       console.log("Logging in with:", email, password);
       console.log("Login response from server:", data);
-      console.log("Redirect URL from server:", data.redirect);  // Log the redirect URL
+      console.log("Redirect URL from server:", data.redirect);
 
       if (data.success) {
-        // Save the JWT token to localStorage (or sessionStorage)
-        localStorage.setItem('authToken', data.token);  // Store the token, not userId
-        console.log("Saved token to localStorage:", data.token);
-
-        // Optionally save the user's role or other data if needed
+        localStorage.setItem('authToken', data.token);   // ✅ token
+        localStorage.setItem('userId', data.user?.id);    // ✅ ADD THIS
         localStorage.setItem('userRole', data.user?.role);
 
-        // Redirect to the dashboard or homepage after successful login
+        console.log("Saved token:", data.token);
+        console.log("Saved userId:", data.user?.id);
+
         window.location.href = data.redirect;
       } else {
         alert(data.error || 'Login failed');

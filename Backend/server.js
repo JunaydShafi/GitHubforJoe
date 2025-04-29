@@ -14,6 +14,8 @@ import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
 import nodemailer from 'nodemailer';
 import AppointmentRequest from './models/AppointmentRequest.js';
+import mongoose from 'mongoose';  // <--- ADD this at top if not already there
+
 
 app.use(express.json());
 
@@ -63,6 +65,36 @@ app.post('/api/vehicles/add', async (req, res) => {
       res.status(500).json({ success: false, message: 'Server error' });
     }
   });
+
+  app.post('/api/jobs/create-from-appointment/:appointmentId', async (req, res) => {
+    try {
+      const { appointmentId } = req.params;
+      const { mechanicId } = req.body;
+  
+      const appointment = await AppointmentRequest.findById(appointmentId);
+  
+      if (!appointment) {
+        return res.status(404).json({ error: 'Appointment not found' });
+      }
+  
+      const newJob = new Job({
+        customerId: appointment.customerId ? new mongoose.Types.ObjectId(appointment.customerId) : undefined,
+        vehicleId: appointment.vehicleId,
+        mechanicId,
+        description: appointment.reason,
+        status: 'pending',
+        startDate: appointment.date
+      });
+  
+      await newJob.save();
+  
+      res.status(201).json({ success: true, message: 'Job created successfully', job: newJob });
+    } catch (err) {
+      console.error('Error creating job from appointment:', err);
+      res.status(500).json({ error: 'Server error creating job' });
+    }
+  });
+        
 
 app.post('/api/employees/create', async (req, res) => {
     try {
@@ -125,7 +157,7 @@ res.status(200).json({
     }
   });
   */
-
+  
   // Middleware
 app.use(bodyParser.json());
 
@@ -139,17 +171,20 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 app.use(express.static(path.join(__dirname,'..?frontend')));
 app.use('/js', express.static(path.join(__dirname, '../Frontend/js')));
 
-// API route: Get all jobs for a specific customer
-// app.get('/api/jobs/customer/:id', async (req, res) => {
-//     try {
-//       const jobs = await Job.find({ customerId: req.params.id })
-//         .populate('vehicleId')
-//         .populate('mechanicId');
-//       res.json(jobs);
-//     } catch (err) {
-//       res.status(500).json({ message: 'Server error' });
-//     }
-// });
+// NEW - Find jobs for a specific customer
+app.get('/api/jobs/customer/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const jobs = await Job.find({ customerId })
+      .populate('vehicleId')
+      .populate('mechanicId');
+
+    res.json(jobs);
+  } catch (err) {
+    console.error('Error fetching customer jobs:', err);
+    res.status(500).json({ error: 'Server error fetching customer jobs' });
+  }
+});
 app.use('/api/jobs',jobsRoutes);
 
 
@@ -586,17 +621,7 @@ app.get("/payroll-display", (req, res) => {
   //customerRequestAppointment start----------------
 app.use(express.urlencoded({extended: true}));
 
-//test appointment router
-app.post('/createAppointment', async (req, res) => {
-  const { firstName, lastName, email, phone, vehicleId, reason } = req.body;
 
-  console.log('Received data:', req.body); // Log incoming data
-
-  try {
-    // Ensure vehicleId is set to a placeholder if not provided
-    const newAppointment = new AppointmentRequest({
-
-/*
   import Appointment from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
@@ -605,16 +630,17 @@ app.post("/createAppointment", async (req, res) => {
 
   try {
     const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
+    const customerId = req.session?.userId || req.body.customerId;  // ← this is how you get who made it (if you track session)
 
     const appointment = new Appointment({
-    */
+      customerId,      // ✅ Save customer ID
+      vehicleId,       // ✅ Save vehicle ID
       firstName,
       lastName,
       email,
       phone,
-      vehicleId,
       reason,
-      date: new Date(appointmentDate),  // <-- Parse date properly
+      date: new Date(appointmentDate),
     });
 
     await appointment.save();
@@ -622,7 +648,6 @@ app.post("/createAppointment", async (req, res) => {
   } catch (err) {
     console.error("❌ Error saving appointment:", err);
     res.status(500).json({ error: "Failed to save appointment" });
-
   }
 });
 
@@ -761,7 +786,6 @@ app.post("/createAppointment", async (req, res) => {
 dotenv.config();
 
 // Import nodemailer for email sending START
-import nodemailer from 'nodemailer';
 
 // Create transporter once and reuse
 const transporter = nodemailer.createTransport({

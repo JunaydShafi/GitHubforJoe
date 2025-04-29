@@ -6,8 +6,12 @@ const appointmentRequestSchema = new mongoose.Schema({
   email: String,
   phone: String,
   vehicleId: {
-    type: String,
-    default: 'placeholder-vehicle-id', // Default value if vehicleId is not provided
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vehicle' // 🔥 properly reference Vehicle collection
+  },
+  customerId: {        // 🔥 ADD THIS FIELD!
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'        // 🔥 it connects to User collection
   },
   reason: String,
   status: {
@@ -19,9 +23,8 @@ const appointmentRequestSchema = new mongoose.Schema({
     type: Date,
     required: true
   }
-});
+}, { timestamps: true });
 
 const AppointmentRequest = mongoose.model('AppointmentRequest', appointmentRequestSchema);
 
 export default AppointmentRequest;
-

@@ -1,9 +1,9 @@
 import express from 'express';
 import Job from '../models/Job.js';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose'; // ✅ good you already have this
 
 const router = express.Router();
-
 
 // Middleware to verify JWT token and authenticate the user
 router.use(async (req, res, next) => {
@@ -15,7 +15,7 @@ router.use(async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
-    req.user = decoded; // Attach the user information to the request object
+    req.user = decoded; // Attach the user info to the request
     next();
   } catch (err) {
     console.error('Authentication error:', err);
@@ -23,21 +23,22 @@ router.use(async (req, res, next) => {
   }
 });
 
-// GET /api/jobs
-router.get('/', async (req, res) => {
+// ✅ FIX THIS ROUTE: Make it expect an employee ID
+router.get('/employee/:id', async (req, res) => {
   try {
-    // Fetch jobs for the logged-in user (use req.user._id to get the logged-in user’s ID)
-    const jobs = await Job.find({ customerId: req.user.id })
-      .populate('vehicleId')  // Ensure this is working, or you can remove these if not needed
-      .populate('mechanicId');
+    const mechanicId = new mongoose.Types.ObjectId(req.params.id); // 🔥 fix: convert to ObjectId
+
+    const jobs = await Job.find({ mechanicId })
+      .populate('vehicleId')
+      .populate('customerId');   // populate customer too if you want names
 
     if (jobs.length === 0) {
-      return res.status(200).json([]); // Return an empty array if no jobs are found
+      return res.status(200).json([]); // Send empty array if no jobs
     }
 
-    return res.json(jobs);  // Return the jobs as the response
+    return res.json(jobs); // send jobs
   } catch (err) {
-    console.error('Error fetching jobs:', err);
+    console.error('Error fetching jobs for mechanic:', err);
     res.status(500).json({ error: 'Failed to fetch jobs' });
   }
 });
