@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Appointment</title>
+  <link rel="stylesheet" href="/Junstyle.css">
+</head>
+<body>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='adminMain.html'">Main Page</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapperAdmin">
+    <h2>Schedule Appointment</h2>
+
+    <form id="scheduleForm">
+      <label for="date">Date:</label><br>
+      <input type="date" id="date" name="date" required><br><br>
+
+      <label for="time">Time:</label><br>
+      <input type="time" id="time" name="time" required><br><br>
+
+      <label for="duration">Duration (minutes):</label><br>
+      <input type="number" id="duration" name="duration" value="30" required><br><br>
+
+      <button type="submit">Confirm Appointment</button>
+    </form>
+
+    <h2>Current Google Calendar</h2>
+    <iframe
+      src="https://calendar.google.com/calendar/embed?src=joeottoshap%40gmail.com&ctz=America%2FLos_Angeles"
+      style="border:0" width="800" height="600" frameborder="0" scrolling="no">
+    </iframe>
+  </div>
+
+  <script src="/js/scheduleAppointment.js"></script>
+</body>
+</html>

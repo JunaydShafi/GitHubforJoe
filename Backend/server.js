@@ -9,8 +9,53 @@ import Job from './models/Job.js';
 import User from './models/User.js';
 import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
+<<<<<<< Updated upstream
 app.use(express.json());
 
+=======
+import nodemailer from 'nodemailer';
+import AppointmentRequest from './models/AppointmentRequest.js';
+import appointmentRoutes from './routes/appointments.js';
+import calendarRoutes from './routes/calendar.js';
+
+
+app.use(express.json());
+
+app.use('/api/calendar', calendarRoutes);
+
+app.use('/api/appointments', appointmentRoutes);
+
+app.get('/scheduleAppointment', (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend", "scheduleAppointment.html"));
+});
+
+
+app.get('/api/payroll', async (req, res) => {
+  try {
+    const employees = await User.find({ role: 'employee' });
+    const data = employees.map(emp => {
+      const { minutes, overtime, rate } = emp.payroll || {};
+      const basePay = ((minutes || 0) / 60) * (rate || 0);
+      const otPay = (overtime || 0) * (rate || 0) * 1.5;
+      const total = basePay + otPay;
+
+
+
+      return {
+        name: emp.username,
+        minutes,
+        overtime,
+        rate,
+        total
+      };
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load payroll' });
+  }
+});
+
+>>>>>>> Stashed changes
 app.post('/api/vehicles/add', async (req, res) => {
     try {
       const { customerId, make, model, year, vin, licensePlate } = req.body;
@@ -374,8 +419,335 @@ app.get("/payroll-display", (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend/payroll-display.html"));
 });
 
+<<<<<<< Updated upstream
 dotenv.config();
 
+=======
+  //customerRequestAppointment start----------------
+app.use(express.urlencoded({extended: true}));
+
+//test appointment router
+app.post('/createAppointment', async (req, res) => {
+  const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
+
+  console.log('Received data:', req.body); // Log incoming data
+
+  try {
+    // Ensure vehicleId is set to a placeholder if not provided
+    const newAppointment = new AppointmentRequest({
+
+/*
+  import Appointment from "./models/AppointmentRequest.js";
+app.use(express.urlencoded({extended: true}));
+
+app.post("/createAppointment", async (req, res) => {
+  console.log("📥 Incoming appointment:", req.body);
+
+  try {
+    const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
+
+    const appointment = new Appointment({
+    */
+      firstName,
+      lastName,
+      email,
+      phone,
+      vehicleId,
+      reason,
+      date: new Date(appointmentDate),  // <-- Parse date properly
+    });
+
+    await appointment.save();
+    res.redirect("/customerMainPage");
+  } catch (err) {
+    console.error("❌ Error saving appointment:", err);
+    res.status(500).json({ error: "Failed to save appointment" });
+
+  }
+});
+
+
+  //customerRequestAppointment end--------------
+
+  app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) return res.status(404).json({ message: 'Email not found' });
+  
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  
+      user.resetOtp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
+  
+      // ✉️ Send OTP via email using Nodemailer
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,     // your email
+          pass: process.env.EMAIL_PASS      // app password or email pass
+        }
+      });
+  
+      await transporter.sendMail({
+        from: `"Joe's Auto" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Your Password Reset OTP',
+        text: `Your OTP code is: ${otp} — valid for 10 minutes.`
+      });
+  
+      res.json({ message: 'OTP sent' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error sending OTP' });
+    }
+  });
+  
+  // ✅ 2. Verify OTP
+  app.post('/api/verify-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user || user.resetOtp !== otp || user.otpExpires < new Date()) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+      }
+  
+      user.resetOtp = null;
+      user.otpExpires = null;
+      user.canReset = true; // flag to allow reset
+      await user.save();
+  
+      res.json({ message: 'OTP verified' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Verification error' });
+    }
+  });
+  
+  // ✅ 3. Reset password
+  app.post('/api/reset-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user || !user.canReset) return res.status(403).json({ message: 'Not authorized to reset password' });
+  
+      const hashed = await bcrypt.hash(newPassword, 10);
+      user.password = hashed;
+      user.canReset = false;
+      await user.save();
+  
+      res.json({ message: 'Password reset successful' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Password reset failed' });
+    }
+  });
+  
+
+
+  // retreive customerRequestAppointment to output on admins view appointment START
+
+
+  app.get("/api/admin/appointments", async (req, res) => {
+    try {
+      const appointments = await Appointment.find({ status: "pending" });
+      res.json(appointments);
+    } catch (error) {
+      console.error("❌ Failed to fetch appointments:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  //retreive customerRequestAppointment to output on admins view appointment END
+
+  // Backend Points STart
+  app.post("/api/admin/appointments/:id/approve", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Appointment.findByIdAndUpdate(id, { status: "approved" });
+      res.json({ message: "Appointment approved" });
+    } catch (err) {
+      console.error("❌ Error approving:", err);
+      res.status(500).json({ error: "Failed to approve" });
+    }
+  });
+  
+  app.post("/api/admin/appointments/:id/deny", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Appointment.findByIdAndUpdate(id, { status: "denied" });
+      res.json({ message: "Appointment denied" });
+    } catch (err) {
+      console.error("❌ Error denying:", err);
+      res.status(500).json({ error: "Failed to deny" });
+    }
+  });
+  //Backend points ENd
+
+  //Page to view the database objects on admin/appointments
+  app.get('/api/appointments', async (req, res) => {
+    try {
+        const appointments = await Appointment.find({});
+        res.json(appointments);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+
+dotenv.config();
+
+
+
+// Create transporter once and reuse
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  }
+});
+
+// DELETE appointment route (used in admin/appointments)
+app.delete('/api/appointments/:id', async (req, res) => {
+  try {
+    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    // Send denial email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: appointment.email,
+      subject: 'Appointment Denied - Joe\'s AutoShop',
+      text: `Hello ${appointment.firstName} ${appointment.lastName},
+
+Unfortunately, your appointment request for ${appointment.date} has been denied.
+If you have any questions or would like to reschedule, please contact us at (916) 553-4249.
+
+Best,
+Joe's AutoShop Team`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email sending failed:', error);
+      } else {
+        console.log('Denial email sent:', info.response);
+      }
+    });
+
+    res.json({ message: 'Appointment denied and deleted', appointment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// POST route to approve appointment and send approval email
+app.post('/approve-appointment', async (req, res) => {
+  const { appointmentId } = req.body;
+
+  try {
+    const appointment = await AppointmentRequest.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).send('Appointment not found');
+    }
+
+    console.log(`Appointment ${appointmentId} approved.`);
+
+    // Step 1: Send approval email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: appointment.email,
+      subject: 'Appointment Approved - Joe\'s AutoShop',
+      text: `Hi ${appointment.firstName} ${appointment.lastName},
+
+Your appointment on ${appointment.date} has been approved.
+We look forward to seeing you!
+
+Bring your car down to the shop on the requested date and time, if you need more information on where we are located check the homepage for more information.
+
+Best,
+Joe's AutoShop Team`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Approval email failed:', error);
+        return res.status(500).send('Email failed to send');
+      } else {
+        console.log('Approval email sent:', info.response);
+      }
+    });
+
+    // Step 2: Delete the appointment from the DB after email is sent
+    await AppointmentRequest.findByIdAndDelete(appointmentId);
+    console.log(`Appointment ${appointmentId} deleted after approval.`);
+
+    res.send('Approval and email sent, appointment deleted');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error approving appointment');
+  }
+});
+// Approve appointment route END
+
+//cleanup on email
+app.delete('/api/appointments/clean/:id', async (req, res) => {
+  try {
+    const appointment = await AppointmentRequest.findByIdAndDelete(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    res.json({ message: 'Appointment deleted after approval', appointment });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting appointment after approval' });
+  }
+});
+
+
+//to send info to database in createJob.html
+
+app.post('/api/createJob', async (req, res) => {
+  try {
+    const { customerId, vehicleId, mechanicId, status, description, startDate } = req.body;
+
+    const newJob = new Job({
+      customerId,
+      vehicleId,
+      mechanicId,
+      status,
+      description,
+      startDate
+    });
+
+    await newJob.save();
+
+    res.status(201).json({ message: 'Job created successfully' });
+  } catch (err) {
+    console.error('Error creating job:', err);
+    res.status(500).json({ error: 'Failed to create job' });
+  }
+});
+
+
+//grab mechanics for createJob.html
+app.get('/api/mechanics', async (req, res) => {
+  const mechanics = await User.find({ role: 'employee' });
+  res.json(mechanics);
+});
+
+
+>>>>>>> Stashed changes
 app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
     connectDB();
