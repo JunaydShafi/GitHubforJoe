@@ -6,6 +6,16 @@
     font-family:inherit, Courier, monospace;
 }
 
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link:visited {
+    color: inherit;
+}
+  
+
 .header-top {
     background-color: rgb(56, 52, 52); 
     color: white; 
