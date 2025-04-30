@@ -26,16 +26,46 @@ document.addEventListener('DOMContentLoaded', async () => {
       const updates = (activeJob.updates || []).map(u => u.message).join('\n');
       document.getElementById('mechanicNotes').value = updates || 'No updates yet.';
   
-      // Estimate time: placeholder calculation (2 hours total duration for example)
       const now = new Date();
-      const elapsed = Math.floor((now - start) / 60000); // minutes
+      const elapsed = Math.floor((now - start) / 60000);
       const remaining = Math.max(120 - elapsed, 0);
       const hrs = Math.floor(remaining / 60);
       const mins = remaining % 60;
-      document.getElementById('etaText').textContent = `Estimated Time Until Job Completion: ${hrs}h ${mins}m`;
+  
+      const estimate = parseInt(activeJob.estimatedMinutes, 10) || 120;
+      console.log('Starting progress bar with:', activeJob.startDate, estimate);
+  
+      startProgressBar(activeJob.startDate, estimate);
+  
     } catch (err) {
       console.error('Error loading job progress:', err);
       document.getElementById('jobWrapper').innerHTML = "<h3>Error loading job info.</h3>";
     }
   });
+  
+  function startProgressBar(startDate, estimatedMinutes) {
+    const fill = document.getElementById('progressBarFill');
+    const status = document.getElementById('progressStatus');
+  
+    if (!fill || !status) return;
+  
+    fill.style.display = 'block';
+  
+    function updateBar() {
+      const now = new Date();
+      const start = new Date(startDate);
+      const elapsed = (now - start) / 60000;
+      const percent = Math.min((elapsed / estimatedMinutes) * 100, 100);
+      fill.style.width = `${percent.toFixed(1)}%`;
+      fill.textContent = `${Math.floor(percent)}%`;
+  
+      const remaining = Math.max(0, estimatedMinutes - elapsed);
+      status.textContent = remaining > 0
+        ? `Estimated time remaining: ${Math.floor(remaining)} min`
+        : 'Job should be completed soon.';
+    }
+  
+    updateBar();
+    setInterval(updateBar, 30000);
+  }
   

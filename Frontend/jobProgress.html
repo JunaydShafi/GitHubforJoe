@@ -41,7 +41,13 @@
     <h3>Mechanic Notes:</h3>
     <div><textarea id="mechanicNotes" readonly></textarea></div>
 
-    <h3 id="etaText">Estimated Time Until Job Completion: xx:xx</h3>
+
+    <h3>Job Progress:</h3>
+    <div id="progressBarContainer" style="width: 100%; background-color: #ddd; height: 25px; border-radius: 10px; overflow: visible;">
+        <div id="progressBarFill" style="height: 100%; width: 0%; background-color: #4CAF50; text-align: center; color: white; line-height: 25px;">0%</div>
+    </div>
+    <p id="progressStatus" style="margin-top: 5px;"></p>
+
 
     <button class="bottomLeftCenter" type="button" onclick="history.back()">Back</button>
   </div>

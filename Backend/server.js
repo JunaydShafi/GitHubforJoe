@@ -342,10 +342,11 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
     if (!job) return res.status(404).json({ message: 'Job not found' });
 
     job.status = req.body.status;
-    if (req.body.status === 'in progress' && !job.startDate) {
+    if (req.body.status === 'in progress') {
       job.startDate = new Date();
+      job.estimatedMinutes = req.body.estimatedMinutes;
     }
-
+        
     await job.save();
     res.json({ message: 'Status updated', job });
   } catch (err) {

@@ -9,6 +9,9 @@ const jobSchema = new mongoose.Schema({
   description: String,
   startDate: Date,
   completedDate: Date,
+  estimatedMinutes: {
+    type: Number,
+  },
   updates: [
     {
       message: String,

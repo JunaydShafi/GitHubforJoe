@@ -718,4 +718,7 @@ form select:focus {
   .dropdown:hover .dropdown-content {
     display: block;
   }
+  #progressBarFill {
+    transition: width 0.5s ease-in-out;
+  }
   

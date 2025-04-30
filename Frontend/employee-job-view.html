@@ -96,39 +96,37 @@
   
     document.addEventListener('DOMContentLoaded', async () => {
       const employeeId = localStorage.getItem('userId');
-      const token = localStorage.getItem('authToken'); // 🔥 GET the token
+      const token = localStorage.getItem('authToken');
       const hideCheckbox = document.getElementById('hideCompleted');
-  
-      if (!employeeId || !token) {   // 🔥 CHECK if token missing too
+
+      if (!employeeId || !token) {
         alert("Not logged in.");
         return;
       }
-  
+
       try {
-        const res = await fetch(`/api/jobs/employee/${employeeId}`, {   // 🔥 ADD token in request
+        const res = await fetch(`/api/jobs/employee/${employeeId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         const jobs = await res.json();
-  
+
         if (!jobs.length) {
           document.getElementById('jobSidebar').innerHTML = "<p>No jobs assigned to you yet.</p>";
           return;
         }
-  
+
         allJobs = jobs;
         renderJobs();
-  
+
         hideCheckbox.addEventListener('change', renderJobs);
       } catch (err) {
         console.error(err);
         document.getElementById('jobSidebar').innerHTML = "<p>Error loading jobs.</p>";
       }
     });
-  
-    // ❗ The rest of your code (renderJobs, showJobDetails, startJob, markComplete, addUpdate, etc.) stays EXACTLY the same!
-  
+
     function renderJobs() {
       const sidebar = document.getElementById('jobSidebar');
       const details = document.getElementById('jobDetails');
@@ -186,21 +184,47 @@
       <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
     </div>
   `;
+    }
+
+    let selectedJobId = null;
+
+function startJob(jobId) {
+  selectedJobId = jobId;
+  document.getElementById('estimateModal').style.display = 'flex';
 }
-async function startJob(jobId) {
+
+function closeEstimateModal() {
+  document.getElementById('estimateModal').style.display = 'none';
+  selectedJobId = null;
+}
+
+async function confirmEstimate() {
+  const token = localStorage.getItem('authToken');
+  const hours = parseInt(document.getElementById('estimateHours').value, 10) || 0;
+  const minutes = parseInt(document.getElementById('estimateMinutes').value, 10) || 0;
+  const totalMinutes = (hours * 60) + minutes;
+
+  if (!selectedJobId || totalMinutes <= 0) {
+    alert("Please enter a valid estimated time.");
+    return;
+  }
+
   try {
-    const token = localStorage.getItem('authToken'); // ✅ get token if needed
-    const res = await fetch(`/api/jobs/${jobId}/status`, {
+    const res = await fetch(`/api/jobs/${selectedJobId}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})  // ✅ attach token if exists
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       },
-      body: JSON.stringify({ status: 'in progress' })
+      body: JSON.stringify({
+        status: 'in progress',
+        estimatedMinutes: totalMinutes
+      })
     });
 
     const data = await res.json();
     if (res.ok) {
+      closeEstimateModal();
       alert("Job started successfully!");
       location.reload();
     } else {
@@ -211,104 +235,128 @@ async function startJob(jobId) {
     alert("Server error starting job.");
   }
 }
+//
 
 
+    async function markComplete(jobId) {
+      const notes = document.getElementById(`notes-${jobId}`).value;
+      const token = localStorage.getItem('authToken');
 
-async function markComplete(jobId) {
-  const notes = document.getElementById(`notes-${jobId}`).value;
-  const token = localStorage.getItem('authToken'); // ✅ Get token
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/complete`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify({
+            updateMessage: notes
+          })
+        });
 
-  try {
-    const res = await fetch(`/api/jobs/${jobId}/complete`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})  // ✅ Attach token if exists
-      },
-      body: JSON.stringify({
-        updateMessage: notes  // ✅ Only sending the notes
-      })
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert("Job marked as complete!");
-      location.reload();
-    } else {
-      alert(data.message || 'Error marking complete.');
+        const data = await res.json();
+        if (res.ok) {
+          alert("Job marked as complete!");
+          location.reload();
+        } else {
+          alert(data.message || 'Error marking complete.');
+        }
+      } catch (err) {
+        console.error('Error completing job:', err);
+        alert('Server error completing job.');
+      }
     }
-  } catch (err) {
-    console.error('Error completing job:', err);
-    alert('Server error completing job.');
-  }
-}
 
+    async function addUpdate(jobId) {
+      const textarea = document.getElementById(`notes-${jobId}`);
+      const updateText = textarea.value.trim();
+      const token = localStorage.getItem('authToken');
 
-async function addUpdate(jobId) {
-  const textarea = document.getElementById(`notes-${jobId}`);
-  const updateText = textarea.value.trim();
-  const token = localStorage.getItem('authToken'); // ✅ Get auth token
+      if (!updateText) {
+        alert("Please enter an update.");
+        return;
+      }
 
-  if (!updateText) {
-    alert("Please enter an update.");
-    return;
-  }
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/add-update`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ message: updateText })
+        });
 
-  try {
-    const res = await fetch(`/api/jobs/${jobId}/add-update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`  // ✅ Attach token here
-      },
-      body: JSON.stringify({ message: updateText })
-    });
+        const data = await res.json();
 
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Update added successfully!");
-      const latest = data.job.updates[data.job.updates.length - 1];
-      textarea.value = latest.message;
-    } else {
-      alert("Error: " + (data.message || 'Unknown error'));
+        if (res.ok) {
+          alert("Update added successfully!");
+          const latest = data.job.updates[data.job.updates.length - 1];
+          textarea.value = latest.message;
+        } else {
+          alert("Error: " + (data.message || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to add update.");
+      }
     }
-  } catch (err) {
-    console.error(err);
-    alert("Failed to add update.");
-  }
-}
+
     function showUpdateHistory(updates) {
-  const list = document.getElementById('updateList');
-  list.innerHTML = '';
+      const list = document.getElementById('updateList');
+      list.innerHTML = '';
 
-  if (updates.length === 0) {
-    list.innerHTML = '<li>No update history found.</li>';
-  } else {
-    updates.forEach(update => {
-      const item = document.createElement('li');
-      const time = new Date(update.timestamp || update.date || Date.now()).toLocaleString();
-      item.textContent = `"${update.message}" — ${time}`;
-      list.appendChild(item);
-    });
-  }
+      if (updates.length === 0) {
+        list.innerHTML = '<li>No update history found.</li>';
+      } else {
+        updates.forEach(update => {
+          const item = document.createElement('li');
+          const time = new Date(update.timestamp || update.date || Date.now()).toLocaleString();
+          item.textContent = `"${update.message}" — ${time}`;
+          list.appendChild(item);
+        });
+      }
 
-  document.getElementById('modalOverlay').style.display = 'block';
-  document.getElementById('updateHistoryModal').style.display = 'block';
-}
+      document.getElementById('modalOverlay').style.display = 'block';
+      document.getElementById('updateHistoryModal').style.display = 'block';
+    }
 
-function closeUpdateHistory() {
-  document.getElementById('modalOverlay').style.display = 'none';
-  document.getElementById('updateHistoryModal').style.display = 'none';
-}
-
+    function closeUpdateHistory() {
+      document.getElementById('modalOverlay').style.display = 'none';
+      document.getElementById('updateHistoryModal').style.display = 'none';
+    }
   </script>
-  <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.5); z-index:1000;" onclick="closeUpdateHistory()"></div>
 
+  <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.5); z-index:1000;" onclick="closeUpdateHistory()"></div>
   <div id="updateHistoryModal" class="update-modal">
     <h3>Update History</h3>
     <ul id="updateList" style="padding-left: 20px;"></ul>
     <button onclick="closeUpdateHistory()" style="margin-top: 15px; padding: 5px 15px;">Close</button>
   </div>
+  <!-- Estimated Time Modal -->
+<!-- Estimated Time Modal -->
+<!-- Estimated Time Modal -->
+<div id="estimateModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#2e302b; padding:25px 30px; border-radius:12px; text-align:center; box-shadow:0 0 10px rgba(0,0,0,0.5); min-width:300px; color:white;">
+    <h3 style="margin-bottom: 15px;">Enter Estimated Job Time</h3>
+    <div style="margin-bottom: 15px;">
+      <label>
+        <input type="number" id="estimateHours" min="0" value="0" style="width:60px; padding:5px; border:none; border-radius:5px; background:#444; color:white;"> hr
+      </label>
+      &nbsp;
+      <label>
+        <input type="number" id="estimateMinutes" min="0" max="59" value="30" style="width:60px; padding:5px; border:none; border-radius:5px; background:#444; color:white;"> min
+      </label>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 10px;">
+      <button onclick="confirmEstimate()" style="background-color: #1a6346; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+        Start Job
+      </button>
+      <button onclick="closeEstimateModal()" style="background-color: #666; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
