@@ -54,16 +54,17 @@
           div.innerHTML = `
             <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
             <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
-            <div class="details" style="display:none; margin-top:10px;">
-              <p><strong>Email:</strong> ${appointment.email}</p>
-              <p><strong>Phone:</strong> ${appointment.phone}</p>
-              <p><strong>Reason:</strong> ${appointment.reason}</p>
-              <p><strong>Vehicle ID:</strong> ${appointment.vehicleId}</p>
-              <label for="mechanicSelect-${appointment._id}"><strong>Select Mechanic:</strong></label><br>
-              <select id="mechanicSelect-${appointment._id}" style="margin-bottom: 10px;"></select><br>
-              <button onclick="approveAppointment('${appointment._id}')" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Approve</button>
-              <button onclick="deny('${appointment._id}', this.closest('.account-box'))" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Deny</button>
-            </div>
+       <div class="details" style="display:none; margin-top:10px;">
+  <p><strong>Email:</strong> ${appointment.email}</p>
+  <p><strong>Phone:</strong> ${appointment.phone}</p>
+  <p><strong>Reason:</strong> ${appointment.reason}</p>
+  ${appointment.reason === "Other" ? `<p><strong>Comment:</strong> ${appointment.comments}</p>` : ""}
+  <p><strong>Vehicle:</strong> ${appointment.vehicleId ? `${appointment.vehicleId.make} ${appointment.vehicleId.model}` : 'N/A'}</p>
+  <label for="mechanicSelect-${appointment._id}"><strong>Select Mechanic:</strong></label><br>
+  <select id="mechanicSelect-${appointment._id}" style="margin-bottom: 10px;"></select><br>
+  <button onclick="approveAppointment('${appointment._id}')" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Approve</button>
+  <button onclick="deny('${appointment._id}', this.closest('.account-box'))" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Deny</button>
+</div>
           `;
 
           container.appendChild(div);

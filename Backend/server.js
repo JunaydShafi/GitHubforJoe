@@ -171,7 +171,17 @@ app.get('/api/jobs/customer/:customerId', async (req, res) => {
 app.use('/api/jobs',jobsRoutes);
 
 
-
+// display vehicle make and medel on appointmnets/html
+app.get('/api/appointments', async (req, res) => {
+  try {
+    const appointments = await AppointmentRequest.find()
+      .populate('vehicleId', 'make model') // Populate vehicle data (make and model)
+      .exec();
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ message: 'Error retrieving appointments' });
+  }
+});
 
 
 // API route: Get all jobs for a specific employee (mechanic)

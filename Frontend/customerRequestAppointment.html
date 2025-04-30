@@ -106,7 +106,7 @@
             userVehicles.forEach(vehicle => {
                 const option = document.createElement('option');
                 option.value = vehicle._id;
-                option.textContent = `${vehicle.year} ${vehicle.make} ${vehicle.model} (${vehicle.licensePlate})`;
+                option.textContent = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
                 dropdown.appendChild(option);
             });
 
