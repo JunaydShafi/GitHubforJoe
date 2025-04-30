@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "joes-auto-calendar",
+  "private_key_id": "afd41d7d1c75b7af2276cdedca8b91e57e27d4e7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDWwFxefZoVL6hu\ncygyGfMvSjNGp2TVj3oYNbNWhcKaGChDiaMe1rViwSp4rPZXN883zFlk2LvvliDQ\nM2RCDGVgwf4pjWYYTpc72uGzMHb5gsAvLpn3BWnlShb9l9r+2lgXwN5Iv0z84C8U\nisZKsXF7leii+rvaOTF9IlLOLkUIxHg+/Qxahm8NiIx6koQBm61o3uupRN8L0DfM\nuHQw1zdkoRkDV/V3uRT1A/Cv9qH4tgQ/SNym9z5vtpzwaedxLIGwZniNjyJZ8Dwu\nQ/5KrsU4EpEe7P5DMzCcvvtNMrOkmPAyhCmLcfe+iNExm1eFLcuZpSADITt1Ykc3\nS3gH9i7VAgMBAAECggEAAocYtaM3ouCah4cWRdV/KRZWTJJmogp8GGuny1cfURFp\nuYNioFezCN3wy9Zu8kKqglcG0leoVqVnId9vYnhwFQrgT/x/FotbElqwMpvzOo3R\nPBaJvDOb6UjNXnmUG7dvamnCjaUN/4f8zEdNFpuVR19Rvq4oc36EcgGea39CufV4\niilcboyQd++fgu8B562OVedmnJew+2kxCsTUp1JlBxseCQwY9f/jIgW9BiW1Q/8Q\npwE2s9OYiebShMbCrlFgYpa0IL4pTH9qQSQKALyVavd99rMgyH8w1xJy0KC20STl\ngJFKaKRo/kqJWy7A1Gm7NFh9HTzxmc2Xs1dbwVdnPQKBgQDsfyqSmtEtKq2RxxiB\n/oZQVogwdWvHKZ6nEITFlGUPzrFE0jV17BCiURccolm7dL+f+ev+9ulb8bOVCSRC\nULls7kEToU37oL0pbY6ZZP4Pjpal6F0rcH9fpR+TzoMVUz0AmNIy4QQQJLS44C2I\ncrdDVgZRh9nuy1LbTNKNbjCs7wKBgQDodh1ppmvX2v41H5/11mTwqjiPRBM+i4T6\neu7pkOGLgoIAV3RETwsqp+JCeBjybY0ssZhM6kwFcDgfVVu6aAv4S8YcS6tEgVeY\nHEWkF5trRkldpILacppqmXoB60ulZn6RMmvhttWzMvlQfw6gSlykHX3MpbzmM8k7\nJ2INWM5oewKBgQDnCIf3dmS4ggPT8LLhc1uVKiOba2phwyfpPzrlpcVgvuPwPobZ\nb0cEusEgSP3uIex9hPJmPqHUH3f3NVoFqsSqRMqwOZlsIygIS63N7po/amWDKE+0\new8DydTiWRE3iPyEE8bsy2NjvegK33272Y1sq6I6jcN6A4krEY5zedz1YwKBgQC/\n5cmQDq8WCRUzG4E8Oxkmxw5bzlGonxpOgC87prtaJIlW6Nr1DN9l/iM8xdGqRx90\nlsLoM74/+wyJaTiI4B2JglvvvdOLgM6jpisjM828N9CWuhi/Zj3s4/ehH/FZgAvZ\npusB8KHnBZxkhA656ckiPao8x1DyJCvpZjB+XiI+gwKBgQDmXg0VkTuawqpJvOpD\nqOVfNM3OnNZZhoEILn4rAtszlk6aMTXxTxabLbT+RrTYah/5WtgayS/QRgEdKtIh\nPjpcbuqSV1nJObn0aWlYAzk/dAzWeCdivk1q7P7omoUqT9NLKJiWgYW7SGbjKL7n\nw5iFRClIL+lXkIdEYx8LbIttJg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "calendar-access@joes-auto-calendar.iam.gserviceaccount.com",
+  "client_id": "114209245389308473684",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/calendar-access%40joes-auto-calendar.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

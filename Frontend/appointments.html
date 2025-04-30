@@ -33,6 +33,7 @@
         <option value="">-- Loading Appointments --</option>
       </select>
 
+      <!-- Appointment details will be shown here after dropdown selection -->
       <div id="appointments"></div>
     </div>
   </div>
@@ -43,26 +44,21 @@
         const res = await fetch('/api/appointments');
         const data = await res.json();
 
-        const container = document.getElementById('appointments');
         const dropdown = document.getElementById('appointmentDropdown');
+        dropdown.innerHTML = '<option value="">-- Select an Appointment --</option>'; // Reset dropdown
 
-        container.innerHTML = '';
-        dropdown.innerHTML = '<option value="">-- Select an Appointment --</option>';
-
-        if (data.length === 0) {
-          container.innerHTML = '<p>No appointments found.</p>';
-          dropdown.innerHTML = '<option value="">No appointments available</option>';
-          return;
-        }
+        // Store cards dynamically
+        const cards = {};
 
         data.forEach(appointment => {
           const dateObj = new Date(appointment.date);
           const formattedDate = isNaN(dateObj) ? "Invalid Date" : dateObj.toLocaleString();
 
-          // Create the appointment card
+          // Create the appointment card dynamically and store it
           const div = document.createElement('div');
           div.className = 'account-box';
           div.id = `appointment-${appointment._id}`;
+          div.style.display = 'none'; // Initially hidden
           div.innerHTML = `
             <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
             <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
@@ -74,8 +70,7 @@
             </div>
           `;
 
-          const detailsDiv = div.querySelector('.details');
-
+          // Create Approve and Deny buttons
           const approveBtn = document.createElement('button');
           approveBtn.textContent = 'Approve';
           approveBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px; margin-right: 5px;';
@@ -94,25 +89,36 @@
           denyBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;';
           denyBtn.addEventListener('click', () => deny(appointment._id, div));
 
+          // Append buttons to the card
+          const detailsDiv = div.querySelector('.details');
           detailsDiv.appendChild(approveBtn);
           detailsDiv.appendChild(denyBtn);
 
-          container.appendChild(div);
+          // Append card to the container
+          document.querySelector('.appointments-container').appendChild(div);
 
-          // Also add it to the dropdown
+          // Add the option to dropdown
           const option = document.createElement('option');
           option.value = appointment._id;
           option.textContent = `${appointment.firstName} ${appointment.lastName} - ${formattedDate}`;
           dropdown.appendChild(option);
+
+          // Save the card for later use
+          cards[appointment._id] = div;
         });
 
-        // Optional: Jump to appointment when selected
+        // Show the selected appointment card when selected
         dropdown.addEventListener('change', (event) => {
           const appointmentId = event.target.value;
+          // Hide all cards first
+          Object.values(cards).forEach(card => card.style.display = 'none');
+
           if (appointmentId) {
-            const card = document.getElementById(`appointment-${appointmentId}`);
-            if (card) {
-              card.scrollIntoView({ behavior: 'smooth' });
+            // Show only the selected card
+            const selectedCard = cards[appointmentId];
+            if (selectedCard) {
+              selectedCard.style.display = 'block'; // Show the card
+              selectedCard.scrollIntoView({ behavior: 'smooth' });
             }
           }
         });
@@ -126,41 +132,28 @@
       }
     }
 
+    // Toggle the details view
     function toggleDetails(button) {
       const details = button.nextElementSibling;
       details.style.display = details.style.display === 'none' ? 'block' : 'none';
     }
 
-    function approve(id, vehicle, reason, date, time, firstName) {
-      const confirmed = confirm(`Are you sure you want to approve this appointment for ${firstName}?`);
-      if (!confirmed) return;
+    function approve(id, vehicle, reason, date, time, firstName, lastName) {
+  const confirmed = confirm(`Are you sure you want to approve this appointment for ${firstName}?`);
+  if (!confirmed) return;
 
-      fetch('/approve-appointment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ appointmentId: id })
-      })
-      .then(res => res.text())
-      .then(message => {
-        alert('Appointment approved and email sent.');
-        const appointmentCard = document.querySelector(`#appointment-${id}`);
-        if (appointmentCard) appointmentCard.remove();
-        const url = new URL('/createJob.html', window.location.origin);
-        url.searchParams.set('vehicle', vehicle);
-        url.searchParams.set('reason', reason);
-        url.searchParams.set('date', date);
-        url.searchParams.set('time', time);
-        url.searchParams.set('firstName', firstName);
-        window.location.href = url.toString();
-      })
-      .catch(err => {
-        console.error(err);
-        alert('Error approving appointment.');
-      });
-    }
+  // Redirect to createAppointmentTime.html to set the date and time
+  const url = new URL('/createAppointmentTime.html', window.location.origin);
+  url.searchParams.set('appointmentId', id);
+  url.searchParams.set('vehicle', vehicle);
+  url.searchParams.set('reason', reason);
+  url.searchParams.set('firstName', firstName);
+  url.searchParams.set('lastName', lastName);
+  window.location.href = url.toString();
+}
 
+
+    // Deny the appointment and update status in MongoDB
     function deny(apptId, card) {
       const confirmed = confirm("Are you sure you want to deny this appointment?");
       if (!confirmed) return;
