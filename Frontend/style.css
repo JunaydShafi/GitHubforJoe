@@ -119,16 +119,19 @@ body {
 }
 
 .text-content {
-    top: 600px;
     position: relative;
+    top: 605px; /* Start at 600px from the top */
+    left: 0;
+    right: 0;
+    bottom: 0; /* Stretch to the bottom of the page */
     color: black;
     background-color: white;
     padding: 20px;
     z-index: 2;
-    height: auto;
     padding-top: 50px;
     padding-left: 380px;
     padding-right: 800px;
+    padding-bottom: 55px;
     line-height: 1.6;
 }
 
@@ -147,9 +150,17 @@ h1 {
 }
 
 h2 {
+    color: #333; 
     font-size: 1.5em;
     line-height: 1.2;
+
 }
+
+.text-content h2 {
+    text-align: left;
+    color: black;
+}
+
 
 p {
     margin-top: 30px;
@@ -315,4 +326,77 @@ h2.go-to-home {
     justify-content: flex-end;  
     margin-right: -35px;
 }
+
+/* Make sure page stretches full height */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The content container will grow to fill space */
+.main {
+    flex: 1;
+}
+
+.footer {
+    background-color: rgb(56, 52, 52);
+    color: rgb(216, 216, 216);
+    text-align: center;
+    font-size: 16px;
+    padding: 20px;
+    box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 999;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    line-height: 1.6;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-links ul {
+    list-style: none;
+    line-height: 1.6;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin: 5px 0;
+    line-height: 1.6;
+}
+
+.footer-links a,
+.footer-social a {
+    color: rgb(216, 216, 216);
+    line-height: 1.6;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+.footer-links a:hover,
+.footer-social a:hover {
+    text-decoration: underline;
+    line-height: 1.6;
+}
+
+.footer-social {
+    display: flex;
+    justify-content: flex-end;
+    line-height: 1.6;
+}
+
+#about {
+    scroll-margin-top: -425px; /* Adjust value as needed */
+}
+
+
 
