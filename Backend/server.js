@@ -402,15 +402,61 @@ app.get('/api/payroll/week', async (req, res) => {
 
 app.patch('/api/jobs/:id/add-update', async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById(req.params.id)
+      .populate('vehicleId')
+      .populate('mechanicId')
+      .populate('customerId');
+
     if (!job) return res.status(404).json({ message: 'Job not found' });
 
-    if (!req.body.message || req.body.message.trim() === "") {
+    const updateMessage = req.body.message?.trim();
+    if (!updateMessage) {
       return res.status(400).json({ message: 'Update message cannot be empty' });
     }
 
-    job.updates.push({ message: req.body.message });
+    job.updates.push({ message: updateMessage, timestamp: new Date() });
     await job.save();
+
+    // ✅ Look up appointment to get the original email
+    const matchingAppointment = await AppointmentRequest.findOne({
+      customerId: job.customerId?._id,
+      vehicleId: job.vehicleId?._id,
+      reason: job.description
+    });
+
+    const customerEmail = matchingAppointment?.email;
+    const vehicleInfo = `${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}`;
+    const mechanicName = job.mechanicId?.username || 'Your assigned mechanic';
+    const timeSent = new Date().toLocaleString();
+
+    if (customerEmail) {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: customerEmail,
+        subject: `New Update from ${mechanicName} — Joe's AutoShop`,
+        text: `Hello,
+
+You’ve received a new update for your ${vehicleInfo}.
+
+🛠 Mechanic: ${mechanicName}
+🕒 Time: ${timeSent}
+
+📝 Update:
+"${updateMessage}"
+
+Thank you for choosing Joe’s AutoShop!
+
+- Joe's Auto Team`
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('❌ Email sending failed:', error);
+        } else {
+          console.log('📬 Update email sent to customer:', info.response);
+        }
+      });
+    }
 
     res.json({ message: 'Update added successfully', job });
   } catch (err) {
