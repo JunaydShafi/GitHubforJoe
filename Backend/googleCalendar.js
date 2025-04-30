@@ -3,55 +3,74 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import dotenv from 'dotenv';
 
-// Get the directory name from the file URL
+dotenv.config();
+
+// Resolve __dirname (ES Module compatible)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load service account credentials
-const credentials = JSON.parse(readFileSync(path.join(__dirname, 'config', 'calendar-access.json')));
+// Load credentials
+const credentials = process.env.GOOGLE_SERVICE_EMAIL
+  ? {
+      client_email: process.env.GOOGLE_SERVICE_EMAIL,
+      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    }
+  : JSON.parse(readFileSync(path.join(__dirname, 'config', 'calendar-access.json')));
 
-// Set up Google Calendar API client with service account
-const calendar = google.calendar({ version: 'v3' });
+// Initialize calendar
+const calendar = google.calendar('v3');
 const auth = new google.auth.JWT({
   email: credentials.client_email,
   key: credentials.private_key,
-  scopes: ['https://www.googleapis.com/auth/calendar'],  // Full access to Google Calendar
+  scopes: ['https://www.googleapis.com/auth/calendar'],
 });
 
-// Function to create an appointment event on Google Calendar (no attendees)
+// Helper: Format time in correct local format for Google Calendar
+const formatLocalTime = (datetime) => {
+  const dt = new Date(datetime);
+  return dt.toLocaleString('sv-SE', { timeZone: 'America/Los_Angeles' }).replace(' ', 'T');
+};
+
+// Function to create a calendar event
 const createCalendarEvent = async (appointmentDateTime, reason, firstName, lastName) => {
   try {
-    console.log('Creating calendar event with the following data:', { appointmentDateTime, reason, firstName, lastName });
+    const startTime = formatLocalTime(appointmentDateTime);
+    const endTime = formatLocalTime(new Date(new Date(appointmentDateTime).getTime() + 60 * 60 * 1000));
 
-    // Build the event object without the attendees field
-    const event = {
-      summary: `Appointment for ${firstName} ${lastName}`, // Event title
-      location: 'Joe\'s AutoShop',                        // Event location
-      description: `Reason: ${reason}`,                    // Event description
+    const calendarEvent = {
+      summary: `Appointment for ${firstName} ${lastName}`,
+      location: "Joe's AutoShop",
+      description: reason,
       start: {
-        dateTime: new Date(appointmentDateTime).toISOString(), // Convert appointmentDateTime to ISO format
-        timeZone: 'America/Los_Angeles', // Set timezone
+        dateTime: startTime,
+        timeZone: 'America/Los_Angeles',
       },
       end: {
-        dateTime: new Date(new Date(appointmentDateTime).getTime() + 60 * 60 * 1000).toISOString(), // 1 hour duration
-        timeZone: 'America/Los_Angeles', // Set timezone
+        dateTime: endTime,
+        timeZone: 'America/Los_Angeles',
       },
-      // No attendees needed (since you don't want invites or attendee emails)
     };
 
-    // Insert event into Google Calendar
     const response = await calendar.events.insert({
       auth,
-      calendarId: 'joeottoshap@gmail.com',  // Use the primary calendar
-      resource: event,        // Event data
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      resource: calendarEvent,
     });
 
-    console.log('Google Calendar event created:', response.data);
-    return { success: true, message: 'Appointment confirmed and added to Google Calendar!' };
+    console.log('✅ Google Calendar event created:', response.data);
+    return {
+      success: true,
+      message: 'Appointment confirmed and added to Google Calendar!',
+      eventLink: response.data.htmlLink,
+    };
   } catch (error) {
-    console.error('Error creating calendar event:', error);
-    return { success: false, message: 'Error creating Google Calendar event.' };
+    console.error('❌ Error adding to Google Calendar:', error);
+    return {
+      success: false,
+      message: `Error adding event to Google Calendar: ${error.message || error}`,
+    };
   }
 };
 
