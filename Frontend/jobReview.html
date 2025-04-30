@@ -1,51 +1,92 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/Junstyle.css">
-        <title>Job Review</title>
-    </head>
-    <body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
+  <title>Leave a Review</title>
+</head>
+<body>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
+    </div>
+  </div>
 
-        <div class="header-main"><!--this is for the top footer of the page-->
-            <div class="logo">
-              <img src="images/WhiteLogo.png" alt="Logo">
-            </div>
-            <div class = "Title">
-              <div class="title-container">
-                  <div class="shop-name">Joe's AutoShop</div>
-                  <div class="tagline">If it ain't Joe don't fix it!</div>
-              </div>
-                <div class="account-box-left">
-                    <button onclick="location.href='index.html'">Log Out</button>
-                </div>
-            </div>
-          </div>
+  <div class="wrapper">
+    <h2>Leave a Review!</h2>
+    <p>Please rate our mechanic and overall service. Any and all feedback would be appreciated in order to improve our services.</p>
+    <p>Thank you and have a nice day!</p>
 
-        <div class ="wrapper">
-            <h1>Leave a Review!</h1>
+    <label for="rating"><strong>Review:</strong></label>
+    <div id="starRating">
+      <span class="star" data-value="1">&#9734;</span>
+      <span class="star" data-value="2">&#9734;</span>
+      <span class="star" data-value="3">&#9734;</span>
+      <span class="star" data-value="4">&#9734;</span>
+      <span class="star" data-value="5">&#9734;</span>
+    </div>
 
-            <h1>&nbsp;</h1><!--Used to space the wrappers-->
+    <textarea id="reviewText" placeholder="Write your feedback here..."></textarea>
 
+    <button class="bottomLeftCenter" onclick="history.back()">Back</button>
+    <button class="bottomRightCenter" onclick="submitReview()">Submit</button>
+  </div>
 
-        <p>Please rate our mechanic and overall service. Any and all feedback
-            would be appreciated in order to improve our services. 
-            Thank you and have a nice day!
-        </p>
+  <script>
+    let selectedRating = 0;
 
-        <h1>&nbsp;</h1><!--Used to space the wrappers-->
-        
-        <h3>Review:</h3>
-        <!--add star rating here-->
-        <!--add user input review text box here-->  
-        <div><textarea name="" placeholder=""></textarea></div>
+    document.querySelectorAll('.star').forEach(star => {
+      star.addEventListener('click', () => {
+        selectedRating = parseInt(star.getAttribute('data-value'));
+        highlightStars(selectedRating);
+      });
+    });
 
-            <button  class="bottomLeftCenter" type= "button" onclick="history.back()">Back</button>
+    function highlightStars(rating) {
+      document.querySelectorAll('.star').forEach(star => {
+        const value = parseInt(star.getAttribute('data-value'));
+        star.innerHTML = value <= rating ? '&#9733;' : '&#9734;';
+      });
+    }
 
-            <button class="bottomRightCenter" onclick="location.href='customerMainPage'">Submit</button>
+    async function submitReview() {
+      const reviewText = document.getElementById('reviewText').value.trim();
+      const job = JSON.parse(localStorage.getItem('selectedJob'));
 
-        </div>
-        
-    </body>
+      if (!job || !job.mechanicId) {
+        alert('No mechanic/job selected.');
+        return;
+      }
+
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+  jobId: job._id,
+  mechanicId: job.mechanicId._id || job.mechanicId,
+  customerId: localStorage.getItem('userId'),
+  stars: selectedRating,         // ✅ match backend
+  comment: reviewText            // ✅ match backend
+})
+      });
+
+      if (response.ok) {
+        alert('Review submitted successfully!');
+        location.href = 'customerJobsProfile.html';
+      } else {
+        alert('Error submitting review.');
+      }
+    }
+  </script>
+</body>
 </html>

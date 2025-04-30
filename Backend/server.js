@@ -92,7 +92,7 @@ app.post('/api/vehicles/add', async (req, res) => {
     } catch (err) {
       console.error('Error creating job from appointment:', err);
       res.status(500).json({ error: 'Server error creating job' });
-    }
+   }
   });
         
 
@@ -259,6 +259,18 @@ app.get('/api/payroll/:id/week', async (req, res) => {
   }
 });
 
+app.get('/api/jobs/:id', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id)
+      .populate('vehicleId')
+      .populate('mechanicId');
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    res.json(job);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error retrieving job' });
+  }
+});
 
 
 
@@ -311,6 +323,16 @@ app.get('/api/users/employees', async (req, res) => {
   }
 });
 
+app.get('/api/appointments/customer/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointments = await AppointmentRequest.find({ customerId: id });
+    res.json(appointments);
+  } catch (err) {
+    console.error('❌ Error fetching customer appointments:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 
@@ -624,6 +646,12 @@ app.use(express.urlencoded({extended: true}));
 
   import Appointment from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
+
+import reviewRoutes from './routes/reviews.js';
+app.use('/api/reviews', reviewRoutes);
+
+
+
 
 app.post("/createAppointment", async (req, res) => {
   console.log("📥 Incoming appointment:", req.body);

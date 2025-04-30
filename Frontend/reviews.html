@@ -1,45 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Junstyle.css">
-    <title>Reviews</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reviews</title>
+  <link rel="stylesheet" href="/Junstyle.css" />
 </head>
 <body>
 
-    <div class="header-main"><!--this is for the top footer of the page-->
-        <div class="logo">
-          <img src="images/WhiteLogo.png" alt="Logo">
-        </div>
-        <div class = "Title">
-          <div class="title-container">
-              <div class="shop-name">Joe's AutoShop</div>
-              <div class="tagline">If it ain't Joe don't fix it!</div>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="review-wrapper">
+    <h2>Submitted Reviews</h2>
+
+    <!-- Controls -->
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+
+      <!-- NEW Dropdown Button Style Sort -->
+      <select id="sortOptions" class="dropdown-button" onchange="handleSortChange()">
+        <option value="">Sort</option>
+        <option value="high"> High to Low</option>
+        <option value="low"> Low to High</option>
+        <option value="alpha"> Alphabetical</option>
+      </select>
+      
+      <select id="mechanicFilter" class="dropdown-button" onchange="filterByMechanic()">
+        <option value="all">Show All Mechanics</option>
+      </select>
           </div>
-            <div class="account-box-left">
-             <button onclick="location.href='index.html'">Log Out</button>
-            </div>
-        </div>
-      </div>
 
-      <div class="wrapper">
-        <div>
-            <h1>Administator</h1>
-        </div>
-    
-        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+    <!-- Table -->
+    <div id="reviewsContent">
+      <table class="review-table">
+        <thead>
+          <tr>
+            <th>Mechanic</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Rating</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody id="reviewsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
 
-        <div>
-            <p>Recent Reviews</p>
-        </div>
+  <script>
+    let allReviews = [];
 
-        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/api/reviews');
+        const reviews = await res.json();
 
-        <div><div><textarea name="" rows="5"placeholder="5/5 I loved the work they did to my 2003 Nissan Fronter, Definetly coming back!"></textarea></div></div>
-        <div>
-            <button class="bottomLeftCenter" type= "button" onclick="history.back()">Back</button>
-        </div>
-      </div>
+        allReviews = reviews;
+        populateMechanicDropdown(reviews);
+        renderReviews(reviews);
+      } catch (err) {
+        console.error('Failed to load reviews:', err);
+        document.getElementById('reviewsContent').innerHTML = '<p class="no-reviews">Error loading reviews.</p>';
+      }
+    });
+
+    function renderReviews(reviews) {
+      const tableBody = document.getElementById('reviewsTableBody');
+      tableBody.innerHTML = '';
+
+      reviews.forEach(r => {
+        const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+        const date = new Date(r.createdAt).toLocaleDateString();
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${r.mechanicId?.username || r.mechanicId || 'Unknown'}</td>
+          <td>${r.customerName || 'Unknown'}</td>
+          <td>${date}</td>
+          <td style="color: gold;">${stars} (${r.stars}/5)</td>
+          <td>${r.comment || 'No comment'}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function populateMechanicDropdown(reviews) {
+      const select = document.getElementById('mechanicFilter');
+      const uniqueMechanics = [...new Set(reviews.map(r => r.mechanicId?.username || r.mechanicId || 'Unknown'))];
+
+      uniqueMechanics.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+    }
+    function handleSortChange() {
+  const sortBy = document.getElementById('sortOptions').value;
+  if (sortBy) sortReviews(sortBy);
+}
+
+
+
+
+    function filterByMechanic() {
+      const selected = document.getElementById('mechanicFilter').value;
+      if (selected === 'all') {
+        renderReviews(allReviews);
+      } else {
+        const filtered = allReviews.filter(r =>
+          (r.mechanicId?.username || r.mechanicId || 'Unknown') === selected
+        );
+        renderReviews(filtered);
+      }
+    }
+
+    function sortReviews(criteria) {
+  let sorted = [...allReviews];
+
+  if (criteria === 'high') {
+    sorted.sort((a, b) => b.stars - a.stars);
+  } else if (criteria === 'low') {
+    sorted.sort((a, b) => a.stars - b.stars);
+  } else if (criteria === 'alpha') {
+    sorted.sort((a, b) => {
+      const nameA = (a.customerName || '').toLowerCase();
+      const nameB = (b.customerName || '').toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }
+
+  renderReviews(sorted);
+}
+  </script>
 </body>
 </html>
