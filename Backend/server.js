@@ -17,7 +17,6 @@ import nodemailer from 'nodemailer';
 import AppointmentRequest from './models/AppointmentRequest.js';
 import { readFileSync } from 'fs';
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -58,27 +57,19 @@ app.get('/api/calendar/events', async (req, res) => {
   }
 });
 
+app.use(express.json());
+// API route to set the appointment time
 app.post('/api/set-appointment-time', async (req, res) => {
-  const { appointmentId, appointmentDateTime, reason, firstName, lastName, email } = req.body;
+  const { reason, firstName, lastName, appointmentDateTime } = req.body;
 
   try {
-    // Step 1: Update MongoDB with the selected appointment details
-    const appointment = await AppointmentRequest.findByIdAndUpdate(appointmentId, {
-      appointmentDateTime: new Date(appointmentDateTime),
-      status: 'approved',
-    }, { new: true });
-
-    if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
-    }
-
-    // Ensure that email exists
-    if (!appointment.email || !email) {
-      return res.status(400).json({ message: 'Missing or invalid attendee email' });
-    }
-
-    // Step 2: Create the event in Google Calendar using the `createCalendarEvent` function
-    const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName, appointment.email);
+    // Create the event directly with the received appointment details
+    const result = await createCalendarEvent(
+      appointmentDateTime,  // Appointment date/time
+      reason,               // Appointment reason
+      firstName,            // Customer's first name
+      lastName              // Customer's last name
+    );
 
     res.json(result);  // Return success or failure message
   } catch (error) {
@@ -130,35 +121,6 @@ app.post('/api/vehicles/add', async (req, res) => {
     } catch (err) {
       console.error(err);
       res.status(500).json({ success: false, message: 'Server error' });
-    }
-  });
-
-  app.post('/api/set-appointment-time', async (req, res) => {
-    const { appointmentId, appointmentDateTime, reason, firstName, lastName, email } = req.body;
-  
-    try {
-      // Step 1: Update MongoDB with the selected appointment details
-      const appointment = await AppointmentRequest.findByIdAndUpdate(appointmentId, {
-        appointmentDateTime: new Date(appointmentDateTime),
-        status: 'approved',
-      }, { new: true });
-  
-      if (!appointment) {
-        return res.status(404).json({ message: 'Appointment not found' });
-      }
-  
-      // Ensure that email exists
-      if (!appointment.email || !email) {
-        return res.status(400).json({ message: 'Missing or invalid attendee email' });
-      }
-  
-      // Step 2: Create the event in Google Calendar using the `createCalendarEvent` function
-      const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName, appointment.email);
-  
-      res.json(result);  // Return success or failure message
-    } catch (error) {
-      console.error('Error handling appointment time:', error);
-      res.status(500).json({ message: 'Error handling appointment' });
     }
   });
   
@@ -681,58 +643,6 @@ app.get("/payroll-display", (req, res) => {
 
   //customerRequestAppointment start----------------
 app.use(express.urlencoded({extended: true}));
-
-// Set the appointment date/time and add it to Google Calendar
-app.post('/api/set-appointment-time', async (req, res) => {
-  const { appointmentId, vehicle, reason, firstName, lastName, appointmentDateTime } = req.body;
-
-  try {
-    // Step 1: Update the appointment with the selected date/time in MongoDB
-    const appointment = await AppointmentRequest.findByIdAndUpdate(appointmentId, {
-      appointmentDateTime: new Date(appointmentDateTime), // Store the exact date/time
-      status: 'approved'
-    }, { new: true });
-
-    if (!appointment) {
-      return res.status(404).json({ success: false, message: "Appointment not found" });
-    }
-
-    // Step 2: Google Calendar API integration
-    const calendar = google.calendar('v3');
-    const auth = getGoogleAuthClient(); // Define this function to get authenticated client
-
-    const event = {
-      summary: `Appointment for ${firstName} ${lastName}`,
-      location: 'Joe\'s AutoShop',
-      description: reason,
-      start: {
-        dateTime: appointmentDateTime, // The time selected by the admin
-        timeZone: 'America/Los_Angeles',
-      },
-      end: {
-        dateTime: new Date(new Date(appointmentDateTime).getTime() + 60 * 60 * 1000), // Assuming 1-hour appointment
-        timeZone: 'America/Los_Angeles',
-      },
-      attendees: [{ email: appointment.email }], // Add customer's email as attendee
-    };
-
-    const calendarResponse = await calendar.events.insert({
-      auth,
-      calendarId: 'primary',
-      resource: event,
-    });
-
-    console.log('Google Calendar event created:', calendarResponse.data);
-
-    // Step 3: Send approval email
-    sendApprovalEmail(appointment.email, appointment.firstName, appointment.lastName, appointmentDateTime);
-
-    res.json({ success: true, message: "Appointment confirmed and added to Google Calendar!" });
-  } catch (error) {
-    console.error('Error handling appointment time:', error);
-    res.status(500).json({ success: false, message: "Error saving appointment or adding to Google Calendar" });
-  }
-});
 
 
 //test appointment router

@@ -20,6 +20,7 @@ const appointmentRequestSchema = new mongoose.Schema({
     required: true
   }
 });
+//s
 
 const AppointmentRequest = mongoose.model('AppointmentRequest', appointmentRequestSchema);
 

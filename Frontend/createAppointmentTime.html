@@ -49,14 +49,6 @@
       color: black;
     }
 
-    label:focus-within {
-      color: black;
-    }
-
-    label[for="appointmentDate"], label[for="appointmentTime"] {
-      font-size: 14px;
-    }
-
     .form-group {
       display: flex;
       justify-content: space-between;
@@ -95,54 +87,6 @@
       font-weight: bold;
     }
 
-    /* Styling for Google Calendar */
-    #calendar {
-      margin-top: 30px;
-      background-color: #f0f0f0;
-      padding: 20px;
-      border-radius: 8px;
-    }
-
-    #calendar div {
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 5px;
-      background-color: #e0e0e0;
-    }
-
-    button.select-event-btn {
-      background-color: #007bff;
-      color: white;
-      padding: 5px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button.select-event-btn:hover {
-      background-color: #0056b3;
-    }
-
-    /* Always visible Google Calendar Button */
-    #openCalendarBtn {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #4285F4;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
-      width: auto;
-    }
-
-    #openCalendarBtn:hover {
-      background-color: #357ae8;
-    }
   </style>
 </head>
 <body>
@@ -186,51 +130,7 @@
     </div>
   </div>
 
-  <!-- Display Google Calendar events -->
-  <div id="calendar"></div>
-
-  <!-- Button to open Google Calendar -->
-  <div>
-    <a href="https://calendar.google.com/calendar/u/0/r?tab=mc" target="_blank">
-      <button id="openCalendarBtn">Open Google Calendar</button>
-    </a>
-  </div>
-
 <script>
-  // Fetch calendar events from the backend
-  async function fetchCalendarEvents() {
-    const res = await fetch('/api/calendar/events');
-    const events = await res.json();
-    const calendarContainer = document.getElementById('calendar');
-    
-    events.forEach(event => {
-      const eventElement = document.createElement('div');
-      eventElement.innerHTML = ` 
-        <p><strong>${event.summary}</strong></p>
-        <p>${new Date(event.start.dateTime).toLocaleString()}</p>
-        <button class="select-event-btn" onclick="selectEvent('${event.id}')">Select Event</button>
-      `;
-      calendarContainer.appendChild(eventElement);
-    });
-  }
-
-  function selectEvent(eventId) {
-    // Here you can populate the appointment form based on the selected event
-    // For now, just alert the event ID
-    alert('Event selected: ' + eventId);
-  }
-
-  // Fetch Google Calendar events when page loads
-  fetchCalendarEvents();
-
-  // Get query params passed from the previous page
-  const urlParams = new URLSearchParams(window.location.search);
-  const appointmentId = urlParams.get('appointmentId');
-  const vehicle = urlParams.get('vehicle');
-  const reason = urlParams.get('reason');
-  const firstName = urlParams.get('firstName');
-  const lastName = urlParams.get('lastName');
-
   // Handle form submission
   const form = document.getElementById('appointmentForm');
   form.addEventListener('submit', async (event) => {
@@ -252,11 +152,9 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          appointmentId,
-          vehicle,
-          reason,
-          firstName,
-          lastName,
+          reason: 'Appointment reason here',  // Replace with actual reason
+          firstName: 'Customer First Name',  // Replace with actual name
+          lastName: 'Customer Last Name',    // Replace with actual name
           appointmentDateTime
         })
       });
@@ -273,6 +171,13 @@
     }
   });
 </script>
+
+  <!-- Google Calendar Button -->
+  <div>
+    <a href="https://calendar.google.com/calendar/u/0/r?tab=mc" target="_blank">
+      <button id="openCalendarBtn">Open Google Calendar</button>
+    </a>
+  </div>
 
 </body>
 </html>
