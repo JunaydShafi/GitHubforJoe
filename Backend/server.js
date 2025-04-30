@@ -21,7 +21,7 @@ import { readFileSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Read service account credentials
+// Read service account credential
 const credentials = JSON.parse(readFileSync(path.join(__dirname, 'config', 'calendar-access.json')));
 
 app.use(express.json());
