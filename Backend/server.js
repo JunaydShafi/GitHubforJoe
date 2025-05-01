@@ -67,34 +67,52 @@ app.post('/api/vehicles/add', async (req, res) => {
   });
 
   app.post('/api/jobs/create-from-appointment/:appointmentId', async (req, res) => {
+    const { appointmentId } = req.params;
+    const { mechanicId } = req.body;
+  
     try {
-      const { appointmentId } = req.params;
-      const { mechanicId } = req.body;
-  
       const appointment = await AppointmentRequest.findById(appointmentId);
-  
       if (!appointment) {
         return res.status(404).json({ error: 'Appointment not found' });
       }
   
-      const newJob = new Job({
+      const mechanic = await User.findById(mechanicId);
+      if (!mechanic) {
+        return res.status(404).json({ error: 'Mechanic not found' });
+      }
+  
+      const job = new Job({
         customerId: appointment.customerId ? new mongoose.Types.ObjectId(appointment.customerId) : undefined,
         vehicleId: appointment.vehicleId,
         mechanicId,
         description: appointment.reason,
-        status: 'pending',
-        startDate: appointment.date
+        status: 'Assigned',
+        startDate: appointment.date,
+        notes: ''
       });
   
-      await newJob.save();
+      await job.save();
   
-      res.status(201).json({ success: true, message: 'Job created successfully', job: newJob });
+      // ✅ Send confirmation email
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: appointment.email,
+        subject: "Your Job Has Been Scheduled - Joe's AutoShop",
+        text: `Hi ${appointment.firstName},\n\nYour appointment for "${appointment.reason}" has been approved and scheduled with our mechanic ${mechanic.username}.\n\nDate: ${appointment.date}\nTime: ${appointment.time}\n\nThanks,\nJoe's AutoShop`
+      });
+  
+      // ✅ Delete the appointment
+      await AppointmentRequest.findByIdAndDelete(appointmentId);
+  
+      res.status(200).json({ message: 'Job created and appointment removed' });
     } catch (err) {
-      console.error('Error creating job from appointment:', err);
-      res.status(500).json({ error: 'Server error creating job' });
-   }
-  });
-        
+      console.error('Job creation error:', err);
+      res.status(500).json({ error: 'Server error during job creation' });
+    }
+  });        
+
+
+
 
 app.post('/api/employees/create', async (req, res) => {
     try {
@@ -239,7 +257,7 @@ app.get('/api/payroll/:id/week', async (req, res) => {
     const totalMinutes = jobs.reduce((sum, job) => {
       const start = new Date(job.startDate);
       const end = new Date(job.completedDate);
-      return sum + (end - start) / (1000 * 60);
+      return sum + Math.max(0, (end - start) / (1000 * 60));
     }, 0);
 
     const rate = emp.payroll?.rate || 0;
@@ -372,7 +390,7 @@ app.get('/api/payroll/week', async (req, res) => {
     for (const job of jobs) {
       const start = new Date(job.startDate);
       const end = new Date(job.completedDate);
-      const mins = (end - start) / (1000 * 60);
+      const mins = Math.max(0, (end - start) / (1000 * 60));
       const empId = job.mechanicId.toString();
 
       payrollMap[empId] = (payrollMap[empId] || 0) + mins;
