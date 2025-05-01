@@ -908,6 +908,27 @@ app.post('/api/createJob', async (req, res) => {
   }
 });
 
+//to delete admin or employees
+// Get all users (for dropdown)
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find(); // import your User model
+    res.json(users);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+// Delete a user by ID
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).send('User not found');
+    res.send('User deleted');
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
 
 //grab mechanics for createJob.html
 app.get('/api/mechanics', async (req, res) => {
@@ -920,3 +941,4 @@ app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
     connectDB();
 });
+
