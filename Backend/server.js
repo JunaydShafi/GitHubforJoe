@@ -902,6 +902,32 @@ app.post('/api/createJob', async (req, res) => {
 });
 
 
+app.put('/api/vehicles/:id', async (req, res) => {
+  try {
+    const updatedVehicle = await Vehicle.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedVehicle) {
+      return res.status(404).send({ error: 'Vehicle not found' });
+    }
+    res.send(updatedVehicle);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/vehicles/:id', async (req, res) => {
+  try {
+    const vehicleId = req.params.id;
+    await Vehicle.findByIdAndDelete(vehicleId);
+    res.status(200).send({ message: 'Vehicle deleted' });
+  } catch (err) {
+    console.error('DELETE error:', err);
+    res.status(500).send({ error: 'Failed to delete vehicle' });
+  }
+});
+
+
+
 //grab mechanics for createJob.html
 app.get('/api/mechanics', async (req, res) => {
   const mechanics = await User.find({ role: 'employee' });
