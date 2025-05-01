@@ -165,8 +165,9 @@
 
       details.innerHTML = `
     <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
-<p><strong>Customer:</strong> ${job.customerName || 'Unknown'}
+<p><strong>Customer:</strong> ${job.customerId?.name || 'Unknown'}</p>
     <p><strong>Reason:</strong> ${job.description}</p>
+   <p><strong>User Comments:</strong> ${job.comments?.trim() || 'No comment was added'}</p>
     <p><strong>Status:</strong> ${job.status}</p>
     <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
     <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>

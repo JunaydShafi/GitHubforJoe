@@ -86,6 +86,7 @@ app.post('/api/vehicles/add', async (req, res) => {
         vehicleId: appointment.vehicleId,
         mechanicId,
         description: appointment.reason,
+        comments: appointment.comments,
         status: 'Assigned',
         startDate: appointment.date,
         notes: ''
@@ -622,7 +623,7 @@ app.post("/createAppointment", async (req, res) => {
   console.log("📥 Incoming appointment:", req.body);
 
   try {
-    const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
+    const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate, comments} = req.body;
     const customerId = req.session?.userId || req.body.customerId;  // ← this is how you get who made it (if you track session)
 
     const appointment = new Appointment({
@@ -634,6 +635,7 @@ app.post("/createAppointment", async (req, res) => {
       phone,
       reason,
       date: new Date(appointmentDate),
+      comments,
     });
 
     await appointment.save();
