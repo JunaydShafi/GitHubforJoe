@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reviews</title>
   <link rel="stylesheet" href="/Junstyle.css" />
+
+  <style>
+    .clickable-cell {
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .clickable-cell:hover {
+      background-color: #444;
+    }
+  </style>
 </head>
 <body>
 
@@ -26,10 +37,7 @@
   <div class="review-wrapper">
     <h2>Submitted Reviews</h2>
 
-    <!-- Controls -->
     <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
-
-      <!-- NEW Dropdown Button Style Sort -->
       <select id="sortOptions" class="dropdown-button" onchange="handleSortChange()">
         <option value="">Sort</option>
         <option value="high"> High to Low</option>
@@ -40,9 +48,8 @@
       <select id="mechanicFilter" class="dropdown-button" onchange="filterByMechanic()">
         <option value="all">Show All Mechanics</option>
       </select>
-          </div>
+    </div>
 
-    <!-- Table -->
     <div id="reviewsContent">
       <table class="review-table">
         <thead>
@@ -57,6 +64,15 @@
         <tbody id="reviewsTableBody"></tbody>
       </table>
     </div>
+  </div>
+
+  <div id="jobModal" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%);
+  background-color: #2e302b; color: white; border:1px solid #ccc; padding:20px; z-index:1000; max-width:400px; border-radius:8px; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+    <div id="jobModalContent"></div>
+    <button onclick="document.getElementById('jobModal').style.display='none'" 
+      style="margin-top:10px; padding: 5px 10px; background:#ddd; color:#000; border:none; border-radius:4px; cursor:pointer;">
+      Close
+    </button>
   </div>
 
   <script>
@@ -86,7 +102,12 @@
 
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${r.mechanicId?.username || r.mechanicId || 'Unknown'}</td>
+          <td>
+            <span class="clickable-cell" title="Click to view job details"
+              onclick='showJobDetails(${JSON.stringify(r.jobId || {})})'>
+              ${r.mechanicId?.username || r.mechanicId || 'Unknown'}
+            </span>
+          </td>
           <td>${r.customerName || 'Unknown'}</td>
           <td>${date}</td>
           <td style="color: gold;">${stars} (${r.stars}/5)</td>
@@ -94,6 +115,26 @@
         `;
         tableBody.appendChild(row);
       });
+    }
+
+    function showJobDetails(job) {
+      const container = document.getElementById('jobModalContent');
+
+      const updates = job.updates?.map(u =>
+        `<li>"${u.message}" — ${new Date(u.timestamp || u.date).toLocaleString()}</li>`
+      ).join('') || '<li>No mechanic notes</li>';
+
+      container.innerHTML = `
+        <p><strong>Status:</strong> ${job.status || 'N/A'}</p>
+        <p><strong>Description:</strong> ${job.description || 'N/A'}</p>
+        <p><strong>Start:</strong> ${new Date(job.startDate).toLocaleString()}</p>
+        <p><strong>Completed:</strong> ${new Date(job.completedDate).toLocaleString()}</p>
+        <p><strong>Vehicle:</strong> ${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</p>
+        <p><strong>Mechanic Notes:</strong></p>
+        <ul>${updates}</ul>
+      `;
+
+      document.getElementById('jobModal').style.display = 'block';
     }
 
     function populateMechanicDropdown(reviews) {
@@ -107,13 +148,11 @@
         select.appendChild(option);
       });
     }
+
     function handleSortChange() {
-  const sortBy = document.getElementById('sortOptions').value;
-  if (sortBy) sortReviews(sortBy);
-}
-
-
-
+      const sortBy = document.getElementById('sortOptions').value;
+      if (sortBy) sortReviews(sortBy);
+    }
 
     function filterByMechanic() {
       const selected = document.getElementById('mechanicFilter').value;
@@ -128,22 +167,22 @@
     }
 
     function sortReviews(criteria) {
-  let sorted = [...allReviews];
+      let sorted = [...allReviews];
 
-  if (criteria === 'high') {
-    sorted.sort((a, b) => b.stars - a.stars);
-  } else if (criteria === 'low') {
-    sorted.sort((a, b) => a.stars - b.stars);
-  } else if (criteria === 'alpha') {
-    sorted.sort((a, b) => {
-      const nameA = (a.customerName || '').toLowerCase();
-      const nameB = (b.customerName || '').toLowerCase();
-      return nameA.localeCompare(nameB);
-    });
-  }
+      if (criteria === 'high') {
+        sorted.sort((a, b) => b.stars - a.stars);
+      } else if (criteria === 'low') {
+        sorted.sort((a, b) => a.stars - b.stars);
+      } else if (criteria === 'alpha') {
+        sorted.sort((a, b) => {
+          const nameA = (a.customerName || '').toLowerCase();
+          const nameB = (b.customerName || '').toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      }
 
-  renderReviews(sorted);
-}
+      renderReviews(sorted);
+    }
   </script>
 </body>
 </html>

@@ -162,9 +162,10 @@
       const formatDate = (date) => date ? new Date(date).toLocaleString() : 'Not recorded';
 
       details.innerHTML = `
-    <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
-<p><strong>Customer:</strong> ${job.customerName || 'Unknown'}
+<h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
+<p><strong>Customer:</strong> ${job.customerId?.name || 'Unknown'}</p>
     <p><strong>Reason:</strong> ${job.description}</p>
+   <p><strong>User Comments:</strong> ${job.comments?.trim() || 'No comment was added'}</p>
     <p><strong>Status:</strong> ${job.status}</p>
     <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
     <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>
@@ -183,8 +184,7 @@
       <button class="job-start-btn" onclick="startJob('${job._id}')">Start Job</button>
       <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
     </div>
-  `;
-    }
+  `;    }
 
     let selectedJobId = null;
 
