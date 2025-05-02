@@ -7,44 +7,69 @@
   <title>Employee Job Dashboard</title>
 </head>
 <body>
+  <div class="header-main"><!--this is for the top footer of the page-->
+    <div class="logo">
+      <a href="employee-dashboard.html" class ="logo-link">
+        <img src="images/JoeLogo.png" alt="Logo">
+        </div>
+        <div class="Title">
+          <div class="title-container">
+            <div class="shop-name">Joe's AutoShop</div>
+            <div class="tagline">If it ain't Joe don't fix it!</div>
+          </div>
+        </a>
+        <div class="account-box-left">
+            <button onclick="location.href='index.html'">Log Out</button>
+        </div>
+    </div>
+  </div>
+  
   <div class="wrapper">
     <h1>My Assigned Jobs</h1>
     <div id="jobList"></div>
   </div>
 
   <script>
-    // Get the mechanic ID (in a real app, get this from login/session)
-    const mechanicId = localStorage.getItem('mechanicId'); // Example method
-
-    fetch(`/api/mechanicJobs/${mechanicId}`)
+    const mechanicId = localStorage.getItem('userId');
+    const token = localStorage.getItem('authToken');
+  
+    if (!mechanicId || !token) {
+      // 🔴 If no mechanicId or token, force re-login
+      alert('Session expired. Please log in again.');
+      window.location.href = '/login';  // or whatever your login page is
+    } else {
+      fetch(`/api/jobs/employee/${mechanicId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
       .then(res => res.json())
       .then(jobs => {
         const container = document.getElementById('jobList');
-
+  
         if (jobs.length === 0) {
           container.innerHTML = '<p>No jobs assigned yet.</p>';
           return;
         }
-
+  
         jobs.forEach(job => {
           const jobCard = document.createElement('div');
           jobCard.className = 'account-box';
           jobCard.style.margin = '20px';
           jobCard.innerHTML = `
-            <p><strong>Customer:</strong> ${job.customerName || 'N/A'}</p>
-            <p><strong>Vehicle:</strong> ${job.vehicle}</p>
-            <p><strong>Reason:</strong> ${job.reason}</p>
-            <p><strong>Date/Time:</strong> ${new Date(job.date).toLocaleString()}</p>
+            <p><strong>Customer:</strong> ${job.customerId?.username || 'N/A'}</p>
+            <p><strong>Vehicle:</strong> ${job.vehicleId?.make || 'Unknown'} ${job.vehicleId?.model || ''}</p>
+            <p><strong>Reason:</strong> ${job.description || 'N/A'}</p>
+            <p><strong>Date/Time:</strong> ${new Date(job.appointmentDate).toLocaleString()}</p>
             <p><strong>Status:</strong> ${job.status}</p>
-            <button onclick="location.href='/viewJob.html?jobId=${job._id}'">View</button>
+            <button onclick="location.href='/employee-job-view?jobId=${job._id}'">View Job</button>
           `;
-
           container.appendChild(jobCard);
         });
       })
       .catch(err => {
         console.error('Error fetching jobs:', err);
       });
+    }
   </script>
-</body>
-</html>
+  

@@ -1,64 +1,142 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/Junstyle.css">
-        <title>Jobs Profile</title>
-    </head>
-    <body>
-
-        <div class="header-main"><!--this is for the top footer of the page-->
-            <div class="logo">
-              <img src="images/WhiteLogo.png" alt="Logo">
-            </div>
-            <div class = "Title">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/Junstyle.css" />
+  <title>Customer Jobs Profile</title>
+</head>
+<body>
+      <div class="header-main"><!--this is for the top footer of the page-->
+        <div class="logo">
+          <a href="customerMainPage.html" class ="logo-link">
+            <img src="images/JoeLogo.png" alt="Logo">
+            <div class="Title">
               <div class="title-container">
-                  <div class="shop-name">Joe's AutoShop</div>
-                  <div class="tagline">If it ain't Joe don't fix it!</div>
-              </div>
+                <div class="shop-name">Joe's AutoShop</div>
+                <div class="tagline">If it ain't Joe don't fix it!</div>
+                      </div>
+                    </div>
+                 </a>
                 <div class="account-box-left">
                     <button onclick="location.href='index.html'">Log Out</button>
-                    <button onclick="location.href='customerMainPage.html'">Main Page</button>
                 </div>
             </div>
           </div>
-
-        <!-- <div class="wrapper">
-            <h3>Upcoming Appointments:</h3>
-
-            <div class="account-box">
-                <button onclick="location.href='upcomingAppointment'">x/x/x [Vehicle]</button>
-
-            </div>
-            
-            <h1>&nbsp;</h1>Used to space the wrappers
-            
-            <h3>In Progress:</h3>
-            <h4>Vehicle: [2003 STI Subaru Impreza]</h4>
-            <h4>Status: Ongoing</h4>
-
-            <div class="account-box">
-                <button onclick="location.href='jobProgress'">Job Progress</button>    
-            </div>
-            
-            <h4>Date Started: 02-20-2025</h4>
-
-            <h1>&nbsp;</h1><Used to space the wrappers--
-
+                <div class="account-box">
+                    <button id="progressBtn" disabled>No jobs</button>
+                </div>
+      
+      <div class="section-group">
+        <div class="section-inner">
             <h3>Past Job History:</h3>
-            <div class="account-box">
-                <button onclick="location.href='jobHistory'">x/x/x [Vehicle]</button>
-            </div>
+        <div class="scroll-horizontal"><!-- this is where you can add class scrool horizontal-->
+            <div id="pastJobs" ></div>
+        </div>
+        </div>
+        </div>
+      
+  <div>
+    <button class="bottomLeftCenter" type="button" onclick="history.back()">Back</button>
+  </div>
 
-            <div class="account-box">
-                <button onclick="location.href='jobHistory'">x/x/x [Vehicle]</button>
-            </div>
-            
-
-        </div> -->
-        <div class = "wrapper"><div id="jobsContainer"></div></div>
-
-        <script src="./js/custJobView.js"></script>
-    </body>
+  <script>
+    function updateScrollAlignment(containerId) {
+      const container = document.getElementById(containerId);
+      const items = container.children;
+  
+      if (items.length > 1) {
+        container.style.justifyContent = 'flex-start';
+      } else {
+        container.style.justifyContent = 'center';
+      }
+    }
+  
+    document.addEventListener('DOMContentLoaded', async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return alert("Please log in first.");
+  
+      const jobRes = await fetch(`/api/jobs/customer/${userId}`);
+      const jobs = await jobRes.json();
+  
+      const progressBtn = document.getElementById('progressBtn');
+      const pastJobsContainer = document.getElementById('pastJobs');
+      const upcomingContainer = document.getElementById('upcomingAppointments');
+  
+      const inProgress = jobs.find(j => j.status === 'in progress');
+      const completed = jobs.filter(j => j.status === 'complete');
+      const upcoming = jobs.filter(j => j.status === 'pending');
+  
+      // 🔹 UPCOMING APPOINTMENTS
+      if (upcoming.length > 0) {
+        upcoming.forEach(app => {
+          const v = app.vehicleId || {};
+          const btn = document.createElement('button');
+          btn.className = 'account-box';
+          const date = new Date(app.startDate).toLocaleDateString();
+          btn.textContent = `${date} [${v.make || 'Vehicle'}]`;
+          upcomingContainer.appendChild(btn);
+        });
+      } else {
+        const btn = document.createElement('button');
+        btn.className = 'account-box';
+        btn.textContent = 'No appointments';
+        btn.disabled = true;
+        upcomingContainer.appendChild(btn);
+      }
+      updateScrollAlignment("upcomingAppointments");
+  
+      // 🔹 IN PROGRESS JOB
+      if (inProgress) {
+        const v = inProgress.vehicleId || {};
+        progressBtn.textContent = `${v.year || ''} ${v.make || ''} ${v.model || 'Vehicle'}`;
+        progressBtn.disabled = false;
+        progressBtn.onclick = () => {
+          localStorage.setItem('selectedJob', JSON.stringify(inProgress));
+          location.href = 'jobProgress.html';
+        };
+      }
+  
+      // 🔹 PAST JOBS
+      if (completed.length > 0) {
+        completed.forEach(job => {
+          const v = job.vehicleId || {};
+          const jobDiv = document.createElement('div');
+          jobDiv.className = 'account-box';
+          jobDiv.style.textAlign = 'center';
+  
+          const label = document.createElement('p');
+          label.textContent = `${v.year || ''} ${v.make || ''} ${v.model || 'Vehicle'}`;
+          jobDiv.appendChild(label);
+  
+          const viewBtn = document.createElement('button');
+          viewBtn.textContent = 'View Details';
+          viewBtn.onclick = () => {
+            localStorage.setItem('selectedJob', JSON.stringify(job));
+            location.href = 'jobHistory.html';
+          };
+          jobDiv.appendChild(viewBtn);
+  
+          const reviewBtn = document.createElement('button');
+          reviewBtn.textContent = 'Leave a Review';
+          reviewBtn.style.marginLeft = '10px';
+          reviewBtn.onclick = () => {
+            localStorage.setItem('selectedJob', JSON.stringify(job));
+            location.href = 'jobReview.html';
+          };
+          jobDiv.appendChild(reviewBtn);
+  
+          pastJobsContainer.appendChild(jobDiv);
+        });
+      } else {
+        const btn = document.createElement('button');
+        btn.className = 'account-box';
+        btn.textContent = 'No jobs';
+        btn.disabled = true;
+        pastJobsContainer.appendChild(btn);
+      }
+      updateScrollAlignment("pastJobs");
+    });
+  </script>
+  </body>
 </html>
