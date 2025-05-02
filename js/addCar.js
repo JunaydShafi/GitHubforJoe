@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
         customerId,
         make: form.make.value,
         model: form.model.value,
-        color: form.color.value,
         year: form.year.value,
         vin: form.vin.value,
         licensePlate: form.licensePlate.value

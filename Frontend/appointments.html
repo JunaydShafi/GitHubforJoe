@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="/Junstyle.css" />
-  <title>Appointments</title>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/Junstyle.css" />
+    <link rel="stylesheet" href="/appointmentsStyle.css" /> <!-- Add this line -->
+    <title>Appointments</title>
+  </head>
 <body>
   <div class="header-main">
     <div class="logo">
@@ -25,7 +26,7 @@
   </div>
 
   <div class="wrapperAdmin">
-    <div class="appointments-container">
+    <div class="appointments-container" style="max-height: 600px; overflow-y: auto;">
       <h2>Appointments Awaiting Approval</h2>
       <div id="appointments"></div>
     </div>
@@ -33,109 +34,83 @@
 
   <script>
     async function fetchAppointments() {
-  try {
-    const res = await fetch('/api/appointments');
-    const data = await res.json();
+      try {
+        const res = await fetch('/api/appointments');
+        const data = await res.json();
 
-    const container = document.getElementById('appointments');
-    container.innerHTML = '';
+        const container = document.getElementById('appointments');
+        container.innerHTML = '';
 
-    if (data.length === 0) {
-      container.innerHTML = '<p>No appointments found.</p>';
-      return;
+        if (data.length === 0) {
+          container.innerHTML = '<p>No appointments found.</p>';
+          return;
+        }
+
+        data.forEach(appointment => {
+          const dateObj = new Date(appointment.date);
+          const formattedDate = isNaN(dateObj) ? "Invalid Date" : dateObj.toLocaleString();
+
+          const div = document.createElement('div');
+          div.className = 'account-box';
+          div.id = `appointment-${appointment._id}`;
+          div.innerHTML = `
+            <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
+            <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
+       <div class="details" style="display:none; margin-top:10px;">
+  <p><strong>Email:</strong> ${appointment.email}</p>
+  <p><strong>Phone:</strong> ${appointment.phone}</p>
+  <p><strong>Reason:</strong> ${appointment.reason}</p>
+  ${appointment.reason === "Other" ? `<p><strong>Comment:</strong> ${appointment.comments}</p>` : ""}
+  <p><strong>Vehicle:</strong> ${appointment.vehicleId ? `${appointment.vehicleId.make} ${appointment.vehicleId.model}` : 'N/A'}</p>
+  <label for="mechanicSelect-${appointment._id}"><strong>Select Mechanic:</strong></label><br>
+  <select id="mechanicSelect-${appointment._id}" style="margin-bottom: 10px;"></select><br>
+  <button onclick="approveAppointment('${appointment._id}')" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Approve</button>
+  <button onclick="deny('${appointment._id}', this.closest('.account-box'))" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Deny</button>
+</div>
+          `;
+
+          container.appendChild(div);
+        });
+
+        populateMechanics();
+      } catch (err) {
+        console.error('Error fetching appointments:', err);
+      }
     }
 
-    data.forEach(appointment => {
-      const dateObj = new Date(appointment.date);
-      const formattedDate = isNaN(dateObj) ? "Invalid Date" : dateObj.toLocaleString();
-
-      const div = document.createElement('div');
-      div.className = 'account-box';
-      div.id = `appointment-${appointment._id}`; // Add ID for easy removal
-      div.innerHTML = `
-        <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
-        <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
-        <div class="details" style="display:none; margin-top:10px;">
-          <p><strong>Email:</strong> ${appointment.email}</p>
-          <p><strong>Phone:</strong> ${appointment.phone}</p>
-          <p><strong>Reason:</strong> ${appointment.reason}</p>
-          <p><strong>Vehicle ID:</strong> ${appointment.vehicleId}</p>
-        </div>
-      `;
-
-      const detailsDiv = div.querySelector('.details');
-
-      // Approve button
-      const approveBtn = document.createElement('button');
-      approveBtn.textContent = 'Approve';
-      approveBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px; margin-right: 5px;';
-      approveBtn.onclick = () => approve(
-        appointment._id,
-        appointment.vehicleName || appointment.vehicleId,  // adapt if your model uses vehicleName
-        appointment.reason,
-        appointment.date,
-        appointment.time,
-        appointment.firstName,
-        appointment.lastName
-      );
-
-      // Deny button
-      const denyBtn = document.createElement('button');
-      denyBtn.textContent = 'Deny';
-      denyBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;';
-      denyBtn.addEventListener('click', () => deny(appointment._id, div));
-
-      detailsDiv.appendChild(approveBtn);
-      detailsDiv.appendChild(denyBtn);
-
-      container.appendChild(div);
-    });
-  } catch (err) {
-    console.error('Error fetching appointments:', err);
-  }
-}
-  
     function toggleDetails(button) {
       const details = button.nextElementSibling;
       details.style.display = details.style.display === 'none' ? 'block' : 'none';
     }
-  
-    function approve(id, vehicle, reason, date, time, firstName) {
-  const confirmed = confirm(`Are you sure you want to approve this appointment for ${firstName}?`);
-  if (!confirmed) return;
 
-  // Step 1: Send POST to server to trigger approval and send email
-  fetch('/approve-appointment', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ appointmentId: id })
-  })
-  .then(res => res.text())
-  .then(message => {
-    alert('Appointment approved and email sent.');
+    async function approveAppointment(appointmentId) {
+      const mechanicSelect = document.getElementById(`mechanicSelect-${appointmentId}`);
+      const selectedMechanicId = mechanicSelect.value;
 
-    // ✅ Step 2: Remove the approved appointment from the UI
-    const appointmentCard = document.querySelector(`#appointment-${id}`);
-    if (appointmentCard) appointmentCard.remove(); // Remove the appointment card
+      const confirmed = confirm("Are you sure you want to approve this appointment?");
+      if (!confirmed) return;
 
-    // ✅ Step 3: Redirect to createJob.html with query parameters
-    const url = new URL('/createJob.html', window.location.origin);
-    url.searchParams.set('vehicle', vehicle);
-    url.searchParams.set('reason', reason);
-    url.searchParams.set('date', date);
-    url.searchParams.set('time', time);
-    url.searchParams.set('firstName', firstName);
+      try {
+        const res = await fetch(`/api/jobs/create-from-appointment/${appointmentId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mechanicId: selectedMechanicId })
+        });
 
-    window.location.href = url.toString();
-  })
-  .catch(err => {
-    console.error(err);
-    alert('Error approving appointment.');
-  });
-}
-  
+        const data = await res.json();
+        if (res.ok) {
+          alert("Appointment approved and job created!");
+          const appointmentCard = document.querySelector(`#appointment-${appointmentId}`);
+          if (appointmentCard) appointmentCard.remove();
+        } else {
+          alert(data.error || 'Failed to approve appointment.');
+        }
+      } catch (err) {
+        console.error('Error approving appointment:', err);
+        alert('Error approving appointment.');
+      }
+    }
+
     function deny(apptId, card) {
       const confirmed = confirm("Are you sure you want to deny this appointment?");
       if (!confirmed) return;
@@ -146,14 +121,32 @@
       .then(res => res.json())
       .then(data => {
         alert('Appointment denied and email sent.');
-        card.remove(); // remove the appointment card from the UI
+        card.remove();
       })
       .catch(err => {
         console.error(err);
         alert('Error denying appointment.');
       });
     }
-  
+
+    async function populateMechanics() {
+      try {
+        const res = await fetch('/api/mechanics');
+        const mechanics = await res.json();
+
+        mechanics.forEach(mechanic => {
+          document.querySelectorAll('[id^="mechanicSelect-"]').forEach(select => {
+            const option = document.createElement('option');
+            option.value = mechanic._id;
+            option.textContent = mechanic.username;
+            select.appendChild(option);
+          });
+        });
+      } catch (err) {
+        console.error('Error loading mechanics:', err);
+      }
+    }
+
     fetchAppointments();
   </script>
 </body>
