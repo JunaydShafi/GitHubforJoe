@@ -598,6 +598,9 @@ app.get('/addCar', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "addCar.html"));
 });
 
+import reviewRoutes from './routes/reviews.js';
+app.use('/api/reviews', reviewRoutes);
+
 // Employee pages
 app.get("/employee-dashboard", (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend/employee-dashboard.html"));
