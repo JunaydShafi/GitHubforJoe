@@ -3,8 +3,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family:inherit, Courier, monospace;
+    font-family: Arial, sans-serif;
 }
+
 
 .logo-link {
     text-decoration: none;
@@ -47,7 +48,9 @@
     top: 40px;
     left: 0;
     right: 0;
-    z-index: 999; 
+    z-index: 999;
+    width: 100%;  /* Add this */
+    box-sizing: border-box;
 }
 
 .title {
@@ -96,47 +99,34 @@
 
 .main-image {
     width: 100%;
-    height: auto;
     position: fixed;
     top: 0px;
-    left: 0;
+    left: 0px;
     z-index: 1; 
     filter: brightness(0.3) blur(1.5px) contrast(.9); 
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-}
-
 .img-text {
-    top: 375px;
+    width: 100%;
+    aspect-ratio: 1920 / 605;
+    max-height: 605px;
     position: relative;
     color: white;
     text-align: center;
     font-weight: bold;
+    
+    padding-top: 180px;
+    display: flex;
+    justify-content: center;   /* horizontal centering */
+    align-items: center;       /* vertical centering */
+    flex-direction: column;    /* if you have multiple text elements */
     z-index: 2;
-}
-
-.text-content {
-    position: relative;
-    top: 605px; /* Start at 600px from the top */
-    left: 0;
-    right: 0;
-    bottom: 0; /* Stretch to the bottom of the page */
-    color: black;
-    background-color: white;
-    padding: 20px;
-    z-index: 2;
-    padding-top: 50px;
-    padding-left: 380px;
-    padding-right: 800px;
-    padding-bottom: 55px;
-    line-height: 1.6;
+    width: 100%;  /* Add this */
+    box-sizing: border-box;
 }
 
 .about-us {
-    display: flex;
+    display: 1;
     flex-direction: row;
 }
 
@@ -169,41 +159,64 @@ p {
     font-weight:100;
     color: #333; 
 }
-
-.button {
-    background: linear-gradient(to top, #9c2121, #ff4a4a);
-    height: 50px;
-    width: 220px;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); 
-    border:inset 2px solid;
-    border-color: #d43232;
-    font-size: 18px;
-    font-weight: lighter;
-    cursor: pointer;
-    margin-left: auto;
+.buttons {
     display: flex;
-    justify-content: center; 
+    justify-content: flex-end; /* align to the right */
+    gap: 0;                     /* remove spacing between buttons */
+    margin-left: auto;         /* push to the right */
+    gap: 5px;
+}
+
+
+.button-bright-red, .button-bright-red:hover, .button-bright-gold, .button-bright-gold:hover {
+    margin: 0; /* no gaps */
+    border-radius: 5px; /* rounded corners */
+}
+
+.button-bright-red {
+    background: linear-gradient(to top, #b31217, #e52d27, #ff6f61); /* deep to light red */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s;
+    padding: 25px 10px;
+    display: flex;
+    justify-content: center;
     align-items: center;
-}
+    border: none;
+  }
+  
+  .button-bright-red:hover {
+    background: linear-gradient(to top, #ff0000, #d12424, #ff7b7b); /* hover red shades */
+    transform: scale(1.03);
+  }
+  
+  
+  
+  
 
-.button:hover {
-    background: linear-gradient(to top, #8b1e1e, #e44242);;
-    border-color: #bd2d2d;
-}
-
-
-/* ACTUAL BACKGROUND (image of cars) */
-body {
-    background-image: url("JoesWallpaper.jpg"); 
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100vh; 
-}
+  .button-bright-gold {
+    background: linear-gradient(to top, #ac7000, #ffba26, #ffe873);
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s;
+    padding: 25px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+  }
+  
+  .button-bright-gold:hover {
+    background: linear-gradient(to top, #ff5e00, #ffb921, #ffec8b);
+    transform: scale(1.03);
+  }
 /* TRANSPARENT GREEN BOX */
 .wrapper{
+  flex:1; 
   width: 350px;
   margin:10% auto;
   max-width: 350px;
@@ -329,38 +342,56 @@ h2.go-to-home {
 
 /* Make sure page stretches full height */
 html, body {
+    background-color: black;
     height: 100%;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
 }
 
 /* The content container will grow to fill space */
 .main {
-    flex: 1;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .footer {
     background-color: rgb(56, 52, 52);
-    color: rgb(216, 216, 216);
-    text-align: center;
-    font-size: 16px;
-    padding: 20px;
-    box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 14px;
     position: relative;
-    z-index: 999;
+    z-index: 998; 
+    height: 150px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+}
+
+.footer-border {
+    background-color: rgb(26, 99, 70);
+    color: white;
+    font-size: 14px;
+    position: relative;
+    z-index: 998; 
+    height: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
 }
 
 .footer-content {
     display: flex;
     justify-content: space-between;
-    line-height: 1.6;
     align-items: center;
-    flex-wrap: wrap;
-    max-width: 1200px;
-    margin: 0 auto;
+    line-height: 1.6;
+    padding-left: 380px;
+    padding-right: 380px;
+    width: 100%;  /* Add this */
+    box-sizing: border-box; /* Prevent padding from overflowing */
 }
+
 
 .footer-links ul {
     list-style: none;
@@ -399,4 +430,39 @@ html, body {
 }
 
 
+.content-container {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background-color: white;
+    z-index: 997;
+}
 
+.text-content {
+    flex: 1;
+    padding-left: 380px;
+    padding-right: 50px;
+    color: black;
+    line-height: 1.6;
+}
+
+.image-column {
+    display: flex;
+    flex-direction: column;
+    padding-right: 380px;
+    padding-bottom: 50px;
+    gap: 50px;
+    width: 800px;
+}
+
+.side-image {
+    filter:contrast(.9) brightness(.8);
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+}
