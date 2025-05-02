@@ -21,13 +21,29 @@ html{
     text-align: center;
 }
 
+
 body{
     min-height: 100vh;
     background-image: url(images/JoesWallpaper.png);
     background-size: cover;
     background-position: right;
-    overflow: hidden; /*Overflow makes it so you cannot scroll*/
+    overflow: hidden; 
 }
+/*
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 
+    background-image: url(images/JoesWallpaper.png);
+    background-size: cover;
+    background-position: center; 
+    background-attachment: fixed;
+    overflow-x: hidden;
+    font-family: sans-serif;
+  }*/
 
 .wrapper{
     width: 800px;
@@ -386,7 +402,7 @@ form select {
     box-sizing: border-box;
     flex-grow: 1;
     min-width: 0;
-    height: 70px;
+    height: 60px;
     width: 230px;
     padding: 1em;
     font: inherit;
@@ -587,5 +603,45 @@ form select:focus {
     background-color: #666;
   }
 
-  
-  
+  /** Scrool box for customerJobsProfile**/
+  .scroll-box {
+    max-height: 300px; /* adjust based on how much space you want */
+    overflow-y: auto;
+    border: none; /* optional for clarity */
+    padding: 10px;
+    margin-top: 10px;
+  }
+  .scroll-horizontal {
+    display: flex;
+    justify-content: center; /* Center by default */
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0;
+    max-width: 90%;
+    white-space: nowrap;
+    transition: justify-content 0.3s ease;
+  }
+  .scroll-horizontal::-webkit-scrollbar {
+    height: 8px;
+  }
+  .scroll-horizontal::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  .scroll-horizontal::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .customer-wrapper {
+    max-width: 1000px;
+    margin: 130px auto; /* Adds space above AND centers horizontally */
+    padding: 180px 40px 130px 40px; /* Reducing top padding now */
+    background-color: rgba(26, 99, 70, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .section-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
