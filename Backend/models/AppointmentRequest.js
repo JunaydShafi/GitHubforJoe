@@ -14,6 +14,7 @@ const appointmentRequestSchema = new mongoose.Schema({
     ref: 'User'        // 🔥 it connects to User collection
   },
   reason: String,
+  comments: String, // <-- Add the comments field here
   status: {
     type: String,
     enum: ['pending', 'approved', 'denied'],

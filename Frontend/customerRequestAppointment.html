@@ -1,10 +1,51 @@
 <!doctype html>
 <html lang="en">
+
+    <head>
+        <meta charset="UTF8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/Junstyle.css">
+        <title>Request Appointment</title>
+    </head>
+    <body>
+        <div class="header-main"><!--this is for the top footer of the page-->
+            <div class="logo">
+              <a href="customerMainPage.html" class ="logo-link">
+                <img src="images/JoeLogo.png" alt="Logo">
+                </div>
+                <div class="Title">
+                  <div class="title-container">
+                    <div class="shop-name">Joe's AutoShop</div>
+                    <div class="tagline">If it ain't Joe don't fix it!</div>
+                  </div>
+                </a>
+                <div class="account-box-left">
+                    <button onclick="location.href='index.html'">Log Out</button>
+                </div>
+          </div>
+      <body>
+<!--
 <head>
-    <meta charset="UTF8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/Junstyle.css">
     <title>Request Appointment</title>
+    <style>
+        /* Wider dropdown for Reason for Appointment */
+        select#reason {
+            width: 250px; /* Adjust width here */
+        }
+
+        /* Shorten height of dropdowns */
+        select {
+            height: 20px; /* Adjust height as needed */
+        }
+
+        /* Adjust height for input fields if desired */
+        input {
+            height: 20px; /* Optional: Adjust height of input fields */
+        }
+    </style>
 </head>
 <body>
     <div class="header-main">
@@ -22,6 +63,16 @@
         </div>
     </div>
 
+        </div>
+        <div class="Title">
+            <div class="title-container">
+                <div class="shop-name">Joe's AutoShop</div>
+                <div class="tagline">If it ain't Joe don't fix it!</div>
+            </div>
+            <div class="account-box-left">
+                <button onclick="location.href='index.html'">Log Out</button>
+-->
+          
     <div class="wrapper">
         <h1>Request Appointment</h1>
 
@@ -50,7 +101,21 @@
                 </span>
             </div>
 
-            <textarea name="reason" placeholder="Reason for appointment..." required></textarea>
+            <!-- Dropdown for reason -->
+            <select name="reason" id="reason" required>
+                <option value="" disabled selected>Reason for appointment</option>
+                <option value="Oil change">Oil change</option>
+                <option value="Check engine light on">Check engine light on</option>
+                <option value="Brakes">Brakes</option>
+                <option value="Tire change / rotation">Tire change / rotation</option>
+                <option value="Smog check">Smog check</option>
+                <option value="Alignment">Alignment</option>
+                <option value="Air conditioner / refill">Air conditioner / refill</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <!-- Textarea for additional comments -->
+            <textarea name="comments" id="comments" rows="2" placeholder="Any additional comments?"></textarea>
 
             <button type="submit">Submit</button>
         </form>
@@ -101,6 +166,7 @@
                 vehicleId: document.querySelector('[name="vehicleId"]').value,
                 appointmentDate: document.querySelector('[name="appointmentDate"]').value,
                 reason: document.querySelector('[name="reason"]').value,
+                comments: document.querySelector('[name="comments"]').value,
                 customerId: userId
             };
 

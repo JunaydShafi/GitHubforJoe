@@ -1,31 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="/Junstyle.css" />
-  <title>Appointments</title>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/Junstyle.css" />
+    <link rel="stylesheet" href="/appointmentsStyle.css" /> <!-- Add this line -->
+    <title>Appointments</title>
+  </head>
 <body>
   <div class="header-main">
     <div class="logo">
-      <img src="images/WhiteLogo.png" alt="Logo">
-    </div>
-    <div class="Title">
-      <div class="title-container">
-        <div class="shop-name">Joe's AutoShop</div>
-        <div class="tagline">If it ain't Joe don't fix it!</div>
-      </div>
+      <a href="adminMain.html" class ="logo-link">
+        <img src="images/JoeLogo.png" alt="Logo">
+        <div class="Title">
+          <div class="title-container">
+            <div class="shop-name">Joe's AutoShop</div>
+            <div class="tagline">If it ain't Joe don't fix it!</div>
+          </div>
+        </div>
+        </a>
       <div class="account-box-left">
         <button onclick="location.href='index.html'">Log Out</button>
-        <button onclick="location.href='adminMain.html'">Main Page</button>
       </div>
     </div>
   </div>
 
   <div class="wrapperAdmin">
-    <div class="appointments-container">
+    <div class="appointments-container" style="max-height: 600px; overflow-y: auto;">
       <h2>Appointments Awaiting Approval</h2>
+
+      <!-- Dropdown for Quick Appointment Selection -->
+      <label for="appointmentDropdown">Select an Appointment:</label>
+      <select id="appointmentDropdown">
+        <option value="">-- Loading Appointments --</option>
+      </select>
+
+      <!-- Appointment details will be shown here after dropdown selection -->
       <div id="appointments"></div>
     </div>
   </div>
@@ -35,6 +45,14 @@
       try {
         const res = await fetch('/api/appointments');
         const data = await res.json();
+
+/*<<<<<<< OutlawBranch
+        const dropdown = document.getElementById('appointmentDropdown');
+        dropdown.innerHTML = '<option value="">-- Select an Appointment --</option>'; // Reset dropdown
+
+        // Store cards dynamically
+        const cards = {};
+        */
 
         const container = document.getElementById('appointments');
         container.innerHTML = '';
@@ -51,6 +69,13 @@
           const div = document.createElement('div');
           div.className = 'account-box';
           div.id = `appointment-${appointment._id}`;
+
+/*<<<<<<< OutlawBranch
+          // Create the appointment card dynamically and store it
+          const div = document.createElement('div');
+          div.className = 'account-box';
+          div.id = `appointment-${appointment._id}`;
+          div.style.display = 'none'; // Initially hidden
           div.innerHTML = `
             <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
             <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
@@ -72,13 +97,127 @@
         populateMechanics();
       } catch (err) {
         console.error('Error fetching appointments:', err);
+
+            </div>
+          `;
+
+          // Create Approve and Deny buttons
+          const approveBtn = document.createElement('button');
+          approveBtn.textContent = 'Approve';
+          approveBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px; margin-right: 5px;';
+          approveBtn.onclick = () => approve(
+            appointment._id,
+            appointment.vehicleName || appointment.vehicleId,
+            appointment.reason,
+            appointment.date,
+            appointment.time,
+            appointment.firstName,
+            appointment.lastName
+          );
+
+          const denyBtn = document.createElement('button');
+          denyBtn.textContent = 'Deny';
+          denyBtn.style.cssText = 'background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;';
+          denyBtn.addEventListener('click', () => deny(appointment._id, div));
+
+          // Append buttons to the card
+          const detailsDiv = div.querySelector('.details');
+          detailsDiv.appendChild(approveBtn);
+          detailsDiv.appendChild(denyBtn);
+
+          // Append card to the container
+          document.querySelector('.appointments-container').appendChild(div);
+
+          // Add the option to dropdown
+          const option = document.createElement('option');
+          option.value = appointment._id;
+          option.textContent = `${appointment.firstName} ${appointment.lastName} - ${formattedDate}`;
+          dropdown.appendChild(option);
+
+          // Save the card for later use
+          cards[appointment._id] = div;
+        });
+
+        // Show the selected appointment card when selected
+        dropdown.addEventListener('change', (event) => {
+          const appointmentId = event.target.value;
+          // Hide all cards first
+          Object.values(cards).forEach(card => card.style.display = 'none');
+
+          if (appointmentId) {
+            // Show only the selected card
+            const selectedCard = cards[appointmentId];
+            if (selectedCard) {
+              selectedCard.style.display = 'block'; // Show the card
+              selectedCard.scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        });
+
+      } catch (err) {
+        console.error('Error fetching appointments:', err);
+        const dropdown = document.getElementById('appointmentDropdown');
+        if (dropdown) {
+          dropdown.innerHTML = '<option value="">Error loading appointments</option>';
+        }
+      }
+    }
+*/
+    // Toggle the details view
+
+
+          const div = document.createElement('div');
+          div.className = 'account-box';
+          div.id = `appointment-${appointment._id}`;
+          div.innerHTML = `
+            <p><strong>${appointment.firstName} ${appointment.lastName}</strong> - Requested for: ${formattedDate}</p>
+            <button style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;" onclick="toggleDetails(this)">View</button>
+       <div class="details" style="display:none; margin-top:10px;">
+  <p><strong>Email:</strong> ${appointment.email}</p>
+  <p><strong>Phone:</strong> ${appointment.phone}</p>
+  <p><strong>Reason:</strong> ${appointment.reason}</p>
+  ${appointment.reason === "Other" ? `<p><strong>Comment:</strong> ${appointment.comments}</p>` : ""}
+  <p><strong>Vehicle:</strong> ${appointment.vehicleId ? `${appointment.vehicleId.make} ${appointment.vehicleId.model}` : 'N/A'}</p>
+  <label for="mechanicSelect-${appointment._id}"><strong>Select Mechanic:</strong></label><br>
+  <select id="mechanicSelect-${appointment._id}" style="margin-bottom: 10px;"></select><br>
+  <button onclick="approveAppointment('${appointment._id}')" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Approve</button>
+  <button onclick="deny('${appointment._id}', this.closest('.account-box'))" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Deny</button>
+</div>
+      `;    
+
+          container.appendChild(div);
+        });
+
+        populateMechanics();
+      } catch (err) {
+        console.error('Error fetching appointments:', err);
       }
     }
 
+    
+    
     function toggleDetails(button) {
       const details = button.nextElementSibling;
       details.style.display = details.style.display === 'none' ? 'block' : 'none';
     }
+
+
+    function approve(id, vehicle, reason, date, time, firstName, lastName) {
+  const confirmed = confirm(`Are you sure you want to approve this appointment for ${firstName}?`);
+  if (!confirmed) return;
+
+  // Redirect to createAppointmentTime.html to set the date and time
+  const url = new URL('/createAppointmentTime.html', window.location.origin);
+  url.searchParams.set('appointmentId', id);
+  url.searchParams.set('vehicle', vehicle);
+  url.searchParams.set('reason', reason);
+  url.searchParams.set('firstName', firstName);
+  url.searchParams.set('lastName', lastName);
+  window.location.href = url.toString();
+}
+
+
+    // Deny the appointment and update status in MongoDB
 
     async function approveAppointment(appointmentId) {
       const mechanicSelect = document.getElementById(`mechanicSelect-${appointmentId}`);

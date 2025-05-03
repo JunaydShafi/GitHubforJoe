@@ -1,5 +1,6 @@
 import express from "express";
 const app = express();
+import { calendar, auth, createCalendarEvent } from './googleCalendar.js'; // Import both calendar and auth
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import path from "path";
@@ -17,7 +18,78 @@ import AppointmentRequest from './models/AppointmentRequest.js';
 import mongoose from 'mongoose';  // <--- ADD this at top if not already there
 
 
+import { readFileSync } from 'fs';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Read service account credential
+const credentials = JSON.parse(readFileSync(path.join(__dirname, 'config', 'calendar-access.json')));
+
+import mongoose from 'mongoose';  // <--- ADD this at top if not already there
+
 app.use(express.json());
+
+// OAuth2 callback route
+app.get('/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+
+  try {
+    const { tokens } = await oauth2Client.getToken(code);  // Exchange code for tokens
+    oauth2Client.setCredentials(tokens);  // Store the tokens for future requests
+
+    res.redirect('/adminMain');  // Redirect after authentication
+  } catch (error) {
+    console.error('Error during Google OAuth callback:', error);
+    res.status(500).send('Error during Google OAuth callback');
+  }
+});
+
+app.get('/api/calendar/events', async (req, res) => {
+  try {
+    const response = await calendar.events.list({
+      calendarId: 'joeottoshap@gmail.com',  // Use the primary calendar
+      timeMin: new Date().toISOString(),
+      maxResults: 10,
+      singleEvents: true,
+      orderBy: 'startTime',
+      auth,  // Ensure that authentication is passed here
+    });
+    res.json(response.data.items);  // Return the events
+  } catch (error) {
+    console.error('Error fetching calendar events:', error);
+    res.status(500).send('Error fetching events');
+  }
+});
+
+app.post('/api/set-appointment-time', async (req, res) => {
+  const { appointmentId, appointmentDateTime, reason, firstName, lastName } = req.body;
+
+  try {
+    // Step 1: Update MongoDB with the selected appointment details
+    const appointment = await AppointmentRequest.findByIdAndUpdate(
+      appointmentId,
+      {
+        appointmentDateTime: new Date(appointmentDateTime),
+        status: 'approved',
+      },
+      { new: true }
+    );
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    // ✅ Step 2: Create the event in Google Calendar (no email needed)
+    const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName);
+
+    res.json(result); // Return success or failure message
+  } catch (error) {
+    console.error('Error handling appointment time:', error);
+    res.status(500).json({ message: 'Error handling appointment' });
+  }
+});
 
 
 app.get('/api/payroll', async (req, res) => {
@@ -47,7 +119,7 @@ app.get('/api/payroll', async (req, res) => {
 
 app.post('/api/vehicles/add', async (req, res) => {
     try {
-      const { customerId, make, model, year, vin, licensePlate } = req.body;
+      const { customerId, make, model, year, vin, color, licensePlate } = req.body;
   
       const newVehicle = new Vehicle({
         customerId,
@@ -55,6 +127,7 @@ app.post('/api/vehicles/add', async (req, res) => {
         model,
         year,
         vin,
+        color,
         licensePlate
       });
   
@@ -114,35 +187,82 @@ app.post('/api/vehicles/add', async (req, res) => {
 
 //
 
-app.post('/api/employees/create', async (req, res) => {
-    try {
-      const { email, password, username, phone, isAdmin } = req.body;
+  app.post('/api/set-appointment-time', async (req, res) => {
+    const { appointmentId, appointmentDateTime, reason, firstName, lastName, email } = req.body;
   
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ message: 'User already exists' });
+    try {
+      // Step 1: Update MongoDB with the selected appointment details
+      const appointment = await AppointmentRequest.findByIdAndUpdate(appointmentId, {
+        appointmentDateTime: new Date(appointmentDateTime),
+        status: 'approved',
+      }, { new: true });
+  
+      if (!appointment) {
+        return res.status(404).json({ message: 'Appointment not found' });
       }
   
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // Ensure that email exists
+      if (!appointment.email || !email) {
+        return res.status(400).json({ message: 'Missing or invalid attendee email' });
+      }
   
-      const newUser = new User({
-        email,
-        password: hashedPassword,
-        username,
-        phone,
-        role: isAdmin ? 'admin' : 'employee',
-        payroll: {
-          hours: 0,
-          overtime: 0,
-          rate: 20
-        }
-      });
+      // Step 2: Create the event in Google Calendar using the `createCalendarEvent` function
+      const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName, appointment.email);
+  
+      res.json(result);  // Return success or failure message
+    } catch (error) {
+      console.error('Error handling appointment time:', error);
+      res.status(500).json({ message: 'Error handling appointment' });
+    }
+  });
+  
+
+app.post('/api/employees/create', async (req, res) => {
+
         
-      await newUser.save();
-      res.status(201).json({ success: true, message: 'Employee account created successfully.' });
+  app.post('/api/jobs/create-from-appointment/:appointmentId', async (req, res) => {
+    const { appointmentId } = req.params;
+    const { mechanicId } = req.body;
+  
+    try {
+      const appointment = await AppointmentRequest.findById(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ error: 'Appointment not found' });
+      }
+  
+      const mechanic = await User.findById(mechanicId);
+      if (!mechanic) {
+        return res.status(404).json({ error: 'Mechanic not found' });
+      }
+  
+      const job = new Job({
+        customerId: appointment.customerId ? new mongoose.Types.ObjectId(appointment.customerId) : undefined,
+        vehicleId: appointment.vehicleId,
+        mechanicId,
+        description: appointment.reason,
+        comments: appointment.comments,
+        status: 'Assigned',
+        startDate: appointment.date,
+        notes: ''
+      });
+  
+      await job.save();
+  
+      // ✅ Send confirmation email
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: appointment.email,
+        subject: "Your Job Has Been Scheduled - Joe's AutoShop",
+        text: `Hi ${appointment.firstName} ${appointment.lastName},\n\nYour appointment for "${appointment.reason}" has been approved and scheduled with our mechanic ${mechanic.username}.\n\nDate: ${appointment.date}\n\n\nThanks,\nJoe's AutoShop`
+      });
+  
+      // ✅ Delete the appointment
+      await AppointmentRequest.findByIdAndDelete(appointmentId);
+  
+      res.status(200).json({ message: 'Job created and appointment removed' });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ success: false, message: 'Server error' });
+      console.error('Job creation error:', err);
+      res.status(500).json({ error: 'Server error during job creation' });
     }
   });
 
@@ -182,9 +302,6 @@ app.use(bodyParser.json());
 // Use the login route
 app.use('/api/auth', loginRouter);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use(express.static(path.join(__dirname,'..?frontend')));
 app.use('/js', express.static(path.join(__dirname, '../Frontend/js')));
@@ -205,8 +322,26 @@ app.get('/api/jobs/customer/:customerId', async (req, res) => {
 });
 app.use('/api/jobs',jobsRoutes);
 
+    res.json(jobs);
+  } catch (err) {
+    console.error('Error fetching customer jobs:', err);
+    res.status(500).json({ error: 'Server error fetching customer jobs' });
+  }
+});
+app.use('/api/jobs',jobsRoutes);
 
 
+// display vehicle make and medel on appointmnets/html
+app.get('/api/appointments', async (req, res) => {
+  try {
+    const appointments = await AppointmentRequest.find()
+      .populate('vehicleId', 'make model') // Populate vehicle data (make and model)
+      .exec();
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ message: 'Error retrieving appointments' });
+  }
+});
 
 
 // API route: Get all jobs for a specific employee (mechanic)
@@ -709,6 +844,22 @@ app.get("/payroll-display", (req, res) => {
 app.use(express.urlencoded({extended: true}));
 
 
+// Set the appointment date/time and add it to Google Calendar
+app.post('/api/set-appointment-time', async (req, res) => {
+  const { appointmentId, vehicle, reason, firstName, lastName, appointmentDateTime } = req.body;
+
+  try {
+    // Step 1: Update the appointment with the selected date/time in MongoDB
+    const appointment = await AppointmentRequest.findByIdAndUpdate(appointmentId, {
+      appointmentDateTime: new Date(appointmentDateTime), // Store the exact date/time
+      status: 'approved'
+    }, { new: true });
+
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+
   import Appointment from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
@@ -720,12 +871,54 @@ app.use('/api/reviews', reviewRoutes);
 
 app.post("/createAppointment", async (req, res) => {
   console.log("📥 Incoming appointment:", req.body);
+    // Step 2: Google Calendar API integration
+    const calendar = google.calendar('v3');
+    const auth = getGoogleAuthClient(); // Define this function to get authenticated client
 
+    const event = {
+      summary: `Appointment for ${firstName} ${lastName}`,
+      location: 'Joe\'s AutoShop',
+      description: reason,
+      start: {
+        dateTime: appointmentDateTime, // The time selected by the admin
+        timeZone: 'America/Los_Angeles',
+      },
+      end: {
+        dateTime: new Date(new Date(appointmentDateTime).getTime() + 60 * 60 * 1000), // Assuming 1-hour appointment
+        timeZone: 'America/Los_Angeles',
+      },
+      attendees: [{ email: appointment.email }], // Add customer's email as attendee
+    };
+
+    const calendarResponse = await calendar.events.insert({
+      auth,
+      calendarId: 'joeottoshap@gmail.com',
+      resource: event,
+    });
+
+    console.log('Google Calendar event created:', calendarResponse.data);
+
+    // Step 3: Send approval email
+    sendApprovalEmail(appointment.email, appointment.firstName, appointment.lastName, appointmentDateTime);
+
+    res.json({ success: true, message: "Appointment confirmed and added to Google Calendar!" });
+  } catch (error) {
+    console.error('Error handling appointment time:', error);
+    res.status(500).json({ success: false, message: "Error saving appointment or adding to Google Calendar" });
+  }
+});
+
+
+//test appointment router
+app.post('/createAppointment', async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate } = req.body;
+
+    const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate, comments} = req.body;
     const customerId = req.session?.userId || req.body.customerId;  // ← this is how you get who made it (if you track session)
 
-    const appointment = new Appointment({
+    const newAppointment = new AppointmentRequest({
+
+    // const appointment = new Appointment({
       customerId,      // ✅ Save customer ID
       vehicleId,       // ✅ Save vehicle ID
       firstName,
@@ -734,15 +927,18 @@ app.post("/createAppointment", async (req, res) => {
       phone,
       reason,
       date: new Date(appointmentDate),
+      status: "pending"
+      comments,
     });
 
-    await appointment.save();
+    await newAppointment.save();
     res.redirect("/customerMainPage");
   } catch (err) {
-    console.error("❌ Error saving appointment:", err);
+    console.error("Error saving appointment:", err);
     res.status(500).json({ error: "Failed to save appointment" });
   }
 });
+
 
 
   //customerRequestAppointment end--------------
@@ -759,15 +955,6 @@ app.post("/createAppointment", async (req, res) => {
       user.resetOtp = otp;
       user.otpExpires = otpExpires;
       await user.save();
-  
-      // ✉️ Send OTP via email using Nodemailer
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,     // your email
-          pass: process.env.EMAIL_PASS      // app password or email pass
-        }
-      });
   
       await transporter.sendMail({
         from: `"Joe's Auto" <${process.env.EMAIL_USER}>`,
@@ -830,10 +1017,10 @@ app.post("/createAppointment", async (req, res) => {
 
   app.get("/api/admin/appointments", async (req, res) => {
     try {
-      const appointments = await Appointment.find({ status: "pending" });
+      const appointments = await AppointmentRequest.find({ status: "pending" });
       res.json(appointments);
     } catch (error) {
-      console.error("❌ Failed to fetch appointments:", error);
+      console.error("Failed to fetch appointments:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
@@ -843,48 +1030,44 @@ app.post("/createAppointment", async (req, res) => {
   app.post("/api/admin/appointments/:id/approve", async (req, res) => {
     try {
       const { id } = req.params;
-      await Appointment.findByIdAndUpdate(id, { status: "approved" });
+      await AppointmentRequest.findByIdAndUpdate(id, { status: "approved" });
       res.json({ message: "Appointment approved" });
     } catch (err) {
       console.error("❌ Error approving:", err);
       res.status(500).json({ error: "Failed to approve" });
     }
   });
-  
-  app.post("/api/admin/appointments/:id/deny", async (req, res) => {
-    try {
-      const { id } = req.params;
-      await Appointment.findByIdAndUpdate(id, { status: "denied" });
-      res.json({ message: "Appointment denied" });
-    } catch (err) {
-      console.error("❌ Error denying:", err);
-      res.status(500).json({ error: "Failed to deny" });
-    }
-  });
+
   //Backend points ENd
 
   //Page to view the database objects on admin/appointments
   app.get('/api/appointments', async (req, res) => {
     try {
-        const appointments = await Appointment.find({});
-        res.json(appointments);
+      const appointments = await AppointmentRequest.find({ status: 'pending' });
+      res.json(appointments);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+      console.error(err);
+      res.status(500).json({ error: 'Server error fetching appointments' });
     }
-});
+  });
+  
 
 
 
 dotenv.config();
 
+// Create transporter once and reuse
+
 // Import nodemailer for email sending START
 
-// Create transporter once and reuse
+//import nodemailer from 'nodemailer';
+
+
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
+    user: process.env.EMAIL_USER,  // ✅ These will now be defined
     pass: process.env.EMAIL_PASS,
   }
 });
@@ -892,7 +1075,10 @@ const transporter = nodemailer.createTransport({
 // DELETE appointment route (used in admin/appointments)
 app.delete('/api/appointments/:id', async (req, res) => {
   try {
-    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+
+    const appointment = await AppointmentRequest.findByIdAndDelete(req.params.id);
+
+   // const appointment = await Appointment.findById(req.params.id);
 
     if (!appointment) {
       return res.status(404).json({ error: 'Appointment not found' });
@@ -920,6 +1106,8 @@ Joe's AutoShop Team`
       }
     });
 
+    await Appointment.findByIdAndDelete(req.params.id); // Delete after email is sent
+
     res.json({ message: 'Appointment denied and deleted', appointment });
   } catch (err) {
     console.error(err);
@@ -928,18 +1116,16 @@ Joe's AutoShop Team`
 });
 
 // POST route to approve appointment and send approval email
-app.post('/approve-appointment', async (req, res) => {
-  const { appointmentId } = req.body;
-
+app.post('/api/admin/appointments/:id/approve', async (req, res) => {
   try {
-    const appointment = await AppointmentRequest.findById(appointmentId);
+    const { id } = req.params;
+    const appointment = await Appointment.findById(id);
+
     if (!appointment) {
-      return res.status(404).send('Appointment not found');
+      return res.status(404).json({ error: 'Appointment not found' });
     }
 
-    console.log(`Appointment ${appointmentId} approved.`);
-
-    // Step 1: Send approval email
+    // Send approval email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: appointment.email,
@@ -949,29 +1135,27 @@ app.post('/approve-appointment', async (req, res) => {
 Your appointment on ${appointment.date} has been approved.
 We look forward to seeing you!
 
-Bring your car down to the shop on the requested date and time, if you need more information on where we are located check the homepage for more information.
-
 Best,
 Joe's AutoShop Team`
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, async (error, info) => {
       if (error) {
         console.error('Approval email failed:', error);
-        return res.status(500).send('Email failed to send');
-      } else {
-        console.log('Approval email sent:', info.response);
+        return res.status(500).json({ error: 'Email failed to send' });
       }
+
+      console.log('Approval email sent:', info.response);
+
+      // Delete the appointment after approval
+      await Appointment.findByIdAndDelete(id);
+
+      res.json({ message: 'Appointment approved, email sent, and deleted' });
     });
 
-    // Step 2: Delete the appointment from the DB after email is sent
-    await AppointmentRequest.findByIdAndDelete(appointmentId);
-    console.log(`Appointment ${appointmentId} deleted after approval.`);
-
-    res.send('Approval and email sent, appointment deleted');
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error approving appointment');
+    console.error("❌ Error approving:", err);
+    res.status(500).json({ error: "Failed to approve" });
   }
 });
 // Approve appointment route END
@@ -1017,6 +1201,53 @@ app.post('/api/createJob', async (req, res) => {
   }
 });
 
+//to delete admin or employees
+// Get all users (for dropdown)
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find(); // import your User model
+    res.json(users);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+// Delete a user by ID
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).send('User not found');
+    res.send('User deleted');
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+app.put('/api/vehicles/:id', async (req, res) => {
+  try {
+    const updatedVehicle = await Vehicle.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedVehicle) {
+      return res.status(404).send({ error: 'Vehicle not found' });
+    }
+    res.send(updatedVehicle);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/vehicles/:id', async (req, res) => {
+  try {
+    const vehicleId = req.params.id;
+    await Vehicle.findByIdAndDelete(vehicleId);
+    res.status(200).send({ message: 'Vehicle deleted' });
+  } catch (err) {
+    console.error('DELETE error:', err);
+    res.status(500).send({ error: 'Failed to delete vehicle' });
+  }
+});
+
+
 
 //grab mechanics for createJob.html
 app.get('/api/mechanics', async (req, res) => {
@@ -1029,3 +1260,4 @@ app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
     connectDB();
 });
+

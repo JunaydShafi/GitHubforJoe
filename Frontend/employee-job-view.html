@@ -60,13 +60,15 @@
 <body>
   <div class="header-main">
     <div class="logo">
-      <img src="images/WhiteLogo.png" alt="Logo">
-    </div>
-    <div class="Title">
-      <div class="title-container">
-        <div class="shop-name">Joe's AutoShop</div>
-        <div class="tagline">If it ain't Joe don't fix it!</div>
-      </div>
+      <a href="employee-dashboard.html" class ="logo-link">
+        <img src="images/JoeLogo.png" alt="Logo">
+        </div>
+        <div class="Title">
+          <div class="title-container">
+            <div class="shop-name">Joe's AutoShop</div>
+            <div class="tagline">If it ain't Joe don't fix it!</div>
+          </div>
+        </a>
       <div class="account-box-left">
         <button onclick="location.href='index.html'">Log Out</button>
       </div>
@@ -96,37 +98,41 @@
   
     document.addEventListener('DOMContentLoaded', async () => {
       const employeeId = localStorage.getItem('userId');
-      const token = localStorage.getItem('authToken');
-      const hideCheckbox = document.getElementById('hideCompleted');
 
-      if (!employeeId || !token) {
+      const token = localStorage.getItem('authToken'); // 🔥 GET the token
+      const hideCheckbox = document.getElementById('hideCompleted');
+  
+      if (!employeeId || !token) {   // 🔥 CHECK if token missing too
         alert("Not logged in.");
         return;
       }
-
+  
       try {
         const res = await fetch(`/api/jobs/employee/${employeeId}`, {
+
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         const jobs = await res.json();
-
+  
         if (!jobs.length) {
           document.getElementById('jobSidebar').innerHTML = "<p>No jobs assigned to you yet.</p>";
           return;
         }
-
+  
         allJobs = jobs;
         renderJobs();
-
+  
         hideCheckbox.addEventListener('change', renderJobs);
       } catch (err) {
         console.error(err);
         document.getElementById('jobSidebar').innerHTML = "<p>Error loading jobs.</p>";
       }
     });
-
+  
+    // ❗ The rest of your code (renderJobs, showJobDetails, startJob, markComplete, addUpdate, etc.) stays EXACTLY the same!
+  
     function renderJobs() {
       const sidebar = document.getElementById('jobSidebar');
       const details = document.getElementById('jobDetails');
@@ -162,8 +168,9 @@
       const formatDate = (date) => date ? new Date(date).toLocaleString() : 'Not recorded';
 
       details.innerHTML = `
-<h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
-    <p><strong>Customer:</strong> ${job.customerId?.username || 'Unknown'}</p>
+
+    <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
+<p><strong>Customer:</strong> ${job.customerId?.name || 'Unknown'}</p>
     <p><strong>Reason:</strong> ${job.description}</p>
    <p><strong>User Comments:</strong> ${job.comments?.trim() || 'No comment was added'}</p>
     <p><strong>Status:</strong> ${job.status}</p>
@@ -192,8 +199,31 @@ function startJob(jobId) {
   selectedJobId = jobId;
   document.getElementById('estimateModal').style.display = 'flex';
 }
+async function startJob(jobId) {
+  try {
+    const token = localStorage.getItem('authToken'); // ✅ get token if needed
+    const res = await fetch(`/api/jobs/${jobId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})  // ✅ attach token if exists
+      },
+      body: JSON.stringify({ status: 'in progress' })
+    });
+  const data = await res.json();
+    if (res.ok) {
+      alert("Job started successfully!");
+      location.reload();
+    } else {
+      alert(data.message || "Failed to start job.");
+    }
+  } catch (err) {
+    console.error("Error starting job:", err);
+    alert("Server error starting job.");
+  }
+}
 
-function closeEstimateModal() {
+    function closeEstimateModal() {
   document.getElementById('estimateModal').style.display = 'none';
   selectedJobId = null;
 }
@@ -237,35 +267,35 @@ async function confirmEstimate() {
 }
 //
 
+async function markComplete(jobId) {
+  const notes = document.getElementById(`notes-${jobId}`).value;
+  const token = localStorage.getItem('authToken'); // ✅ Get token
 
-    async function markComplete(jobId) {
-      const notes = document.getElementById(`notes-${jobId}`).value;
-      const token = localStorage.getItem('authToken');
+  try {
+    const res = await fetch(`/api/jobs/${jobId}/complete`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})  // ✅ Attach token if exists
+      },
+      body: JSON.stringify({
+        updateMessage: notes  // ✅ Only sending the notes
+      })
+    });
 
-      try {
-        const res = await fetch(`/api/jobs/${jobId}/complete`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-          },
-          body: JSON.stringify({
-            updateMessage: notes
-          })
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-          alert("Job marked as complete!");
-          location.reload();
-        } else {
-          alert(data.message || 'Error marking complete.');
-        }
-      } catch (err) {
-        console.error('Error completing job:', err);
-        alert('Server error completing job.');
-      }
+    const data = await res.json();
+    if (res.ok) {
+      alert("Job marked as complete!");
+      location.reload();
+    } else {
+      alert(data.message || 'Error marking complete.');
     }
+  } catch (err) {
+    console.error('Error completing job:', err);
+    alert('Server error completing job.');
+  }
+}
+
 
     async function addUpdate(jobId) {
       const textarea = document.getElementById(`notes-${jobId}`);

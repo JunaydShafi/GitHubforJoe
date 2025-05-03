@@ -10,6 +10,7 @@ const vehicleSchema = new mongoose.Schema({
   model: String,
   year: Number,
   vin: String,
+  color: String,
   licensePlate: String,
 }, {
   timestamps: true

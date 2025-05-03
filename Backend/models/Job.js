@@ -7,6 +7,7 @@ const jobSchema = new mongoose.Schema({
   mechanicId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: String,
   description: String,
+  comments: String,
   startDate: Date,
   completedDate: Date,
   estimatedMinutes: {
