@@ -2,10 +2,10 @@ import express from 'express';
 import Review from '../models/review.js';
 import AppointmentRequest from '../models/AppointmentRequest.js';
 
-const router = express.Router();
+const reviewRoutes = express.Router();
 
 // POST: Submit review
-router.post('/', async (req, res) => {
+reviewRoutes.post('/', async (req, res) => {
   try {
     const { jobId, mechanicId, customerId, stars, comment } = req.body;
     console.log('Incoming review:', req.body);
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
 });
 
 // ✅ GET: Fetch all reviews
-router.get('/', async (req, res) => {
+reviewRoutes.get('/', async (req, res) => {
   try {
     const reviews = await Review.find()
       .populate({
@@ -63,4 +63,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-export default router;
+export default reviewRoutes;

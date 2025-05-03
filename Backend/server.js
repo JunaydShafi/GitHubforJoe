@@ -16,7 +16,9 @@ import Vehicle from './models/Vehicles.js';
 import nodemailer from 'nodemailer';
 import AppointmentRequest from './models/AppointmentRequest.js';
 import mongoose from 'mongoose';  // <--- ADD this at top if not already there
+import reviewRoutes from './routes/reviews.js';
 
+dotenv.config();
 
 import { readFileSync } from 'fs';
 
@@ -27,7 +29,6 @@ const __dirname = dirname(__filename);
 // Read service account credential
 const credentials = JSON.parse(readFileSync(path.join(__dirname, 'config', 'calendar-access.json')));
 
-import mongoose from 'mongoose';  // <--- ADD this at top if not already there
 
 app.use(express.json());
 
@@ -217,7 +218,7 @@ app.post('/api/vehicles/add', async (req, res) => {
   });
   
 
-app.post('/api/employees/create', async (req, res) => {
+// app.post('/api/employees/create', async (req, res) => {
 
         
   app.post('/api/jobs/create-from-appointment/:appointmentId', async (req, res) => {
@@ -320,14 +321,15 @@ app.get('/api/jobs/customer/:customerId', async (req, res) => {
     res.status(500).json({ error: 'Server error fetching customer jobs' });
   }
 });
-app.use('/api/jobs',jobsRoutes);
+
+/*app.use('/api/jobs',jobsRoutes);
 
     res.json(jobs);
   } catch (err) {
     console.error('Error fetching customer jobs:', err);
     res.status(500).json({ error: 'Server error fetching customer jobs' });
   }
-});
+});*/
 app.use('/api/jobs',jobsRoutes);
 
 
@@ -858,15 +860,16 @@ app.post('/api/set-appointment-time', async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ success: false, message: "Appointment not found" });
     }
+  } catch (error) {
+    console.error('Error handling appointment time:', error);
+    res.status(500).json({ success: false, message: "Error saving appointment or adding to Google Calendar" });
+  }
+});
 
-
-  import Appointment from "./models/AppointmentRequest.js";
+ // import AppointmentRequest from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
-import reviewRoutes from './routes/reviews.js';
 app.use('/api/reviews', reviewRoutes);
-
-
 
 
 app.post("/createAppointment", async (req, res) => {
@@ -902,10 +905,7 @@ app.post("/createAppointment", async (req, res) => {
     sendApprovalEmail(appointment.email, appointment.firstName, appointment.lastName, appointmentDateTime);
 
     res.json({ success: true, message: "Appointment confirmed and added to Google Calendar!" });
-  } catch (error) {
-    console.error('Error handling appointment time:', error);
-    res.status(500).json({ success: false, message: "Error saving appointment or adding to Google Calendar" });
-  }
+  
 });
 
 
@@ -927,7 +927,7 @@ app.post('/createAppointment', async (req, res) => {
       phone,
       reason,
       date: new Date(appointmentDate),
-      status: "pending"
+      status: "pending",
       comments,
     });
 
@@ -1054,7 +1054,6 @@ app.post('/createAppointment', async (req, res) => {
 
 
 
-dotenv.config();
 
 // Create transporter once and reuse
 
@@ -1260,4 +1259,3 @@ app.listen(5000, () => {
     console.log("Server is ready at http://localhost:5000");
     connectDB();
 });
-
