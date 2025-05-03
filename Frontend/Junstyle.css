@@ -781,7 +781,7 @@ form select:focus {
   .customer-wrapper {
     max-width: 1000px;
     margin: 130px auto; /* Adds space above AND centers horizontally */
-    padding: 180px 40px 130px 40px; /* Reducing top padding now */
+    padding: 180px 40px 87px 40px; /* Reducing top padding now */
     background-color: rgba(26, 99, 70, 0.9);
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

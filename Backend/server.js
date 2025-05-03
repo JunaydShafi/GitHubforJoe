@@ -17,6 +17,7 @@ import nodemailer from 'nodemailer';
 import AppointmentRequest from './models/AppointmentRequest.js';
 import mongoose from 'mongoose';  // <--- ADD this at top if not already there
 import reviewRoutes from './routes/reviews.js';
+import { google } from 'googleapis';
 
 dotenv.config();
 
@@ -337,7 +338,7 @@ app.use('/api/jobs',jobsRoutes);
 app.get('/api/appointments', async (req, res) => {
   try {
     const appointments = await AppointmentRequest.find()
-      .populate('vehicleId', 'make model') // Populate vehicle data (make and model)
+      .populate('vehicleId', 'make model year') // Now includes year!
       .exec();
     res.json(appointments);
   } catch (err) {
@@ -872,7 +873,7 @@ app.use(express.urlencoded({extended: true}));
 app.use('/api/reviews', reviewRoutes);
 
 
-app.post("/createAppointment", async (req, res) => {
+/*app.post("/createAppointment", async (req, res) => {
   console.log("📥 Incoming appointment:", req.body);
     // Step 2: Google Calendar API integration
     const calendar = google.calendar('v3');
@@ -906,7 +907,7 @@ app.post("/createAppointment", async (req, res) => {
 
     res.json({ success: true, message: "Appointment confirmed and added to Google Calendar!" });
   
-});
+});*/
 
 
 //test appointment router
