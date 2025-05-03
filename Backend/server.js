@@ -223,6 +223,42 @@ app.post('/api/vehicles/add', async (req, res) => {
 
 // app.post('/api/employees/create', async (req, res) => {
 
+  app.post('/api/newEmployee', async (req, res) => {
+    try {
+      const { username, email, password, phone } = req.body;
+  
+      const existingUser = await User.findOne({ email });
+      if (existingUser) return res.status(400).json({ message: 'Employee already exists' });
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const newEmployee = new User({
+        username,
+        email,
+        password: hashedPassword,
+        phone,
+        role: 'employee', // critical!
+        payroll: { hours: 0, minutes: 0, overtime: 0, rate: 0 }
+      });
+  
+      await newEmployee.save();
+      res.status(201).json({ success: true, message: 'Employee created', user: newEmployee });
+  
+    } catch (err) {
+      console.error('❌ Error creating employee:', err);
+      res.status(500).json({ success: false, message: 'Error creating employee' });
+    }
+  });
+  
+
+
+
+
+
+
+
+
+
         
   app.post('/api/jobs/create-from-appointment/:appointmentId', async (req, res) => {
     const { appointmentId } = req.params;
