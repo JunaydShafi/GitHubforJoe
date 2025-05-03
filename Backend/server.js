@@ -1,6 +1,6 @@
 import express from "express";
 const app = express();
-import { calendar, auth, createCalendarEvent } from './googleCalendar.js'; // Import both calendar and auth
+// import { calendar, auth, createCalendarEvent } from './googleCalendar.js';
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import path from "path";
@@ -20,19 +20,19 @@ import reviewRoutes from './routes/reviews.js';
 
 dotenv.config();
 
-import { readFileSync } from 'fs';
+// import { readFileSync } from 'fs';
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Read service account credential
-const credentials = JSON.parse(readFileSync(path.join(__dirname, 'config', 'calendar-access.json')));
-
+// const credentials = JSON.parse(readFileSync(path.join(__dirname, 'config', 'calendar-access.json')));
 
 app.use(express.json());
 
 // OAuth2 callback route
+/*
 app.get('/auth/google/callback', async (req, res) => {
   const { code } = req.query;
 
@@ -46,7 +46,8 @@ app.get('/auth/google/callback', async (req, res) => {
     res.status(500).send('Error during Google OAuth callback');
   }
 });
-
+*/
+/*
 app.get('/api/calendar/events', async (req, res) => {
   try {
     const response = await calendar.events.list({
@@ -63,6 +64,7 @@ app.get('/api/calendar/events', async (req, res) => {
     res.status(500).send('Error fetching events');
   }
 });
+*/
 
 app.post('/api/set-appointment-time', async (req, res) => {
   const { appointmentId, appointmentDateTime, reason, firstName, lastName } = req.body;
@@ -83,7 +85,7 @@ app.post('/api/set-appointment-time', async (req, res) => {
     }
 
     // ✅ Step 2: Create the event in Google Calendar (no email needed)
-    const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName);
+    //const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName);
 
     res.json(result); // Return success or failure message
   } catch (error) {
@@ -119,19 +121,20 @@ app.get('/api/payroll', async (req, res) => {
 });
 
 app.post('/api/vehicles/add', async (req, res) => {
-    try {
-      const { customerId, make, model, year, vin, color, licensePlate } = req.body;
-  
-      const newVehicle = new Vehicle({
-        customerId,
-        make,
-        model,
-        year,
-        vin,
-        color,
-        licensePlate
-      });
-  
+  try {
+    const { customerId, make, model, color, year, vin, licensePlate, notes } = req.body;
+
+    const newVehicle = new Vehicle({
+      customerId,
+      make,
+      model,
+      color,
+      year,
+      vin,
+      notes,
+      licensePlate
+    });
+
       await newVehicle.save();
       res.status(201).json({ success: true, message: 'Vehicle added successfully' });
     } catch (err) {
@@ -208,7 +211,7 @@ app.post('/api/vehicles/add', async (req, res) => {
       }
   
       // Step 2: Create the event in Google Calendar using the `createCalendarEvent` function
-      const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName, appointment.email);
+     // const result = await createCalendarEvent(appointmentDateTime, reason, firstName, lastName, appointment.email);
   
       res.json(result);  // Return success or failure message
     } catch (error) {
@@ -436,6 +439,36 @@ app.get('/api/jobs/:id', async (req, res) => {
 
 // Admin: Get all vehicles
 app.get('/api/vehicles', async (req, res) => {
+  const vehicles = await Vehicle.find().populate('customerId', 'username');
+  res.json(vehicles);
+});
+
+app.get('/api/vehicles/:id', async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findById(req.params.id);
+    if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+    res.json(vehicle);
+  } catch (err) {
+    console.error('Error fetching vehicle:', err);
+    res.status(500).json({ message: 'Server error fetching vehicle' });
+  }
+});
+
+
+app.delete('/api/vehicles/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Vehicle.findByIdAndDelete(id);
+    res.json({ success: true, message: 'Vehicle deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Delete failed' });
+  }
+});
+
+
+
+app.get('/api/vehicles', async (req, res) => {
   try {
     const vehicles = await Vehicle.find().populate('customerId', 'username');
     res.json(vehicles);
@@ -444,6 +477,45 @@ app.get('/api/vehicles', async (req, res) => {
     res.status(500).json({ message: 'Error fetching vehicles' });
   }
 });
+
+
+app.get('/api/vehicles/customer/:id', async (req, res) => {
+  try {
+    const customerId = req.params.id;
+    console.log("🔍 Fetching cars for customerId:", customerId);
+    const vehicles = await Vehicle.find({ customerId });
+    res.json(vehicles);
+  } catch (err) {
+    console.error('Error fetching customer vehicles:', err);
+    res.status(500).json({ error: 'Failed to fetch vehicles' });
+  }
+});
+
+
+app.put('/api/vehicles/:id', async (req, res) => {
+  try {
+    const updated = await Vehicle.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ success: false, message: 'Vehicle not found' });
+    res.json({ success: true, vehicle: updated });
+  } catch (err) {
+    console.error('Error updating vehicle:', err);
+    res.status(500).json({ success: false, message: 'Server error updating vehicle' });
+  }
+});
+
+app.delete('/api/vehicles/:id', async (req, res) => {
+  try {
+    const vehicleId = req.params.id;
+    await Vehicle.findByIdAndDelete(vehicleId);
+    res.status(200).send({ message: 'Vehicle deleted' });
+  } catch (err) {
+    console.error('DELETE error:', err);
+    res.status(500).send({ error: 'Failed to delete vehicle' });
+  }
+});
+
+
+
 
 // Admin: Get all employees
 app.get('/api/users/employees', async (req, res) => {
@@ -456,16 +528,6 @@ app.get('/api/users/employees', async (req, res) => {
   }
 });
 
-// Admin: Get all vehicles
-app.get('/api/vehicles', async (req, res) => {
-  try {
-    const vehicles = await Vehicle.find().populate('customerId', 'username');
-    res.json(vehicles);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching vehicles' });
-  }
-});
 
 // Admin: Get all employees
 app.get('/api/users/employees', async (req, res) => {
@@ -875,8 +937,8 @@ app.use('/api/reviews', reviewRoutes);
 app.post("/createAppointment", async (req, res) => {
   console.log("📥 Incoming appointment:", req.body);
     // Step 2: Google Calendar API integration
-    const calendar = google.calendar('v3');
-    const auth = getGoogleAuthClient(); // Define this function to get authenticated client
+   // const calendar = google.calendar('v3');
+    // const auth = getGoogleAuthClient(); // Define this function to get authenticated client
 
     const event = {
       summary: `Appointment for ${firstName} ${lastName}`,
@@ -1222,29 +1284,7 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
-app.put('/api/vehicles/:id', async (req, res) => {
-  try {
-    const updatedVehicle = await Vehicle.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedVehicle) {
-      return res.status(404).send({ error: 'Vehicle not found' });
-    }
-    res.send(updatedVehicle);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({ error: 'Internal Server Error' });
-  }
-});
 
-app.delete('/api/vehicles/:id', async (req, res) => {
-  try {
-    const vehicleId = req.params.id;
-    await Vehicle.findByIdAndDelete(vehicleId);
-    res.status(200).send({ message: 'Vehicle deleted' });
-  } catch (err) {
-    console.error('DELETE error:', err);
-    res.status(500).send({ error: 'Failed to delete vehicle' });
-  }
-});
 
 
 
