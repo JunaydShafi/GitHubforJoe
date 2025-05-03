@@ -161,7 +161,7 @@ app.post('/api/vehicles/add', async (req, res) => {
         vehicleId: appointment.vehicleId,
         mechanicId,
         description: appointment.reason,
-        status: 'Assigned',
+        status: 'pending',
         startDate: appointment.date,
         notes: ''
       });
