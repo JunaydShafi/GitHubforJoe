@@ -15,6 +15,8 @@ import bcrypt from "bcrypt";
 import Vehicle from './models/Vehicles.js';
 import nodemailer from 'nodemailer';
 import AppointmentRequest from './models/AppointmentRequest.js';
+import mongoose from 'mongoose';  // <--- ADD this at top if not already there
+
 
 import { readFileSync } from 'fs';
 
@@ -136,6 +138,54 @@ app.post('/api/vehicles/add', async (req, res) => {
       res.status(500).json({ success: false, message: 'Server error' });
     }
   });
+
+  app.post('/api/jobs/create-from-appointment/:appointmentId', async (req, res) => {
+    const { appointmentId } = req.params;
+    const { mechanicId } = req.body;
+  
+    try {
+      const appointment = await AppointmentRequest.findById(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ error: 'Appointment not found' });
+      }
+  
+      const mechanic = await User.findById(mechanicId);
+      if (!mechanic) {
+        return res.status(404).json({ error: 'Mechanic not found' });
+      }
+  
+      const job = new Job({
+        customerId: appointment.customerId ? new mongoose.Types.ObjectId(appointment.customerId) : undefined,
+        vehicleId: appointment.vehicleId,
+        mechanicId,
+        description: appointment.reason,
+        status: 'Assigned',
+        startDate: appointment.date,
+        notes: ''
+      });
+  
+      await job.save();
+  
+      // ✅ Send confirmation email
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: appointment.email,
+        subject: "Your Job Has Been Scheduled - Joe's AutoShop",
+        text: `Hi ${appointment.firstName},\n\nYour appointment for "${appointment.reason}" has been approved and scheduled with our mechanic ${mechanic.username}.\n\nDate: ${appointment.date}\nTime: ${appointment.time}\n\nThanks,\nJoe's AutoShop`
+      });
+  
+      // ✅ Delete the appointment
+      await AppointmentRequest.findByIdAndDelete(appointmentId);
+  
+      res.status(200).json({ message: 'Job created and appointment removed' });
+    } catch (err) {
+      console.error('Job creation error:', err);
+      res.status(500).json({ error: 'Server error during job creation' });
+    }
+  });        
+
+
+//
 
   app.post('/api/set-appointment-time', async (req, res) => {
     const { appointmentId, appointmentDateTime, reason, firstName, lastName, email } = req.body;
@@ -272,6 +322,14 @@ app.get('/api/jobs/customer/:customerId', async (req, res) => {
 });
 app.use('/api/jobs',jobsRoutes);
 
+    res.json(jobs);
+  } catch (err) {
+    console.error('Error fetching customer jobs:', err);
+    res.status(500).json({ error: 'Server error fetching customer jobs' });
+  }
+});
+app.use('/api/jobs',jobsRoutes);
+
 
 // display vehicle make and medel on appointmnets/html
 app.get('/api/appointments', async (req, res) => {
@@ -334,7 +392,7 @@ app.get('/api/payroll/:id/week', async (req, res) => {
     const totalMinutes = jobs.reduce((sum, job) => {
       const start = new Date(job.startDate);
       const end = new Date(job.completedDate);
-      return sum + (end - start) / (1000 * 60);
+      return sum + Math.max(0, (end - start) / (1000 * 60));
     }, 0);
 
     const rate = emp.payroll?.rate || 0;
@@ -354,6 +412,18 @@ app.get('/api/payroll/:id/week', async (req, res) => {
   }
 });
 
+app.get('/api/jobs/:id', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id)
+      .populate('vehicleId')
+      .populate('mechanicId');
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    res.json(job);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error retrieving job' });
+  }
+});
 
 
 
@@ -406,6 +476,16 @@ app.get('/api/users/employees', async (req, res) => {
   }
 });
 
+app.get('/api/appointments/customer/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointments = await AppointmentRequest.find({ customerId: id });
+    res.json(appointments);
+  } catch (err) {
+    console.error('❌ Error fetching customer appointments:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 
@@ -415,10 +495,11 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
     if (!job) return res.status(404).json({ message: 'Job not found' });
 
     job.status = req.body.status;
-    if (req.body.status === 'in progress' && !job.startDate) {
+    if (req.body.status === 'in progress') {
       job.startDate = new Date();
+      job.estimatedMinutes = req.body.estimatedMinutes;
     }
-
+        
     await job.save();
     res.json({ message: 'Status updated', job });
   } catch (err) {
@@ -444,7 +525,7 @@ app.get('/api/payroll/week', async (req, res) => {
     for (const job of jobs) {
       const start = new Date(job.startDate);
       const end = new Date(job.completedDate);
-      const mins = (end - start) / (1000 * 60);
+      const mins = Math.max(0, (end - start) / (1000 * 60));
       const empId = job.mechanicId.toString();
 
       payrollMap[empId] = (payrollMap[empId] || 0) + mins;
@@ -475,15 +556,61 @@ app.get('/api/payroll/week', async (req, res) => {
 
 app.patch('/api/jobs/:id/add-update', async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById(req.params.id)
+      .populate('vehicleId')
+      .populate('mechanicId')
+      .populate('customerId');
+
     if (!job) return res.status(404).json({ message: 'Job not found' });
 
-    if (!req.body.message || req.body.message.trim() === "") {
+    const updateMessage = req.body.message?.trim();
+    if (!updateMessage) {
       return res.status(400).json({ message: 'Update message cannot be empty' });
     }
 
-    job.updates.push({ message: req.body.message });
+    job.updates.push({ message: updateMessage, timestamp: new Date() });
     await job.save();
+
+    // ✅ Look up appointment to get the original email
+    const matchingAppointment = await AppointmentRequest.findOne({
+      customerId: job.customerId?._id,
+      vehicleId: job.vehicleId?._id,
+      reason: job.description
+    });
+
+    const customerEmail = matchingAppointment?.email;
+    const vehicleInfo = `${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}`;
+    const mechanicName = job.mechanicId?.username || 'Your assigned mechanic';
+    const timeSent = new Date().toLocaleString();
+
+    if (customerEmail) {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: customerEmail,
+        subject: `New Update from ${mechanicName} — Joe's AutoShop`,
+        text: `Hello,
+
+You’ve received a new update for your ${vehicleInfo}.
+
+🛠 Mechanic: ${mechanicName}
+🕒 Time: ${timeSent}
+
+📝 Update:
+"${updateMessage}"
+
+Thank you for choosing Joe’s AutoShop!
+
+- Joe's Auto Team`
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('❌ Email sending failed:', error);
+        } else {
+          console.log('📬 Update email sent to customer:', info.response);
+        }
+      });
+    }
 
     res.json({ message: 'Update added successfully', job });
   } catch (err) {
@@ -716,6 +843,7 @@ app.get("/payroll-display", (req, res) => {
   //customerRequestAppointment start----------------
 app.use(express.urlencoded({extended: true}));
 
+
 // Set the appointment date/time and add it to Google Calendar
 app.post('/api/set-appointment-time', async (req, res) => {
   const { appointmentId, vehicle, reason, firstName, lastName, appointmentDateTime } = req.body;
@@ -735,6 +863,14 @@ app.post('/api/set-appointment-time', async (req, res) => {
   import Appointment from "./models/AppointmentRequest.js";
 app.use(express.urlencoded({extended: true}));
 
+import reviewRoutes from './routes/reviews.js';
+app.use('/api/reviews', reviewRoutes);
+
+
+
+
+app.post("/createAppointment", async (req, res) => {
+  console.log("📥 Incoming appointment:", req.body);
     // Step 2: Google Calendar API integration
     const calendar = google.calendar('v3');
     const auth = getGoogleAuthClient(); // Define this function to get authenticated client
@@ -776,6 +912,7 @@ app.use(express.urlencoded({extended: true}));
 //test appointment router
 app.post('/createAppointment', async (req, res) => {
   try {
+
     const { firstName, lastName, email, phone, vehicleId, reason, appointmentDate, comments} = req.body;
     const customerId = req.session?.userId || req.body.customerId;  // ← this is how you get who made it (if you track session)
 

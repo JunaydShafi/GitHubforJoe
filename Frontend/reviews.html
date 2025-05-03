@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Junstyle.css">
-    <title>Reviews</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reviews</title>
+  <link rel="stylesheet" href="/Junstyle.css" />
+
+  <style>
+    .clickable-cell {
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .clickable-cell:hover {
+      background-color: #444;
+    }
+  </style>
 </head>
 <body>
 
@@ -25,23 +36,155 @@
     </div>
   </div>
 
-      <div class="wrapper">
-        <div>
-            <h1>Administator</h1>
-        </div>
-    
-        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+  <div class="review-wrapper">
+    <h2>Submitted Reviews</h2>
 
-        <div>
-            <p>Recent Reviews</p>
-        </div>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+      <select id="sortOptions" class="dropdown-button" onchange="handleSortChange()">
+        <option value="">Sort</option>
+        <option value="high"> High to Low</option>
+        <option value="low"> Low to High</option>
+        <option value="alpha"> Alphabetical</option>
+      </select>
+      
+      <select id="mechanicFilter" class="dropdown-button" onchange="filterByMechanic()">
+        <option value="all">Show All Mechanics</option>
+      </select>
+    </div>
 
-        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+    <div id="reviewsContent">
+      <table class="review-table">
+        <thead>
+          <tr>
+            <th>Mechanic</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Rating</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody id="reviewsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
 
-        <div><div><textarea name="" rows="5"placeholder="5/5 I loved the work they did to my 2003 Nissan Fronter, Definetly coming back!"></textarea></div></div>
-        <div>
-            <button class="bottomLeftCenter" type= "button" onclick="history.back()">Back</button>
-        </div>
-      </div>
+  <div id="jobModal" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%);
+  background-color: #2e302b; color: white; border:1px solid #ccc; padding:20px; z-index:1000; max-width:400px; border-radius:8px; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+    <div id="jobModalContent"></div>
+    <button onclick="document.getElementById('jobModal').style.display='none'" 
+      style="margin-top:10px; padding: 5px 10px; background:#ddd; color:#000; border:none; border-radius:4px; cursor:pointer;">
+      Close
+    </button>
+  </div>
+
+  <script>
+    let allReviews = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/api/reviews');
+        const reviews = await res.json();
+
+        allReviews = reviews;
+        populateMechanicDropdown(reviews);
+        renderReviews(reviews);
+      } catch (err) {
+        console.error('Failed to load reviews:', err);
+        document.getElementById('reviewsContent').innerHTML = '<p class="no-reviews">Error loading reviews.</p>';
+      }
+    });
+
+    function renderReviews(reviews) {
+      const tableBody = document.getElementById('reviewsTableBody');
+      tableBody.innerHTML = '';
+
+      reviews.forEach(r => {
+        const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+        const date = new Date(r.createdAt).toLocaleDateString();
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <span class="clickable-cell" title="Click to view job details"
+              onclick='showJobDetails(${JSON.stringify(r.jobId || {})})'>
+              ${r.mechanicId?.username || r.mechanicId || 'Unknown'}
+            </span>
+          </td>
+          <td>${r.customerName || 'Unknown'}</td>
+          <td>${date}</td>
+          <td style="color: gold;">${stars} (${r.stars}/5)</td>
+          <td>${r.comment || 'No comment'}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function showJobDetails(job) {
+      const container = document.getElementById('jobModalContent');
+
+      const updates = job.updates?.map(u =>
+        `<li>"${u.message}" — ${new Date(u.timestamp || u.date).toLocaleString()}</li>`
+      ).join('') || '<li>No mechanic notes</li>';
+
+      container.innerHTML = `
+        <p><strong>Status:</strong> ${job.status || 'N/A'}</p>
+        <p><strong>Description:</strong> ${job.description || 'N/A'}</p>
+        <p><strong>Start:</strong> ${new Date(job.startDate).toLocaleString()}</p>
+        <p><strong>Completed:</strong> ${new Date(job.completedDate).toLocaleString()}</p>
+        <p><strong>Vehicle:</strong> ${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</p>
+        <p><strong>Mechanic Notes:</strong></p>
+        <ul>${updates}</ul>
+      `;
+
+      document.getElementById('jobModal').style.display = 'block';
+    }
+
+    function populateMechanicDropdown(reviews) {
+      const select = document.getElementById('mechanicFilter');
+      const uniqueMechanics = [...new Set(reviews.map(r => r.mechanicId?.username || r.mechanicId || 'Unknown'))];
+
+      uniqueMechanics.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+    }
+
+    function handleSortChange() {
+      const sortBy = document.getElementById('sortOptions').value;
+      if (sortBy) sortReviews(sortBy);
+    }
+
+    function filterByMechanic() {
+      const selected = document.getElementById('mechanicFilter').value;
+      if (selected === 'all') {
+        renderReviews(allReviews);
+      } else {
+        const filtered = allReviews.filter(r =>
+          (r.mechanicId?.username || r.mechanicId || 'Unknown') === selected
+        );
+        renderReviews(filtered);
+      }
+    }
+
+    function sortReviews(criteria) {
+      let sorted = [...allReviews];
+
+      if (criteria === 'high') {
+        sorted.sort((a, b) => b.stars - a.stars);
+      } else if (criteria === 'low') {
+        sorted.sort((a, b) => a.stars - b.stars);
+      } else if (criteria === 'alpha') {
+        sorted.sort((a, b) => {
+          const nameA = (a.customerName || '').toLowerCase();
+          const nameB = (b.customerName || '').toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      }
+
+      renderReviews(sorted);
+    }
+  </script>
 </body>
 </html>

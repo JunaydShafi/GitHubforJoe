@@ -1,43 +1,62 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/Junstyle.css">
-        <title>Upcoming Appointment</title>
-    </head>
-    <body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
+  <title>Upcoming Appointment</title>
+</head>
+<body>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
+    </div>
+  </div>
 
-        <div class="header-main"><!--this is for the top footer of the page-->
-            <div class="logo">
-              <img src="images/WhiteLogo.png" alt="Logo">
-            </div>
-            <div class = "Title">
-              <div class="title-container">
-                  <div class="shop-name">Joe's AutoShop</div>
-                  <div class="tagline">If it ain't Joe don't fix it!</div>
-              </div>
-                <div class="account-box-left">
-                    <button onclick="location.href='index.html'">Log Out</button>
-                </div>
-            </div>
-          </div>
+  <div class="wrapper">
+    <h1>Upcoming Appointments:</h1>
+    <div id="appointmentInfo"></div>
+    <button class="bottomLeftCenter" type="button" onclick="history.back()">Back</button>
+  </div>
 
-        <div class="wrapper">
-            <h1>Vehicle: [vehicle]</h1>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return alert("Please log in.");
 
-            <h1>&nbsp;</h1><!--Used to space the wrappers-->
+      try {
+        const res = await fetch(`/api/appointments/customer/${userId}`);
+        const appointments = await res.json();
 
-        <p>Appointment set for x/x/x at xx:xx</p>
-        <div id="root"></div>
+        const upcoming = appointments.find(appt => appt.status === 'pending');
+        const container = document.getElementById('appointmentInfo');
 
-        <h3>Reason for appointment:</h3>
-        <!--insert user's reason text box here-->
-        <div><textarea name="" placeholder=""></textarea></div>
-        
-            <button class ="bottomLeftCenter" type= "button" onclick="history.back()">Back</button>
+        if (!upcoming) {
+          container.innerHTML = '<p>No upcoming appointment found.</p>';
+          return;
+        }
 
-
-        </div>
-    </body>
+        const date = new Date(upcoming.date);
+        container.innerHTML = `
+          <h2>Vehicle: ${upcoming.vehicleId || 'Unknown'}</h2>
+          <p>Appointment set for ${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          <h3>Reason for appointment:</h3>
+          <div><textarea readonly>${upcoming.reason || 'No reason provided.'}</textarea></div>
+        `;
+      } catch (err) {
+        console.error('Error loading appointment:', err);
+        document.getElementById('appointmentInfo').innerHTML = '<p>Error loading appointment.</p>';
+      }
+    });
+  </script>
+</body>
 </html>

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const jobSchema = new mongoose.Schema({
   customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  customerName: String,    // 🔥 <-- add this line
   vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' },
   mechanicId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: String,
@@ -9,6 +10,9 @@ const jobSchema = new mongoose.Schema({
   comments: String,
   startDate: Date,
   completedDate: Date,
+  estimatedMinutes: {
+    type: Number,
+  },
   updates: [
     {
       message: String,

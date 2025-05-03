@@ -45,6 +45,7 @@
       try {
         const res = await fetch('/api/appointments');
         const data = await res.json();
+
 /*<<<<<<< OutlawBranch
         const dropdown = document.getElementById('appointmentDropdown');
         dropdown.innerHTML = '<option value="">-- Select an Appointment --</option>'; // Reset dropdown
@@ -65,6 +66,10 @@
           const dateObj = new Date(appointment.date);
           const formattedDate = isNaN(dateObj) ? "Invalid Date" : dateObj.toLocaleString();
 
+          const div = document.createElement('div');
+          div.className = 'account-box';
+          div.id = `appointment-${appointment._id}`;
+
 /*<<<<<<< OutlawBranch
           // Create the appointment card dynamically and store it
           const div = document.createElement('div');
@@ -79,6 +84,20 @@
               <p><strong>Phone:</strong> ${appointment.phone}</p>
               <p><strong>Reason:</strong> ${appointment.reason}</p>
               <p><strong>Vehicle ID:</strong> ${appointment.vehicleId}</p>
+              <label for="mechanicSelect-${appointment._id}"><strong>Select Mechanic:</strong></label><br>
+              <select id="mechanicSelect-${appointment._id}" style="margin-bottom: 10px;"></select><br>
+              <button onclick="approveAppointment('${appointment._id}')" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Approve</button>
+              <button onclick="deny('${appointment._id}', this.closest('.account-box'))" style="background-color: #FFD700; color: black; padding: 5px 10px; border: none; border-radius: 5px;">Deny</button>
+            </div>
+          `;
+
+          container.appendChild(div);
+        });
+
+        populateMechanics();
+      } catch (err) {
+        console.error('Error fetching appointments:', err);
+
             </div>
           `;
 
@@ -146,6 +165,7 @@
 */
     // Toggle the details view
 
+
           const div = document.createElement('div');
           div.className = 'account-box';
           div.id = `appointment-${appointment._id}`;
@@ -180,6 +200,7 @@
       const details = button.nextElementSibling;
       details.style.display = details.style.display === 'none' ? 'block' : 'none';
     }
+
 
     function approve(id, vehicle, reason, date, time, firstName, lastName) {
   const confirmed = confirm(`Are you sure you want to approve this appointment for ${firstName}?`);
@@ -243,7 +264,6 @@
         alert('Error denying appointment.');
       });
     }
-
 
     async function populateMechanics() {
       try {

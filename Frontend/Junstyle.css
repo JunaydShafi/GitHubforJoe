@@ -212,6 +212,15 @@ form div.incorrect input{
     margin: 10px 0;            /* Adds space above and below */
     color:white;
 }
+/* Enhance account-box inside Swiper slides */
+.swiper-slide .account-box {
+    width: 100%;
+    max-width: 320px;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    margin: 1rem auto;
+  }
+  
 
 .account-box button {
     background-color: #2e302b; /* grey backround button */
@@ -611,6 +620,134 @@ form select:focus {
   #updateHistoryModal button:hover {
     background-color: #666;
   }
+  #pastJobs {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  #pastJobs .account-box {
+    margin: 4px 0; /* 🔽 Adjust vertical spacing between buttons */
+  }
+  #pastJobs .account-box {
+    cursor: pointer;
+  }
+  #upcomingAppointments .account-box:hover {
+    cursor: pointer;
+  }
+  .section-group {
+    margin-bottom: 10px; /* or adjust smaller if needed */
+  }
+  /* Review Page Styles */
+.review-wrapper {
+    width: 90%;
+    max-width: 1000px;
+    margin: 140px auto 60px auto;
+    background-color: rgba(26, 99, 70, 0.9);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px black;
+    color: white;
+  }
+  
+  .review-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    font-family: Poppins, sans-serif;
+  }
+  
+  .review-table th,
+  .review-table td {
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: left;
+    word-break: break-word;
+  }
+  
+  .review-table th {
+    background-color: #1a6346;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .no-reviews {
+    color: white;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  #reviewControls {
+    margin-bottom: 1rem;
+  }
+  
+  #reviewControls button,
+  #reviewControls select {
+    margin-right: 10px;
+    padding: 8px 14px;
+    background-color: #2e302b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: Poppins, sans-serif;
+  }
+  
+  #reviewControls button:hover,
+  #reviewControls select:hover {
+    background-color: #0056b3;
+  }
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-button {
+    background-color: #222; /* match your other buttons */
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: inherit;
+  }
+  
+  .dropdown-button:hover {
+    background-color: #444;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+  }
+  
+  .dropdown-content a {
+    color: white;
+    padding: 10px 14px;
+    display: block;
+    text-decoration: none;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #555;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  #progressBarFill {
+    transition: width 0.5s ease-in-out;
+  }
+  
+
 
   /** Scrool box for customerJobsProfile**/
   .scroll-box {

@@ -98,6 +98,7 @@
   
     document.addEventListener('DOMContentLoaded', async () => {
       const employeeId = localStorage.getItem('userId');
+
       const token = localStorage.getItem('authToken'); // 🔥 GET the token
       const hideCheckbox = document.getElementById('hideCompleted');
   
@@ -107,7 +108,8 @@
       }
   
       try {
-        const res = await fetch(`/api/jobs/employee/${employeeId}`, {   // 🔥 ADD token in request
+        const res = await fetch(`/api/jobs/employee/${employeeId}`, {
+
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -166,6 +168,7 @@
       const formatDate = (date) => date ? new Date(date).toLocaleString() : 'Not recorded';
 
       details.innerHTML = `
+
     <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
 <p><strong>Customer:</strong> ${job.customerId?.name || 'Unknown'}</p>
     <p><strong>Reason:</strong> ${job.description}</p>
@@ -188,7 +191,13 @@
       <button class="job-start-btn" onclick="startJob('${job._id}')">Start Job</button>
       <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
     </div>
-  `;
+  `;    }
+
+    let selectedJobId = null;
+
+function startJob(jobId) {
+  selectedJobId = jobId;
+  document.getElementById('estimateModal').style.display = 'flex';
 }
 async function startJob(jobId) {
   try {
@@ -201,8 +210,7 @@ async function startJob(jobId) {
       },
       body: JSON.stringify({ status: 'in progress' })
     });
-
-    const data = await res.json();
+  const data = await res.json();
     if (res.ok) {
       alert("Job started successfully!");
       location.reload();
@@ -215,7 +223,49 @@ async function startJob(jobId) {
   }
 }
 
+    function closeEstimateModal() {
+  document.getElementById('estimateModal').style.display = 'none';
+  selectedJobId = null;
+}
 
+async function confirmEstimate() {
+  const token = localStorage.getItem('authToken');
+  const hours = parseInt(document.getElementById('estimateHours').value, 10) || 0;
+  const minutes = parseInt(document.getElementById('estimateMinutes').value, 10) || 0;
+  const totalMinutes = (hours * 60) + minutes;
+
+  if (!selectedJobId || totalMinutes <= 0) {
+    alert("Please enter a valid estimated time.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/jobs/${selectedJobId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({
+        status: 'in progress',
+        estimatedMinutes: totalMinutes
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      closeEstimateModal();
+      alert("Job started successfully!");
+      location.reload();
+    } else {
+      alert(data.message || "Failed to start job.");
+    }
+  } catch (err) {
+    console.error("Error starting job:", err);
+    alert("Server error starting job.");
+  }
+}
+//
 
 async function markComplete(jobId) {
   const notes = document.getElementById(`notes-${jobId}`).value;
@@ -250,6 +300,7 @@ async function markComplete(jobId) {
     async function addUpdate(jobId) {
       const textarea = document.getElementById(`notes-${jobId}`);
       const updateText = textarea.value.trim();
+      const token = localStorage.getItem('authToken');
 
       if (!updateText) {
         alert("Please enter an update.");
@@ -260,7 +311,8 @@ async function markComplete(jobId) {
         const res = await fetch(`/api/jobs/${jobId}/add-update`, {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ message: updateText })
         });
@@ -279,37 +331,62 @@ async function markComplete(jobId) {
         alert("Failed to add update.");
       }
     }
+
     function showUpdateHistory(updates) {
-  const list = document.getElementById('updateList');
-  list.innerHTML = '';
+      const list = document.getElementById('updateList');
+      list.innerHTML = '';
 
-  if (updates.length === 0) {
-    list.innerHTML = '<li>No update history found.</li>';
-  } else {
-    updates.forEach(update => {
-      const item = document.createElement('li');
-      const time = new Date(update.timestamp || update.date || Date.now()).toLocaleString();
-      item.textContent = `"${update.message}" — ${time}`;
-      list.appendChild(item);
-    });
-  }
+      if (updates.length === 0) {
+        list.innerHTML = '<li>No update history found.</li>';
+      } else {
+        updates.forEach(update => {
+          const item = document.createElement('li');
+          const time = new Date(update.timestamp || update.date || Date.now()).toLocaleString();
+          item.textContent = `"${update.message}" — ${time}`;
+          list.appendChild(item);
+        });
+      }
 
-  document.getElementById('modalOverlay').style.display = 'block';
-  document.getElementById('updateHistoryModal').style.display = 'block';
-}
+      document.getElementById('modalOverlay').style.display = 'block';
+      document.getElementById('updateHistoryModal').style.display = 'block';
+    }
 
-function closeUpdateHistory() {
-  document.getElementById('modalOverlay').style.display = 'none';
-  document.getElementById('updateHistoryModal').style.display = 'none';
-}
-
+    function closeUpdateHistory() {
+      document.getElementById('modalOverlay').style.display = 'none';
+      document.getElementById('updateHistoryModal').style.display = 'none';
+    }
   </script>
-  <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.5); z-index:1000;" onclick="closeUpdateHistory()"></div>
 
+  <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.5); z-index:1000;" onclick="closeUpdateHistory()"></div>
   <div id="updateHistoryModal" class="update-modal">
     <h3>Update History</h3>
     <ul id="updateList" style="padding-left: 20px;"></ul>
     <button onclick="closeUpdateHistory()" style="margin-top: 15px; padding: 5px 15px;">Close</button>
   </div>
+  <!-- Estimated Time Modal -->
+<!-- Estimated Time Modal -->
+<!-- Estimated Time Modal -->
+<div id="estimateModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#2e302b; padding:25px 30px; border-radius:12px; text-align:center; box-shadow:0 0 10px rgba(0,0,0,0.5); min-width:300px; color:white;">
+    <h3 style="margin-bottom: 15px;">Enter Estimated Job Time</h3>
+    <div style="margin-bottom: 15px;">
+      <label>
+        <input type="number" id="estimateHours" min="0" value="0" style="width:60px; padding:5px; border:none; border-radius:5px; background:#444; color:white;"> hr
+      </label>
+      &nbsp;
+      <label>
+        <input type="number" id="estimateMinutes" min="0" max="59" value="30" style="width:60px; padding:5px; border:none; border-radius:5px; background:#444; color:white;"> min
+      </label>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 10px;">
+      <button onclick="confirmEstimate()" style="background-color: #1a6346; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+        Start Job
+      </button>
+      <button onclick="closeEstimateModal()" style="background-color: #666; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
