@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="/Junstyle.css" />
+  <title>Set Appointment Time</title>
+  <style>
+    /* Basic form layout styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .wrapperAdmin {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      flex-grow: 1; /* Allow the wrapper to take up remaining space */
+    }
+
+    .appointments-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    /* Styling for the form */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    label {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 8px;
+      color: black;
+    }
+
+    label:focus-within {
+      color: black;
+    }
+
+    label[for="appointmentDate"], label[for="appointmentTime"] {
+      font-size: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 5px;
+    }
+
+    .form-group input {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button[type="submit"] {
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      align-self: center;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #444;
+    }
+
+    .confirmation-message {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Styling for Google Calendar */
+    #calendar {
+      margin-top: 30px;
+      background-color: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    #calendar div {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #e0e0e0;
+    }
+
+    button.select-event-btn {
+      background-color: #007bff;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button.select-event-btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Always visible Google Calendar Button */
+    #openCalendarBtn {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4285F4;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      width: auto;
+    }
+
+    #openCalendarBtn:hover {
+      background-color: #357ae8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+        <button onclick="location.href='adminMain.html'">Main Page</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapperAdmin">
+    <div class="appointments-container">
+      <h2>Set Appointment Time</h2>
+      <form id="appointmentForm">
+        <div class="form-group">
+          <div class="form-item">
+            <label for="appointmentDate">Select Appointment Date:</label>
+            <input type="date" id="appointmentDate" name="appointmentDate" required>
+          </div>
+          
+          <div class="form-item">
+            <label for="appointmentTime">Select Appointment Time:</label>
+            <input type="time" id="appointmentTime" name="appointmentTime" required>
+          </div>
+        </div>
+
+        <button type="submit">Confirm Appointment</button>
+      </form>
+
+      <div id="confirmationMessage" class="confirmation-message"></div>
+    </div>
+  </div>
+
+  <!-- Display Google Calendar events -->
+  <div id="calendar"></div>
+
+  <!-- Button to open Google Calendar -->
+  <div>
+    <a href="https://calendar.google.com/calendar/u/0/r?tab=mc" target="_blank">
+      <button id="openCalendarBtn">Open Google Calendar</button>
+    </a>
+  </div>
+
+<script>
+  // Fetch calendar events from the backend
+  async function fetchCalendarEvents() {
+    const res = await fetch('/api/calendar/events');
+    const events = await res.json();
+    const calendarContainer = document.getElementById('calendar');
+    
+    events.forEach(event => {
+      const eventElement = document.createElement('div');
+      eventElement.innerHTML = ` 
+        <p><strong>${event.summary}</strong></p>
+        <p>${new Date(event.start.dateTime).toLocaleString()}</p>
+        <button class="select-event-btn" onclick="selectEvent('${event.id}')">Select Event</button>
+      `;
+      calendarContainer.appendChild(eventElement);
+    });
+  }
+
+  function selectEvent(eventId) {
+    // Here you can populate the appointment form based on the selected event
+    // For now, just alert the event ID
+    alert('Event selected: ' + eventId);
+  }
+
+  // Fetch Google Calendar events when page loads
+  fetchCalendarEvents();
+
+  // Get query params passed from the previous page
+  const urlParams = new URLSearchParams(window.location.search);
+  const appointmentId = urlParams.get('appointmentId');
+  const vehicle = urlParams.get('vehicle');
+  const reason = urlParams.get('reason');
+  const firstName = urlParams.get('firstName');
+  const lastName = urlParams.get('lastName');
+
+  // Handle form submission
+  const form = document.getElementById('appointmentForm');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const appointmentDate = document.getElementById('appointmentDate').value;
+    const appointmentTime = document.getElementById('appointmentTime').value;
+
+    if (!appointmentDate || !appointmentTime) {
+      alert("Please select both date and time.");
+      return;
+    }
+
+    const appointmentDateTime = `${appointmentDate}T${appointmentTime}:00`;
+
+    // Send the data to the server to update the appointment and Google Calendar
+    try {
+      const res = await fetch('/api/set-appointment-time', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appointmentId,
+          vehicle,
+          reason,
+          firstName,
+          lastName,
+          appointmentDateTime
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('confirmationMessage').innerText = "Appointment confirmed and added to Google Calendar!";
+      } else {
+        document.getElementById('confirmationMessage').innerText = "Error: Could not save appointment.";
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      document.getElementById('confirmationMessage').innerText = "Error: Could not save appointment.";
+    }
+  });
+</script>
+
+</body>
+</html>

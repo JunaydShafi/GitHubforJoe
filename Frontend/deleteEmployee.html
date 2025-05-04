@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/Junstyle.css">
+        <title>Delete Employee</title>
+      </head>
+<body>
+
+    <style>.wrapper h2 {
+        text-align: center;
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+      
+      /* Label styling */
+      .wrapper label {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: block;
+        text-align: center;
+      }
+      
+      /* Dropdown styling */
+      #employeeSelect {
+        display: block;
+        margin: 0 auto;
+        width: 300px;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+      }
+      
+      /* Button box styling */
+      .account-box {
+        text-align: center;
+        margin-top: 20px;
+      }
+      
+      .account-box button {
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 10px;
+        background-color: #2e302b;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      
+      .account-box button:hover {
+        background-color: #0056b3;
+      }</style>
+    <div class="header-main">
+        <div class="logo">
+          <img src="images/WhiteLogo.png" alt="Logo">
+        </div>
+        <div class="Title">
+          <div class="title-container">
+            <div class="shop-name">Joe's AutoShop</div>
+            <div class="tagline">If it ain't Joe don't fix it!</div>
+          </div>
+          <div class="account-box-left">
+            <button onclick="location.href='index.html'">Log Out</button>
+            <button onclick="location.href='adminMain.html'">Main Page</button>
+          </div>
+        </div>
+      </div>
+    
+
+      <div class="wrapper">
+        <h2>Delete Employee or Admin</h2>
+        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+        <label for="employeeSelect">Select Employee/Admin:</label>
+        <select id="employeeSelect">
+          <option value="">-- Select a user --</option>
+        </select>
+        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+        <div class="account-box">
+            <button onclick="deleteUser()">Delete Selected User</button>
+        </div>
+      </div>
+
+
+      <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+          const select = document.getElementById('employeeSelect');
+        
+          try {
+            const res = await fetch('/api/users');
+            const users = await res.json();
+        
+            const filtered = users.filter(user =>
+              user.role === 'employee' || user.role === 'admin'
+            );
+        
+            filtered.forEach(user => {
+  const option = document.createElement('option');
+  option.value = user._id;
+  option.textContent = `${user.username} (${user.role})`;
+  select.appendChild(option);
+});
+          } catch (err) {
+            alert('Failed to load users.');
+            console.error(err);
+          }
+        });
+        
+        async function deleteUser() {
+          const userId = document.getElementById('employeeSelect').value;
+          if (!userId) return alert('Please select a user.');
+        
+          if (!confirm('Are you sure you want to delete this user?')) return;
+        
+          try {
+            const res = await fetch(`/api/users/${userId}`, {
+              method: 'DELETE',
+            });
+        
+            if (res.ok) {
+              alert('User deleted successfully.');
+              location.reload();
+            } else {
+              const err = await res.text();
+              alert(`Failed to delete user: ${err}`);
+            }
+          } catch (err) {
+            console.error(err);
+            alert('An error occurred while deleting the user.');
+          }
+        }
+        </script>
+</body>
+</html>
+

@@ -1,75 +1,159 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/Junstyle.css">
-        <title>Request Appointment</title>
-    </head>
-    <body>
-        <div class="header-main"><!--this is for the top footer of the page-->
-            <div class="logo">
-              <img src="images/WhiteLogo.png" alt="Logo">
-            </div>
-            <div class = "Title">
-              <div class="title-container">
-                  <div class="shop-name">Joe's AutoShop</div>
-                  <div class="tagline">If it ain't Joe don't fix it!</div>
-              </div>
-                <div class="account-box-left">
-                    <button onclick="location.href='index.html'">Log Out</button>
-                </div>
-            </div>
-          </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Junstyle.css">
+    <title>Request Appointment</title>
+    <style>
+        /* Wider dropdown for Reason for Appointment */
+        select#reason {
+            width: 250px; /* Adjust width here */
+        }
 
-        <div class ="wrapper">
-            <h1>Request Appointment</h1>
+        /* Shorten height of dropdowns */
+        select {
+            height: 20px; /* Adjust height as needed */
+        }
 
-            <form action="createAppointment" method="post" id="appointmentForm">
-                <input type="text" name="firstName" placeholder="First Name" required />
-                <input type="text" name="lastName" placeholder="Last Name" required />
-                <input type="email" name="email" placeholder="Email" required />
-                <input type="tel" name="phone" placeholder="Phone Number" required />
-                
-                <select name="vehicleId" id="vehicleDropdown" required>
-                    <option value="" disabled selected>Select your vehicle</option>
-                    <!-- Future dynamic options go here -->
-                    <option value="test-vehicle">Test Vehicle</option>
-                  </select>
-
-
-                  <div class="input-icon-wrapper"><!--This is for the time api box-->
-                    <input
-                      type="datetime-local"
-                      class="form-input with-icon"
-                      name="appointmentDate"
-                      id="appointmentDate"
-                      required
-                    />
-                    <span class="icon-inside">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#555" height="20px" width="20px">
-                        <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
-                      </svg>
-                    </span>
-                  </div>
-                  
-              <!-- <div class="date-wrapper">
-                    <label for="appointmentDate" class="calendar-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f">
-                        <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
-                      </svg>
-                    </label>
-                    <input type="date" class="form-input date-input" name="appointmentDate" id="appointmentDate" required />
-                  </div>-->
-                  
-   
-                <textarea name="reason" placeholder="Reason for appointment..." required></textarea>
-                <button type="submit">Submit</button>
-              </form>
-            
-              <script></script>
+        /* Adjust height for input fields if desired */
+        input {
+            height: 20px; /* Optional: Adjust height of input fields */
+        }
+    </style>
+</head>
+<body>
+    <div class="header-main">
+        <div class="logo">
+          <img src="images/WhiteLogo.png" alt="Logo" />
         </div>
+        <div class="Title">
+          <div class="title-container">
+            <div class="shop-name">Joe's AutoShop</div>
+            <div class="tagline">If it ain't Joe don't fix it!</div>
+          </div>
+          <div class="account-box-left">
+            <button onclick="location.href='index.html'">Log Out</button>
+            <button onclick="location.href='customerMainPage.html'">Main Page</button>
+          </div>
+        </div>
+      </div>
 
-        
-    </body>
+    <div class="wrapper">
+        <h1>Request Appointment</h1>
+
+        <form id="appointmentForm">
+            <input type="text" name="firstName" placeholder="First Name" required />
+            <input type="text" name="lastName" placeholder="Last Name" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <input type="tel" name="phone" placeholder="Phone Number" required />
+
+            <select name="vehicleId" id="vehicleDropdown" required>
+                <option value="" disabled selected>Select your vehicle</option>
+            </select>
+
+            <div class="input-icon-wrapper">
+                <input
+                    type="datetime-local"
+                    class="form-input with-icon"
+                    name="appointmentDate"
+                    id="appointmentDate"
+                    required
+                />
+                <span class="icon-inside">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#555" height="20px" width="20px">
+                        <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
+                    </svg>
+                </span>
+            </div>
+
+            <!-- Dropdown for reason -->
+            <select name="reason" id="reason" required>
+                <option value="" disabled selected>Reason for appointment</option>
+                <option value="Oil change">Oil change: $30-$100</option>
+                <option value="Check engine light on">Check engine light on: $50-$130</option>
+                <option value="Brakes">Brakes: $300-$700</option>
+                <option value="Tire change / rotation">Tire change / rotation: $20-$50</option>
+                <option value="Smog check">Smog check: $30-$70</option>
+                <option value="Alignment">Alignment: $50-$175</option>
+                <option value="Air conditioner / refill">Air conditioner / refill: $150-$340</option>
+                <option value="Other">Other: Call For Price</option>
+            </select>
+
+            <!-- Textarea for additional comments -->
+            <textarea name="comments" id="comments" rows="2" placeholder="Any additional comments?"></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            alert("Please log in first.");
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/vehicles');
+            const vehicles = await res.json();
+
+            const dropdown = document.getElementById('vehicleDropdown');
+            dropdown.innerHTML = '<option value="">-- Select your vehicle --</option>';
+
+            const userVehicles = vehicles.filter(v => (v.customerId?._id || v.customerId) === userId);
+
+            userVehicles.forEach(vehicle => {
+                const option = document.createElement('option');
+                option.value = vehicle._id;
+                option.textContent = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+                dropdown.appendChild(option);
+            });
+
+            if (userVehicles.length === 0) {
+                const noVehicleOption = document.createElement('option');
+                noVehicleOption.textContent = 'No vehicles found. Please add one first.';
+                noVehicleOption.disabled = true;
+                dropdown.appendChild(noVehicleOption);
+            }
+        } catch (err) {
+            console.error('Error fetching vehicles:', err);
+        }
+
+        document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                firstName: document.querySelector('[name="firstName"]').value,
+                lastName: document.querySelector('[name="lastName"]').value,
+                email: document.querySelector('[name="email"]').value,
+                phone: document.querySelector('[name="phone"]').value,
+                vehicleId: document.querySelector('[name="vehicleId"]').value,
+                appointmentDate: document.querySelector('[name="appointmentDate"]').value,
+                reason: document.querySelector('[name="reason"]').value,
+                comments: document.querySelector('[name="comments"]').value,
+                customerId: userId
+            };
+
+            try {
+                const response = await fetch('/createAppointment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Appointment request sent!');
+                    window.location.href = '/customerMainPage';
+                } else {
+                    alert('Failed to create appointment');
+                }
+            } catch (err) {
+                console.error('Error sending appointment:', err);
+            }
+        });
+    });
+    </script>
+</body>
 </html>

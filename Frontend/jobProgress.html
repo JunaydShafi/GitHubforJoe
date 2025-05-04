@@ -1,54 +1,58 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/Junstyle.css">
-        <title>Job Progress</title>
-    </head>
-    <body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/Junstyle.css">
+  <title>Job Progress</title>
+</head>
+<body>
 
-        <div class="header-main"><!--this is for the top footer of the page-->
-            <div class="logo">
-              <img src="images/WhiteLogo.png" alt="Logo">
-            </div>
-            <div class = "Title">
-              <div class="title-container">
-                  <div class="shop-name">Joe's AutoShop</div>
-                  <div class="tagline">If it ain't Joe don't fix it!</div>
-              </div>
-                <div class="account-box-left">
-                    <button onclick="location.href='index.html'">Log Out</button>
-                </div>
-            </div>
-          </div>
+  <div class="header-main">
+    <div class="logo">
+      <img src="images/WhiteLogo.png" alt="Logo">
+    </div>
+    <div class="Title">
+      <div class="title-container">
+        <div class="shop-name">Joe's AutoShop</div>
+        <div class="tagline">If it ain't Joe don't fix it!</div>
+      </div>
+      <div class="account-box-left">
+        <button onclick="location.href='index.html'">Log Out</button>
+      </div>
+    </div>
+  </div>
 
-        <div class = "wrapper">
-            <h3>Job: [Vehicle and start data]  &nbsp; Status: [in progress]</h3>
-        <h4>Date Started: xx/xx/xx</h4>
+  <div class="wrapper" id="jobWrapper">
+    <h3 id="jobHeader">Job: [Vehicle and start data] &nbsp; Status: [in progress]</h3>
+    <h4 id="dateStarted">Date Started: xx/xx/xx</h4>
 
-        <h1>&nbsp;</h1><!--Used to space the wrappers-->
+    <h1>&nbsp;</h1>
 
-        <h3>Vehicle Info</h3>
-        <!--add autofill textbox with vehicle info here-->
-        <div><textarea name="" placeholder=""></textarea></div>
+    <h3>Vehicle Info</h3>
+    <div><textarea id="vehicleInfo" readonly></textarea></div>
 
-        <h3>Initial Appointment Request</h3>
-        <!--add autofill textbox with appointment request info here-->
-        <div><textarea name="" placeholder=""></textarea></div>
+    <h3>Initial Appointment Request</h3>
+    <div><textarea id="appointmentInfo" readonly></textarea></div>
 
-        <h3>Mechanic Assigned:</h3>
-        <div><textarea name="" placeholder="[Mechanic Profile]"></textarea></div>
-    
-        <h3>Mechanic Notes:</h3>
-        <!--add mechanic notes textbox here-->
-        <div><textarea name="" placeholder=""></textarea></div>
+    <h3>Mechanic Assigned:</h3>
+    <div><textarea id="mechanicInfo" readonly></textarea></div>
 
-        <h3>Estimated Time Until Job Completion: xx:xx</h3>
+    <h3>Mechanic Notes:</h3>
+    <div><textarea id="mechanicNotes" readonly></textarea></div>
 
-            <button class="bottomLeftCenter" type= "button" onclick="history.back()">Back</button>
-        
 
-        </div>
-    </body>
+    <h3>Job Progress:</h3>
+    <div id="progressBarContainer" style="width: 100%; background-color: #ddd; height: 25px; border-radius: 10px; overflow: visible;">
+        <div id="progressBarFill" style="height: 100%; width: 0%; background-color: #4CAF50; text-align: center; color: white; line-height: 25px;">0%</div>
+    </div>
+    <p id="progressStatus" style="margin-top: 5px;"></p>
+
+
+    <button class="bottomLeftCenter" type="button" onclick="history.back()">Back</button>
+  </div>
+
+  <script src="./js/jobProgress.js"></script>
+</body>
+
 </html>
