@@ -791,3 +791,109 @@ form select:focus {
     max-width: 800px;
     margin: 0 auto;
   }
+
+  /* Style the modal background */
+  .modal-content {
+    background-color: rgba(26, 99, 70, 0.9) !important;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+/* Style the input fields */
+.modal-content input {
+  background-color: #fff; /* White background for input fields */
+  color: black; /* Black text in input fields */
+  border: 1px solid #ccc; /* Light gray border */
+  padding: 5px;
+  border-radius: 4px;
+}
+
+/* Style the buttons */
+.modal-content button {
+  background-color: #2e302b; /* Set button background color to #2e302b */
+  color: white; /* Set button text to white */
+  border: none; /* Remove border */
+  padding: 10px 20px;
+  margin-top: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  background-color: #353735; /* Slightly darker button on hover */
+}
+
+/*for view history in customerJobView*/
+
+
+#updateList {
+  list-style: none;
+  padding: 0;
+}
+#updateList li {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+/* Fullscreen dark background overlay */
+#modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none; /* Hidden by default */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal content box */
+#modalOverlay .modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Show the modal */
+#modalOverlay.show {
+  display: flex;
+}
+
+/*verticle scroolbar fpr customerJobs*/
+.scroll-horizontal-past {
+  display: flex;               /* Flex container */
+  flex-direction: row;         /* Align items horizontally */
+  justify-content: flex-start; /* Align items to the left */
+  overflow-x: auto;            /* Enable horizontal scrolling */
+  gap: 10px;                   /* Space between items */
+  padding: 10px 0;
+  max-width: 90%;
+  white-space: nowrap;
+}
+
+.scroll-horizontal-past::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-horizontal-past::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.scroll-horizontal-past::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.scroll-horizontal-past .account-box {
+  min-width: 200px;
+  flex-shrink: 0;              /* Prevent shrinking */
+  text-align: center;
+}

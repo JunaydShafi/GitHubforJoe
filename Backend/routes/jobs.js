@@ -43,4 +43,55 @@ router.get('/employee/:id', async (req, res) => {
   }
 });
 
+// Route to start a job and set estimated time
+router.patch('/start/:jobId', async (req, res) => {
+  try {
+    const { estimatedMinutes } = req.body;
+    const jobId = req.params.jobId;
+
+    const job = await Job.findByIdAndUpdate(
+      jobId,
+      {
+        startDate: new Date(),
+        estimatedMinutes: estimatedMinutes,
+        status: "in progress"  // ← ADD THIS LINE
+      },
+      { new: true }
+    );
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    res.json(job);
+  } catch (err) {
+    console.error('Error starting job:', err);
+    res.status(500).json({ error: 'Failed to start job' });
+  }
+});
+
+router.patch('/stop/:jobId', async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+
+    const job = await Job.findByIdAndUpdate(
+      jobId,
+      {
+        stopDate: new Date(),
+        status: "paused"  // Optional: You could also just keep it "in progress" and just pause the timer
+      },
+      { new: true }
+    );
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    res.json(job);
+  } catch (err) {
+    console.error('Error stopping job:', err);
+    res.status(500).json({ error: 'Failed to stop job' });
+  }
+});
+
 export default router;
