@@ -94,6 +94,46 @@ app.post('/api/set-appointment-time', async (req, res) => {
 });
 
 
+app.post('/api/newEmployee', async (req, res) => {
+  try {
+    const { username, email, password, phone, payroll } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'Employee already exists' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newEmployee = new User({
+      username,
+      email,
+      password: hashedPassword,
+      phone,
+      role: 'employee',
+      payroll: {
+        hours: 0,
+        minutes: 0,
+        overtime: 0,
+        rate: payroll?.rate || 0   // ✅ use sent payRate from frontend
+      }
+    });
+
+    await newEmployee.save();
+    res.status(201).json({ success: true, message: 'Employee created', user: newEmployee });
+
+  } catch (err) {
+    console.error('❌ Error creating employee:', err);
+    res.status(500).json({ success: false, message: 'Error creating employee' });
+  }
+});
+
+
+
+
+
+
+
+
+
 app.get('/api/payroll', async (req, res) => {
   try {
     const employees = await User.find({ role: 'employee' });
@@ -120,19 +160,20 @@ app.get('/api/payroll', async (req, res) => {
 });
 
 app.post('/api/vehicles/add', async (req, res) => {
-    try {
-      const { customerId, make, model, year, vin, color, licensePlate } = req.body;
-  
-      const newVehicle = new Vehicle({
-        customerId,
-        make,
-        model,
-        year,
-        vin,
-        color,
-        licensePlate
-      });
-  
+  try {
+    const { customerId, make, model, color, year, vin, licensePlate, notes } = req.body;
+
+    const newVehicle = new Vehicle({
+      customerId,
+      make,
+      model,
+      color,
+      year,
+      vin,
+      notes,
+      licensePlate
+    });
+
       await newVehicle.save();
       res.status(201).json({ success: true, message: 'Vehicle added successfully' });
     } catch (err) {
@@ -140,6 +181,7 @@ app.post('/api/vehicles/add', async (req, res) => {
       res.status(500).json({ success: false, message: 'Server error' });
     }
   });
+
 
   app.post('/api/jobs/create-from-appointment/:appointmentId', async (req, res) => {
     const { appointmentId } = req.params;
@@ -437,6 +479,37 @@ app.get('/api/jobs/:id', async (req, res) => {
 
 // Admin: Get all vehicles
 app.get('/api/vehicles', async (req, res) => {
+  const vehicles = await Vehicle.find().populate('customerId', 'username');
+  res.json(vehicles);
+});
+
+
+app.get('/api/vehicles/:id', async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findById(req.params.id);
+    if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+    res.json(vehicle);
+  } catch (err) {
+    console.error('Error fetching vehicle:', err);
+    res.status(500).json({ message: 'Server error fetching vehicle' });
+  }
+});
+
+
+app.delete('/api/vehicles/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Vehicle.findByIdAndDelete(id);
+    res.json({ success: true, message: 'Vehicle deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Delete failed' });
+  }
+});
+
+
+
+app.get('/api/vehicles', async (req, res) => {
   try {
     const vehicles = await Vehicle.find().populate('customerId', 'username');
     res.json(vehicles);
@@ -445,6 +518,35 @@ app.get('/api/vehicles', async (req, res) => {
     res.status(500).json({ message: 'Error fetching vehicles' });
   }
 });
+
+
+app.get('/api/vehicles/customer/:id', async (req, res) => {
+  try {
+    const customerId = req.params.id;
+    console.log("🔍 Fetching cars for customerId:", customerId);
+    const vehicles = await Vehicle.find({ customerId });
+    res.json(vehicles);
+  } catch (err) {
+    console.error('Error fetching customer vehicles:', err);
+    res.status(500).json({ error: 'Failed to fetch vehicles' });
+  }
+});
+
+
+app.put('/api/vehicles/:id', async (req, res) => {
+  try {
+    const updated = await Vehicle.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ success: false, message: 'Vehicle not found' });
+    res.json({ success: true, vehicle: updated });
+  } catch (err) {
+    console.error('Error updating vehicle:', err);
+    res.status(500).json({ success: false, message: 'Server error updating vehicle' });
+  }
+});
+
+
+
+
 
 // Admin: Get all employees
 app.get('/api/users/employees', async (req, res) => {
@@ -454,17 +556,6 @@ app.get('/api/users/employees', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error fetching employees' });
-  }
-});
-
-// Admin: Get all vehicles
-app.get('/api/vehicles', async (req, res) => {
-  try {
-    const vehicles = await Vehicle.find().populate('customerId', 'username');
-    res.json(vehicles);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching vehicles' });
   }
 });
 
@@ -1223,29 +1314,12 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
-app.put('/api/vehicles/:id', async (req, res) => {
-  try {
-    const updatedVehicle = await Vehicle.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedVehicle) {
-      return res.status(404).send({ error: 'Vehicle not found' });
-    }
-    res.send(updatedVehicle);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({ error: 'Internal Server Error' });
-  }
-});
 
-app.delete('/api/vehicles/:id', async (req, res) => {
-  try {
-    const vehicleId = req.params.id;
-    await Vehicle.findByIdAndDelete(vehicleId);
-    res.status(200).send({ message: 'Vehicle deleted' });
-  } catch (err) {
-    console.error('DELETE error:', err);
-    res.status(500).send({ error: 'Failed to delete vehicle' });
-  }
-});
+
+
+
+
+
 
 
 

@@ -10,44 +10,66 @@
 
         <div class="header-main"><!--this is for the top footer of the page-->
             <div class="logo">
-                <a href="customerMainPage.html" class ="logo-link">
-                    <img src="images/JoeLogo.png" alt="Logo">
-                    </div>
-                    <div class="Title">
-                      <div class="title-container">
-                        <div class="shop-name">Joe's AutoShop</div>
-                        <div class="tagline">If it ain't Joe don't fix it!</div>
-                      </div>
-                    </a>
+              <img src="images/WhiteLogo.png" alt="Logo">
+            </div>
+            <div class="Title">
+              <div class="title-container">
+                  <div class="shop-name">Joe's AutoShop</div>
+                  <div class="tagline">If it ain't Joe don't fix it!</div>
+              </div>
                 <div class="account-box-left">
                     <button onclick="location.href='index.html'">Log Out</button>
                 </div>
             </div>
-          </div>
+        </div>
 
-        <div class = "wrapper">
-
+        <div class="wrapper">
             <h1>My Cars</h1>
-
             <h1>&nbsp;</h1><!--Used to space the wrappers-->
 
-        <!--<textarea id="myCars"  rows="2" placeholder="2003 STI Subaru Impreza"></textarea>-->
+            <div>
+                <label for="vehicle"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"></svg></label>
+                <select id="vehicle" required></select>
+            </div>
 
-        <div>
-            <label for="vehicle"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><!--<path d="..."/>--></svg></label>
-            <select id="vehicle" required></select>
+            <div class="account-box">
+                <button onclick="handleViewCar()">View</button>
+            </div>
+
+            <div class="account-box">
+                <button onclick="location.href='addCar'">Add a Car +</button>
+            </div>
         </div>
 
-        <div class ="account-box">
-            <button onclick="location.href='carInfo'">View</button>
-        </div>
-        
-        <div class ="account-box">
-            <button onclick="location.href='addCar'">Add a Car +</button>
-        </div>
+        <script>
+          async function loadVehicles() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return alert("Please log in.");
 
-        </div>
+            try {
+                const res = await fetch(`/api/vehicles/customer/${userId}`);
+                const vehicles = await res.json();
+              const dropdown = document.getElementById('vehicle');
 
-        <script src="/js/myCars.js" defer></script>
+              vehicles.forEach(vehicle => {
+                const option = document.createElement('option');
+                option.value = vehicle._id;
+                option.textContent = `${vehicle.year} ${vehicle.make} ${vehicle.model} (${vehicle.licensePlate})`;
+                dropdown.appendChild(option);
+              });
+            } catch (err) {
+              console.error("Failed to load vehicles:", err);
+            }
+          }
+
+          function handleViewCar() {
+            const selectedId = document.getElementById('vehicle').value;
+            if (!selectedId) return alert("Please select a car.");
+            localStorage.setItem('selectedVehicleId', selectedId);
+            window.location.href = 'carInfo';
+          }
+
+          document.addEventListener('DOMContentLoaded', loadVehicles);
+        </script>
     </body>
 </html>

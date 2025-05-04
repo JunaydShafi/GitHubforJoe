@@ -8,9 +8,10 @@ const vehicleSchema = new mongoose.Schema({
   },
   make: String,
   model: String,
+  color: String, 
   year: Number,
   vin: String,
-  color: String,
+  notes: String,
   licensePlate: String,
 }, {
   timestamps: true
