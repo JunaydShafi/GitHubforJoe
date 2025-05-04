@@ -237,9 +237,28 @@
           <button class="job-complete-btn" onclick="markComplete('${job._id}')">Mark Complete</button>
         `;
       }
-
       details.innerHTML += `<div class="job-buttons">${buttonsHTML}</div>`;
     }
+
+ /*   <h3>${job.vehicleId?.year || ''} ${job.vehicleId?.make || ''} ${job.vehicleId?.model || ''}</h3>
+<p><strong>Customer:</strong> ${job.customerId?.username || 'Unknown'}</p>
+    <p><strong>Reason:</strong> ${job.description}</p>
+   <p><strong>User Comments:</strong> ${job.comments?.trim() || 'No comment was added'}</p>
+    <p><strong>Status:</strong> ${job.status}</p>
+    <p><strong>Created:</strong> ${formatDate(job.createdAt)}</p>
+    <p><strong>Started:</strong> ${formatDate(job.startDate)}</p>
+    <p><strong>Completed:</strong> ${formatDate(job.completedDate)}</p>
+
+    <div class="job-notes-wrapper">
+      <p><strong>Mechanic's Notes:</strong></p>
+      <textarea id="notes-${job._id}" rows="3" placeholder="Enter update here...">${job.updates?.[job.updates.length - 1]?.message || ''}</textarea>
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+        <button class="job-update-btn" onclick="addUpdate('${job._id}')">Update</button>
+        <button class="job-update-btn" onclick='showUpdateHistory(${JSON.stringify(job.updates || [])})'>View History</button>
+      </div>
+    </div>
+    */
+
 
     function startJob(jobId) {
       selectedJobId = jobId;
