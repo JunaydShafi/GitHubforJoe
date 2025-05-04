@@ -110,7 +110,7 @@
               ${r.mechanicId?.username || r.mechanicId || 'Unknown'}
             </span>
           </td>
-          <td>${r.customerName || 'Unknown'}</td>
+          <td>${r.customerId?.username || 'Unknown'}</td>
           <td>${date}</td>
           <td style="color: gold;">${stars} (${r.stars}/5)</td>
           <td>${r.comment || 'No comment'}</td>
