@@ -1,6 +1,0 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-
-
-
-});

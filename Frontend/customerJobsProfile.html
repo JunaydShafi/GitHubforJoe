@@ -7,22 +7,157 @@
   <title>Customer Jobs Profile</title>
 </head>
 <body>
+
   <div class="header-main">
-    <div class="logo">
-      <img src="images/WhiteLogo.png" alt="Logo" />
-    </div>
-    <div class="Title">
+    <div class="left-header">
+      <div class="logo">
+        <img src="images/WhiteLogo.png" alt="Logo" />
+      </div>
       <div class="title-container">
         <div class="shop-name">Joe's AutoShop</div>
         <div class="tagline">If it ain't Joe don't fix it!</div>
       </div>
-      <div class="account-box-left">
-        <button onclick="location.href='index.html'">Log Out</button>
-        <button onclick="location.href='customerMainPage.html'">Main Page</button>
-      </div>
+    </div>
+    <div class="account-box-left">
+      <button onclick="location.href='index.html'">Log Out</button>
+      <button onclick="location.href='customerMainPage.html'">Main Page</button>
     </div>
   </div>
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: rgba(26, 99, 70, 0.1);
+      overflow-y: auto;
+    }
+  
+    .customer-wrapper {
+      padding: 20px;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+    }
+  
+    .section-group {
+      margin-bottom: 30px;
+    }
+  
+    .section-inner {
+      background: transparent;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+  
+    h3 {
+      margin-top: 0;
+    }
+  
+    .account-box {
+      background-color: #2e302b;
+      padding: 10px;
+      margin: 10px 5px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+  
+    .account-box:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  
+    .scroll-horizontal {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px 0;
+    }
+  
+    .scroll-horizontal::-webkit-scrollbar {
+      height: 8px;
+    }
+  
+    .scroll-horizontal::-webkit-scrollbar-thumb {
+      background-color: #888;
+      border-radius: 4px;
+    }
+  
+    .bottomLeftCenter {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  
+    .bottomLeftCenter:hover {
+      background-color: #333;
+    }
+  
+    .header-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(26, 99, 70, 0.9);
+  color: white;
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+  
+    .logo {
+      flex: 0 0 auto;
+    }
+  
+    .logo img {
+      height: 50px;
+      width: auto;
+    }
+  
+    .Title {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .title-container {
+      text-align: center;
+    }
+  
+    .shop-name {
+      font-size: 24px;
+      font-weight: bold;
+    }
+  
+    .tagline {
+      font-size: 14px;
+      font-style: italic;
+    }
+  
+    .account-box-left {
+      flex: 0 0 auto;
+    }
+  
+    .account-box-left button {
+      margin-left: 10px;
+      padding: 5px 10px;
+    }
 
+    #pastJobs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+  </style>
   <div class="customer-wrapper">
 
     <div class="section-group">
@@ -33,24 +168,21 @@
       </div>
       
       <div class="section-group">
-        <div class="section-inner">
-            <h3>In Progress:</h3>
-            <div class="scroll-horizontal"> <!-- this is where you can add class scrool horizontal-->
-                <div class="account-box">
-                    <button id="progressBtn" disabled>No jobs</button>
-                  </div>
-            </div>
+    <div class="section-inner">
+      <h3>In Progress:</h3>
+      <div id="inProgressJobs" class="scroll-horizontal">
+        <div class="account-box">
+          <button id="progressBtn" disabled>No jobs</button>
         </div>
       </div>
+    </div>
+  </div>
       
       <div class="section-group">
         <div class="section-inner">
-            <h3>Past Job History:</h3>
-        <div class="scroll-horizontal"><!-- this is where you can add class scrool horizontal-->
-            <div id="pastJobs" ></div>
+          <h3>Past Job History:</h3>
+          <div id="pastJobs" ></div> <!-- this should be directly holding the job elements -->
         </div>
-        </div>
-        
       </div>
       
 

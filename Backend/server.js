@@ -161,7 +161,7 @@ app.post('/api/vehicles/add', async (req, res) => {
         vehicleId: appointment.vehicleId,
         mechanicId,
         description: appointment.reason,
-        status: 'Assigned',
+        status: 'pending',
         startDate: appointment.date,
         notes: ''
       });
@@ -552,9 +552,39 @@ app.get('/api/payroll/week', async (req, res) => {
   }
 });
 
+//to view job history
+app.get('/api/jobs/:id/updates', async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id).select('updates');
 
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
 
+    res.json(job.updates);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching job updates' });
+  }
+});
 
+//to pause job in progress
+app.patch('/api/jobs/pause/:jobId', async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+    const job = await Job.findById(jobId);
+
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    job.status = 'paused';
+    await job.save();
+
+    res.json({ message: 'Job paused successfully' });
+  } catch (error) {
+    console.error("Pause error:", error);
+    res.status(500).json({ message: 'Server error pausing job.' });
+  }
+});
 
 
 app.patch('/api/jobs/:id/add-update', async (req, res) => {
@@ -743,8 +773,8 @@ app.post('/api/signup', async (req, res) => {
       await newUser.save();
       res.status(201).send('Signup successful');
     } catch (err) {
-      console.error(err);
-      res.status(500).send('Server error');
+      console.error('Signup error:', err);
+res.status(500).send(err.message); // <- for debugging
     }
 });
 
@@ -1247,6 +1277,38 @@ app.delete('/api/vehicles/:id', async (req, res) => {
   }
 });
 
+//for createEmployee
+app.post('/api/newEmployee', async (req, res) => {
+  try {
+    const { username, email, password, phone, payroll, role } = req.body; // include role
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'Employee already exists' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newEmployee = new User({
+      username,
+      email,
+      password: hashedPassword,
+      phone,
+      role: role || 'employee', // use provided role or default to 'employee'
+      payroll: {
+        hours: 0,
+        minutes: 0,
+        overtime: 0,
+        rate: payroll?.rate || 0
+      }
+    });
+
+    await newEmployee.save();
+    res.status(201).json({ success: true, message: 'Employee created', user: newEmployee });
+
+  } catch (err) {
+    console.error('❌ Error creating employee:', err);
+    res.status(500).json({ success: false, message: 'Error creating employee' });
+  }
+});
 
 
 //grab mechanics for createJob.html
