@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
         color: form.color.value,
         year: form.year.value,
         vin: form.vin.value,
-        licensePlate: form.licensePlate.value
+        licensePlate: form.licensePlate.value,
+        notes: form.notes.value,
       };
   
       try {

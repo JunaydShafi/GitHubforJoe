@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/Junstyle.css">
-        <script src="js/carInfo.js"></script>
+        
         <title>Car Info</title>
     </head>
     <body>
@@ -26,103 +26,32 @@
             </div>
           </div>
           
-        <div class = "wrapper">
-            <button class="topLeftCenter" type= "button" onclick="history.back()">Close</button>
-
-            <h1>&nbsp;</h1><!--Used to space the wrappers-->
-        <form id="car-mod-form">
-            <div>
-                <label for="vehicle"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><!--<path d="..."/>--></svg></label>
-                <select id="vehicle" required></select>
-            </div>
-
-        <h3>Vehicle Make: </h3>
-        <h3 id="vehMake"></h3>
-        <script>
-            let makeText = localStorage.getItem('carMake');
-            document.getElementById('vehMake').innerHTML = makeText;
-        </script>
-        <!--add vehicle make text box-->
-
-        <h3>Vehicle Model: </h3>
-        <h3 id="vehModel"></h3>
-        <script>
-            let modelText = localStorage.getItem('carModel');
-            document.getElementById('vehModel').innerHTML = modelText;
-        </script>
-        <!--add vehicle model text box-->
-        </div>
-        <h3>Vehicle Color: </h3>
-        <h3 id="vehColor"></h3>
-        <script>
-            let colorText = localStorage.getItem('carColor');
-            document.getElementById('vehColor').innerHTML = colorText;
-        </script>
-        <!--add vehicle color text box-->
-
-        <h3>Vehicle Year: </h3>
-        <h3 id="vehYear"></h3>
-        <script>
-            let yearText = localStorage.getItem('carYear');
-            document.getElementById('vehYear').innerHTML = yearText;
-        </script>
-        <!--add vehicle year text box-->
-
-        <script>console.log(localStorage.getItem('carID'))</script>
-
-        <h3>Comments / Vehicle Notes:</h3>
-        <!--add comments/notes text box-->
-        <div><textarea id="vehicleNotes"  rows="8" placeholder="I brought the car in for a wheel seal change but have notaced oil over the transmission as well. Can you check the transmission."></textarea></div>
-
-            <button id="deleteButton" class="bottomLeftCenter">Delete Vehicle</button>
-
-
-            <button type="submit" class="bottomRightCenter">Update Vehicle Information</button>
-
-
-        <script>
-           /* async function deleteVehicle() {
-                try {
-                    const vehicleRes = await fetch('/api/vehicles');
-                    const vehicles = await vehicleRes.json();
-
-                    console.log(localStorage.getItem('carID'));
-
-
-                    vehicles.foreach(vehicle => {
-                        if (localStorage.getItem('carID') == vehicle._id) {
-                            fetch(`/api/vehicles/${localStorage.getItem('carID')}`, {
-                                method: 'DELETE'
-                            })
-                        }
-                    });
-                } catch (err) {
-
-                }
-            };*/
-           /* document.getElementById("deleteButton").addEventListener('click', deleteVehicleUse());async () => {
-                const vehicleRes = await fetch('/api/vehicles');
-      const vehicles = await vehicleRes.json();
-
-      console.log(localStorage.getItem('carID'));
-
-
-      vehicles.forEach(vehicle => {
-          if (localStorage.getItem('carID') == vehicle._id) {
-            //console.log(vehicle.year);
-              fetch(`/api/vehicles/${vehicle._id}`)//, {
-                 // method: 'DELETE'
-              }//)
-          }
-      );
-            });*/
-  
-        </script>
-        </form>
+          <div class="wrapper">
+            <button class="topLeftCenter" type="button" onclick="history.back()">Close</button>
+            <h1 id="vehicleTitle">Your Vehicle</h1>
         
-
+            <h1>&nbsp;</h1>
+        
+            <h3>Vehicle Make</h3>
+            <div><textarea id="vehicleMake"  readonly></textarea></div>
+        
+            <h3>Vehicle Model</h3>
+            <div><textarea id="vehicleModel"  readonly></textarea></div>
+        
+            <h3>Vehicle Color</h3>
+            <div><textarea id="vehicleColor"  readonly></textarea></div>
+        
+            <h3>Vehicle Year</h3>
+            <div><textarea id="vehicleYear"  readonly></textarea></div>
+        
+            <h3>Comments / Vehicle Notes:</h3>
+            <div><textarea id="vehicleNotes" rows="6" placeholder="Any notes entered by the customer." readonly></textarea></div>
+        
+            <button id="editToggleBtn">Edit Vehicle</button>
+            <button id="updateBtn">Update Vehicle Information</button>
+            <button onclick="deleteVehicleUse()">Delete Vehicle</button>
         </div>
-
-        <!--<script src="/js/carInfo.js" defer></script>-->
-    </body>
-</html>
+        
+          <script src="js/carInfo.js"></script>
+        </body>
+        </html>
